@@ -6,13 +6,13 @@ async function valid(req,env){const raw=(req.headers.get('Cookie')||'').split(';
 function cookie(value,maxAge){return `${COOKIE}=${value}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${maxAge}`;}
 
 function parseAgent(ua=''){
- const browser=/Edg\\//.test(ua)?'Edge':/Firefox\\//.test(ua)?'Firefox':/Chrome\\//.test(ua)?'Chrome':/Safari\\//.test(ua)&&!/Chrome\\//.test(ua)?'Safari':'Other';
- const os=/Windows/.test(ua)?'Windows':/Mac OS X/.test(ua)?'macOS':/Android/.test(ua)?'Android':/(iPhone|iPad|iPod)/.test(ua)?'iOS':/Linux/.test(ua)?'Linux':'Other';
+ const browser=ua.includes('Edg/')?'Edge':ua.includes('Firefox/')?'Firefox':ua.includes('Chrome/')?'Chrome':ua.includes('Safari/')&&!ua.includes('Chrome/')?'Safari':'Other';
+ const os=ua.includes('Windows')?'Windows':ua.includes('Mac OS X')?'macOS':ua.includes('Android')?'Android':/(iPhone|iPad|iPod)/.test(ua)?'iOS':ua.includes('Linux')?'Linux':'Other';
  const device=/(iPhone|Android.*Mobile|Mobile)/.test(ua)?'Mobile':/(iPad|Tablet)/.test(ua)?'Tablet':'Desktop';
  return {browser,os,device};
 }
 async function supabase(env,path,init={}){
- const base=env.SUPABASE_URL.replace(/\\/$/,'');
+ const base=env.SUPABASE_URL.endsWith('/')?env.SUPABASE_URL.slice(0,-1):env.SUPABASE_URL;
  return fetch(base+'/rest/v1/'+path,{...init,headers:{apikey:env.SUPABASE_SERVICE_ROLE_KEY,Authorization:'Bearer '+env.SUPABASE_SERVICE_ROLE_KEY,'Content-Type':'application/json',...(init.headers||{})}});
 }
 
