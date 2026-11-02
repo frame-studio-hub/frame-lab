@@ -98,3 +98,12 @@
 @media (max-width:700px) and (prefers-reduced-motion:reduce) {
   .js .reveal, .js .reveal.in-view { opacity:1 !important; transform:none !important; }
 }
+
+
+/* UI arrows are inline vector shapes, never platform emoji glyphs. */
+.ui-arrow{display:inline-block;width:1em;height:1em;vertical-align:-.16em;flex:none;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.project-arrow .ui-arrow{width:17px;height:17px}
+.service-plus .ui-arrow{width:20px;height:20px}
+.choice-icon .ui-arrow{width:23px;height:23px}
+.process-step .ui-arrow{width:15px;height:15px}
+.nord-art .ui-arrow{width:20px;height:20px}
