@@ -55,6 +55,15 @@ create or replace function public.purge_site_analytics() returns void language p
 begin
   delete from public.site_visits where created_at < now()-interval '30 days';
   update public.site_visitors set ip_address=null,user_agent=null,browser=null,operating_system=null,device_type=null
-    where last_seen < now()-interval '30 days' and (ip_address is not null or user_agent is not null);
+    where first_seen < now()-interval '30 days' and (ip_address is not null or user_agent is not null);\n  delete from public.site_daily_uniques where day < (now() at time zone 'UTC')::date - 30;
   delete from public.site_visitors where last_seen < now()-interval '180 days';
+end $$;
+
+-- Schedule the purge daily when the Supabase project has pg_cron available.
+do $$
+begin
+  create extension if not exists pg_cron;
+  perform cron.schedule('frame-lab-analytics-retention','17 3 * * *','select public.purge_site_analytics()');
+exception when others then
+  raise notice 'pg_cron is not available; schedule public.purge_site_analytics() in Supabase Cron instead.';
 end $$;
