@@ -29,8 +29,12 @@ function parseAgent(ua=''){
  else if(/iphone|ipod|android.*mobile|windows phone|windows mobile|mobile/.test(u)) device='Mobile';
  return {browser,os,device};
 }
+function projectBase(env){
+ // Accept either the Supabase project root or a pasted REST endpoint.
+ return String(env.SUPABASE_URL||'').replace(/\\/+$/,'').replace(/\\/rest\\/v1$/i,'');
+}
 async function supabase(env,path,init={}){
- const base=env.SUPABASE_URL.endsWith('/')?env.SUPABASE_URL.slice(0,-1):env.SUPABASE_URL;
+ const base=projectBase(env);
  return fetch(base+'/rest/v1/'+path,{...init,headers:{apikey:env.SUPABASE_SERVICE_ROLE_KEY,Authorization:'Bearer '+env.SUPABASE_SERVICE_ROLE_KEY,'Content-Type':'application/json',...(init.headers||{})}});
 }
 
