@@ -15,6 +15,9 @@ create table if not exists public.site_visits (
   visitor_id uuid not null references public.site_visitors(visitor_id) on delete cascade,
   page_path text not null,
   ip_address text,
+  browser text,
+  operating_system text,
+  device_type text,
   referrer text,
   created_at timestamptz not null default now()
 );
@@ -29,6 +32,9 @@ create table if not exists public.site_daily_stats (
   unique_visitors bigint not null default 0
 );
 alter table public.site_visits add column if not exists ip_address text;
+alter table public.site_visits add column if not exists browser text;
+alter table public.site_visits add column if not exists operating_system text;
+alter table public.site_visits add column if not exists device_type text;
 alter table public.site_visits add column if not exists ip_address text;
 create index if not exists site_visits_created_at_idx on public.site_visits(created_at desc);
 create index if not exists site_visits_visitor_idx on public.site_visits(visitor_id);
