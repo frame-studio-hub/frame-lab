@@ -32,7 +32,7 @@ export default {async fetch(req,env){const url=new URL(req.url),path=url.pathnam
   const details=parseAgent(ua);
   const ip=(req.headers.get('CF-Connecting-IP')||'').slice(0,64)||'';
   const key='sb_publishable_FkRZkn5CqQwaN9GbhxBpgg_fMSvotuF';
-  const result=await fetch(env.SUPABASE_URL.replace(/\\/$/,'')+'/rest/v1/rpc/track_site_visit',{
+  const result=await fetch(env.SUPABASE_URL.replace(/\/$/,'')+'/rest/v1/rpc/track_site_visit',{
    method:'POST',
    headers:{apikey:key,Authorization:'Bearer '+key,'Content-Type':'application/json'},
    body:JSON.stringify({p_visitor_id:visitor,p_page_path:String(body.path||'/').slice(0,500),p_referrer:String(body.referrer||'').slice(0,1000),p_ip_address:ip,p_user_agent:ua,p_browser:details.browser,p_operating_system:details.os,p_device_type:details.device})
