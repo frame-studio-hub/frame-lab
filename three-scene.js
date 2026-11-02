@@ -15,11 +15,11 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.m
     return;
   }
 
-  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, mobile ? 1 : 1.65));
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, mobile ? 0.8 : 1.25));
   renderer.setSize(innerWidth, innerHeight, false);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.28;
+  renderer.toneMappingExposure = 1.08;
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera( thirtyFour(), innerWidth / innerHeight, .1, 120 );
@@ -48,19 +48,19 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.m
   }
   const environment = makeStudioEnvironment();
   scene.environment = environment;
-  scene.environmentIntensity = 1.05;
+  scene.environmentIntensity = .72;
 
-  scene.add(new THREE.AmbientLight(0xcbd5c3, .45));
-  const key = new THREE.DirectionalLight(0xffffff, 3.2); key.position.set(5, 7, 8); scene.add(key);
-  const limeLight = new THREE.PointLight(0xbaff20, 125, 26, 1.7); limeLight.position.set(-5, -1, 5); scene.add(limeLight);
-  const rim = new THREE.PointLight(0xeaffed, 90, 30, 1.8); rim.position.set(3, -5, -4); scene.add(rim);
-  const topStrip = new THREE.RectAreaLight(0xffffff, 5, 8, .35); topStrip.position.set(0, 5, 2); topStrip.lookAt(0,0,0); scene.add(topStrip);
+  scene.add(new THREE.AmbientLight(0xcbd5c3, .32));
+  const key = new THREE.DirectionalLight(0xffffff, 2.1); key.position.set(5, 7, 8); scene.add(key);
+  const limeLight = new THREE.PointLight(0xbaff20, 72, 26, 1.7); limeLight.position.set(-5, -1, 5); scene.add(limeLight);
+  const rim = new THREE.PointLight(0xeaffed, 52, 30, 1.8); rim.position.set(3, -5, -4); scene.add(rim);
+  const topStrip = new THREE.RectAreaLight(0xffffff, 3, 8, .35); topStrip.position.set(0, 5, 2); topStrip.lookAt(0,0,0); scene.add(topStrip);
 
   const world = new THREE.Group(); scene.add(world);
   const sculpture = new THREE.Group(); world.add(sculpture);
-  const chrome = new THREE.MeshPhysicalMaterial({ color: 0xd5d9d0, metalness: 1, roughness: .075, clearcoat: 1, clearcoatRoughness: .035, envMapIntensity: 1.7 });
-  const darkChrome = new THREE.MeshPhysicalMaterial({ color: 0x30352e, metalness: 1, roughness: .16, clearcoat: 1, envMapIntensity: 1.5 });
-  const glass = new THREE.MeshPhysicalMaterial({ color: 0xd8f1df, metalness: .02, roughness: .025, transmission: .96, thickness: 2.2, ior: 1.48, clearcoat: 1, clearcoatRoughness: .015, envMapIntensity: 1.8, transparent: true, opacity: .98, side: THREE.DoubleSide });
+  const chrome = new THREE.MeshPhysicalMaterial({ color: 0xd5d9d0, metalness: 1, roughness: .075, clearcoat: 1, clearcoatRoughness: .035, envMapIntensity: 1.15 });
+  const darkChrome = new THREE.MeshPhysicalMaterial({ color: 0x30352e, metalness: 1, roughness: .16, clearcoat: 1, envMapIntensity: 1.05 });
+  const glass = new THREE.MeshPhysicalMaterial({ color: 0xd8f1df, metalness: .02, roughness: .025, transmission: .96, thickness: 2.2, ior: 1.48, clearcoat: 1, clearcoatRoughness: .015, envMapIntensity: 1.2, transparent: true, opacity: .98, side: THREE.DoubleSide });
   const limeGlass = new THREE.MeshPhysicalMaterial({ color: 0x9dff20, emissive: 0x4dff00, emissiveIntensity: .38, metalness: .08, roughness: .08, transmission: .72, thickness: 1.4, ior: 1.42, clearcoat: 1, transparent: true, opacity: .9 });
   const glow = new THREE.MeshStandardMaterial({ color: 0xc7ff42, emissive: 0x9cff00, emissiveIntensity: 2.6, metalness: .55, roughness: .18 });
 
@@ -71,30 +71,30 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.m
     mesh.castShadow = true; mesh.receiveShadow = true; sculpture.add(mesh); return mesh;
   }
   const pathA = [], pathB = [], pathC = [];
-  for (let i = 0; i < 12; i++) {
-    const a = i / 12 * Math.PI * 2;
+  for (let i = 0; i < 10; i++) {
+    const a = i / 10 * Math.PI * 2;
     pathA.push([Math.cos(a)*2.65, Math.sin(a*2)*.78, Math.sin(a)*1.12]);
     pathB.push([Math.cos(a+1.4)*2.15, Math.sin(a*2+1.2)*1.2, Math.sin(a+1.4)*1.55]);
     pathC.push([Math.cos(a*1.0)*1.55, Math.sin(a+2.1)*2.05, Math.cos(a*2)*.72]);
   }
-  const ribbonA = ribbon(pathA, .19, chrome, 320);
-  const ribbonB = ribbon(pathB, .115, darkChrome, 300);
-  const ribbonC = ribbon(pathC, .075, chrome, 280);
+  const ribbonA = ribbon(pathA, .16, chrome, mobile ? 150 : 220);
+  const ribbonB = ribbon(pathB, .10, darkChrome, mobile ? 140 : 200);
+  const ribbonC = ribbon(pathC, .065, chrome, mobile ? 130 : 180);
 
-  const knot = new THREE.Mesh(new THREE.TorusKnotGeometry(1.22, .115, 240, 20, 2, 5), darkChrome);
+  const knot = new THREE.Mesh(new THREE.TorusKnotGeometry(1.22, .115, mobile ? 100 : 160, 12, 2, 5), darkChrome);
   knot.position.set(.1, .1, .35); knot.rotation.set(.5,.2,-.35); sculpture.add(knot);
 
   const glassCluster = new THREE.Group(); sculpture.add(glassCluster);
-  const sphereA = new THREE.Mesh(new THREE.SphereGeometry(.98, 72, 56), glass); sphereA.position.set(-2.1,.9,.35); glassCluster.add(sphereA);
-  const sphereB = new THREE.Mesh(new THREE.SphereGeometry(.68, 64, 48), glass); sphereB.position.set(2.15,-.85,-.35); glassCluster.add(sphereB);
-  const sphereC = new THREE.Mesh(new THREE.SphereGeometry(.43, 48, 36), limeGlass); sphereC.position.set(.2,1.75,-.65); glassCluster.add(sphereC);
+  const sphereA = new THREE.Mesh(new THREE.SphereGeometry(.98, mobile ? 32 : 48, mobile ? 24 : 36), glass); sphereA.position.set(-2.1,.9,.35); glassCluster.add(sphereA);
+  const sphereB = new THREE.Mesh(new THREE.SphereGeometry(.68, mobile ? 28 : 40, mobile ? 20 : 30), glass); sphereB.position.set(2.15,-.85,-.35); glassCluster.add(sphereB);
+  const sphereC = new THREE.Mesh(new THREE.SphereGeometry(.43, mobile ? 24 : 32, mobile ? 18 : 24), limeGlass); sphereC.position.set(.2,1.75,-.65); glassCluster.add(sphereC);
   const innerA = new THREE.Mesh(new THREE.TorusGeometry(.64,.018,12,180), glow); innerA.position.copy(sphereA.position); innerA.rotation.set(.8,.2,.5); glassCluster.add(innerA);
   const innerB = new THREE.Mesh(new THREE.TorusGeometry(.46,.014,10,160), glow); innerB.position.copy(sphereB.position); innerB.rotation.set(.2,.8,.1); glassCluster.add(innerB);
 
   const orbitalGroup = new THREE.Group(); sculpture.add(orbitalGroup);
-  const orbit1 = new THREE.Mesh(new THREE.TorusGeometry(3.55,.026,10,260), glass); orbit1.rotation.set(1.12,.25,.35); orbitalGroup.add(orbit1);
-  const orbit2 = new THREE.Mesh(new THREE.TorusGeometry(2.95,.045,12,240), chrome); orbit2.rotation.set(.3,1.08,-.55); orbitalGroup.add(orbit2);
-  const orbit3 = new THREE.Mesh(new THREE.TorusGeometry(4.05,.012,8,280), glow); orbit3.rotation.set(1.4,.8,.2); orbitalGroup.add(orbit3);
+  const orbit1 = new THREE.Mesh(new THREE.TorusGeometry(3.55,.026,8,mobile ? 100 : 180), glass); orbit1.rotation.set(1.12,.25,.35); orbitalGroup.add(orbit1);
+  const orbit2 = new THREE.Mesh(new THREE.TorusGeometry(2.95,.045,8,mobile ? 90 : 160), chrome); orbit2.rotation.set(.3,1.08,-.55); orbitalGroup.add(orbit2);
+  const orbit3 = new THREE.Mesh(new THREE.TorusGeometry(4.05,.012,6,mobile ? 100 : 180), glow); orbit3.rotation.set(1.4,.8,.2); orbitalGroup.add(orbit3);
 
   // Faceted glass prisms add small technical highlights around the main sculpture.
   const shardGroup = new THREE.Group(); sculpture.add(shardGroup);
@@ -114,12 +114,12 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.m
     const material = new THREE.PointsMaterial({ color:0xc7ff42, size, transparent:true, opacity, depthWrite:false, blending:THREE.AdditiveBlending, sizeAttenuation:true });
     const points = new THREE.Points(geometry,material); points.userData.phases=phases; world.add(points); return points;
   }
-  const particlesBack = particleField(mobile?180:440,6.3,.018,.52);
-  const particlesFront = particleField(mobile?70:150,4.7,.028,.34);
+  const particlesBack = particleField(mobile?55:220,6.3,.018,.52);
+  const particlesFront = particleField(mobile?25:80,4.7,.028,.34);
 
   // Subtle architectural wireframe behind the sculpture.
   const architecture = new THREE.Group(); scene.add(architecture);
-  const gridMaterial = new THREE.LineBasicMaterial({ color:0x9ab47a, transparent:true, opacity:.12 });
+  const gridMaterial = new THREE.LineBasicMaterial({ color:0x9ab47a, transparent:true, opacity:.075 });
   for (let i=0;i<9;i++) {
     const y=-3.7+i*.92;
     const points=[new THREE.Vector3(-8,y,-4),new THREE.Vector3(8,y,-4),new THREE.Vector3(8,y,-4),new THREE.Vector3(8,y,4)];
@@ -127,7 +127,7 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.m
   }
   const floor = new THREE.GridHelper(26,52,0x9cb77b,0x3e4938); floor.position.set(0,-3.4,-1.8); floor.material.transparent=true; floor.material.opacity=.13; architecture.add(floor);
 
-  let pointerX=0,pointerY=0,targetX=0,targetY=0,scrollTarget=0,scrollCurrent=0,raf=0;
+  let pointerX=0,pointerY=0,targetX=0,targetY=0,scrollTarget=0,scrollCurrent=0,raf=0,active=false;
   let materialMode='glass', materialMix=0, lastChapter=-1;
   const sceneLabel=document.querySelector('.scene-label');
   const chapterNames=['МАТЕРИЯ · СВЕТ · ФОРМА','СТРАТЕГИЯ · ИДЕЯ · СМЫСЛ','ОБРАЗ · СИСТЕМА · ДЕТАЛЬ','ДИЗАЙН · ДВИЖЕНИЕ · КОД','ЭКСПЕРИМЕНТ · МАТЕРИАЛ · СВЕТ','ТОЧНОСТЬ · СБОРКА · ЗАПУСК','НОВАЯ ФОРМА · НОВЫЙ ОПЫТ'];
@@ -137,7 +137,7 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.m
     materialButtons.forEach(item=>{const active=item===button;item.classList.toggle('active',active);item.setAttribute('aria-pressed',String(active));});
   }));
   const onPointer = e => { targetX=(e.clientX/innerWidth-.5)*.85; targetY=(e.clientY/innerHeight-.5)*.55; };
-  const onScroll = () => { const max=Math.max(1,document.documentElement.scrollHeight-innerHeight); scrollTarget=scrollY/max; };
+  const onScroll = () => { const max=Math.max(1,document.documentElement.scrollHeight-innerHeight); scrollTarget=scrollY/max; const shouldRun=!document.hidden && scrollY > innerHeight * .58; canvas.style.opacity=shouldRun ? (mobile ? '.22' : '.34') : '0'; if(shouldRun && !active){active=true; animate();} else if(!shouldRun && active){active=false;cancelAnimationFrame(raf);renderer.clear();} };
   if (!mobile) window.addEventListener('pointermove',onPointer,{passive:true});
   window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
 
@@ -157,8 +157,8 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.m
     chrome.roughness = materialMode==='glass' ? .075 : materialMode==='chrome' ? .035 : .12;
     darkChrome.roughness = materialMode==='lime' ? .08 : .16;
     limeGlass.emissiveIntensity = materialMode==='lime' ? 1.7 : .38;
-    glow.emissiveIntensity = materialMode==='lime' ? 4.2 : 2.6;
-    limeLight.intensity = materialMode==='lime' ? 190 : 125;
+    glow.emissiveIntensity = materialMode==='lime' ? 2.8 : 1.7;
+    limeLight.intensity = materialMode==='lime' ? 110 : 72;
     // The same sculpture changes its pose and camera framing as the visitor travels through the page.
     const chapter = s * Math.PI * 2.15;
     sculpture.rotation.y = pointerX*.42 + Math.sin(t*.12)*.12 + chapter*.58;
@@ -184,7 +184,7 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.m
     renderer.render(scene,camera);
     if (!reducedMotion) raf=requestAnimationFrame(animate);
   }
-  function resize() { renderer.setPixelRatio(Math.min(devicePixelRatio||1,mobile?1:1.65)); renderer.setSize(innerWidth,innerHeight,false); camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); }
+  function resize() { renderer.setPixelRatio(Math.min(devicePixelRatio||1,mobile?.8:1.25)); renderer.setSize(innerWidth,innerHeight,false); camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); }
   window.addEventListener('resize',resize,{passive:true});
   document.addEventListener('visibilitychange',()=>{ if(document.hidden) cancelAnimationFrame(raf); else if(!reducedMotion) animate(); });
   animate();
