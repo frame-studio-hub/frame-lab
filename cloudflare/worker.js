@@ -24,7 +24,12 @@ async function supabase(env,path,init={}){
   const ua=(req.headers.get('User-Agent')||'').slice(0,500);
   const details=parseAgent(ua);
   const ip=(req.headers.get('CF-Connecting-IP')||'').slice(0,64)||null;
-  const up=await supabase(env,'site_visitors?on_conflict=visitor_id',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify([{visitor_id:visitor,ip_address:ip,user_agent:ua,browser:details.browser,operating_system:details.os,device_type:details.device,last_seen:new Date().toISOString()}])});
+  const existing=await supabase(env,'site_visitors?visitor_id=eq.'+visitor+'&select=visitor_id&limit=1');
+  if(!existing.ok)return json({error:'Analytics unavailable'},502);
+  const found=await existing.json();
+  const up=found.length
+   ? await supabase(env,'site_visitors?visitor_id=eq.'+visitor,{method:'PATCH',headers:{Prefer:'return=minimal'},body:JSON.stringify({last_seen:new Date().toISOString()})})
+   : await supabase(env,'site_visitors',{method:'POST',headers:{Prefer:'return=minimal'},body:JSON.stringify([{visitor_id:visitor,ip_address:ip,user_agent:ua,browser:details.browser,operating_system:details.os,device_type:details.device}])});
   if(!up.ok)return json({error:'Analytics unavailable'},502);
   const visit=await supabase(env,'site_visits',{method:'POST',headers:{Prefer:'return=minimal'},body:JSON.stringify([{visitor_id:visitor,page_path:String(body.path||'/').slice(0,500),referrer:String(body.referrer||'').slice(0,1000)||null}])});
   if(!visit.ok)return json({error:'Analytics unavailable'},502);
