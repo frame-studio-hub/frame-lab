@@ -15,7 +15,8 @@ async function supabase(env,path,init={}){
  const base=env.SUPABASE_URL.replace(/\\/$/,'');
  return fetch(base+'/rest/v1/'+path,{...init,headers:{apikey:env.SUPABASE_SERVICE_ROLE_KEY,Authorization:'Bearer '+env.SUPABASE_SERVICE_ROLE_KEY,'Content-Type':'application/json',...(init.headers||{})}});
 }
-\nexport default {async fetch(req,env){const url=new URL(req.url),path=url.pathname;
+
+export default {async fetch(req,env){const url=new URL(req.url),path=url.pathname;
 
  if(path==='/analytics/track'&&req.method==='POST'){
   let body={};try{body=await req.json()}catch{return json({error:'Bad request'},400);}
@@ -35,7 +36,8 @@ async function supabase(env,path,init={}){
   if(!visit.ok)return json({error:'Analytics unavailable'},502);
   return json({ok:true},200);
  }
-\n if(path==='/auth/login'&&req.method==='POST'){let body={};try{body=await req.json()}catch{};const u=String(body.username||''),p=String(body.password||'');if(u!==env.ADMIN_USERNAME||p!==env.ADMIN_PASSWORD)return json({error:'Unauthorized'},401);const exp=String(Math.floor(Date.now()/1000)+60*60*12),token=exp+'.'+await sign(exp,env.SESSION_SECRET);return json({ok:true},200,{'Set-Cookie':cookie(token,43200)});}
+
+ if(path==='/auth/login'&&req.method==='POST'){let body={};try{body=await req.json()}catch{};const u=String(body.username||''),p=String(body.password||'');if(u!==env.ADMIN_USERNAME||p!==env.ADMIN_PASSWORD)return json({error:'Unauthorized'},401);const exp=String(Math.floor(Date.now()/1000)+60*60*12),token=exp+'.'+await sign(exp,env.SESSION_SECRET);return json({ok:true},200,{'Set-Cookie':cookie(token,43200)});}
  if(path==='/auth/check'&&req.method==='GET'){if(!await valid(req,env))return json({error:'Unauthorized'},401);return json({id:env.ADMIN_USER_ID,username:env.ADMIN_USERNAME});}
  if(path==='/auth/logout'&&req.method==='POST')return json({ok:true},200,{'Set-Cookie':cookie('',0)});
  if(path.startsWith('/api/')){if(!await valid(req,env))return json({error:'Unauthorized'},401);const base=env.SUPABASE_URL.replace(/\/$/,'');const headers={'apikey':env.SUPABASE_SERVICE_ROLE_KEY,'Authorization':`Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`};
@@ -59,7 +61,8 @@ async function supabase(env,path,init={}){
    const unique=new Set(visits.map(v=>v.visitor_id)).size;
    return json({total:visits.length,unique,online:live.length,hourly,pages,browsers,systems,devices,visits:rows,limited:visits.length>=10000});
   }
-\n  if(path.startsWith('/api/rest/v1/')){const table=path.slice('/api/rest/v1/'.length).split('/')[0];if(!TABLES.has(table))return json({error:'Forbidden'},403);const target=base+'/rest/v1/'+path.slice('/api/rest/v1/'.length)+url.search;const h=new Headers(headers);for(const k of ['Content-Type','Prefer','Accept'])if(req.headers.has(k))h.set(k,req.headers.get(k));const upstream=await fetch(target,{method:req.method,headers:h,body:['GET','HEAD'].includes(req.method)?undefined:req.body});return new Response(upstream.body,{status:upstream.status,headers:{'Content-Type':upstream.headers.get('Content-Type')||'application/json','Cache-Control':'no-store'}});}
+
+  if(path.startsWith('/api/rest/v1/')){const table=path.slice('/api/rest/v1/'.length).split('/')[0];if(!TABLES.has(table))return json({error:'Forbidden'},403);const target=base+'/rest/v1/'+path.slice('/api/rest/v1/'.length)+url.search;const h=new Headers(headers);for(const k of ['Content-Type','Prefer','Accept'])if(req.headers.has(k))h.set(k,req.headers.get(k));const upstream=await fetch(target,{method:req.method,headers:h,body:['GET','HEAD'].includes(req.method)?undefined:req.body});return new Response(upstream.body,{status:upstream.status,headers:{'Content-Type':upstream.headers.get('Content-Type')||'application/json','Cache-Control':'no-store'}});}
   if(path.startsWith('/api/storage/')){const rest=path.slice('/api/storage/'.length);const [bucket,...parts]=rest.split('/');if(bucket!=='client-files'||!parts.length)return json({error:'Forbidden'},403);const objectPath=parts.map(decodeURIComponent).join('/');const fd=await req.formData(),file=fd.get('file');if(!file)return json({error:'Missing file'},400);const target=base+'/storage/v1/object/'+bucket+'/'+objectPath.split('/').map(encodeURIComponent).join('/');const up=await fetch(target,{method:'POST',headers:{...headers,'Content-Type':file.type||'application/octet-stream','x-upsert':'false'},body:await file.arrayBuffer()});const data=await up.json().catch(()=>({}));return json(data,up.status);}
   if(path.startsWith('/api/storage-sign/')){const rest=path.slice('/api/storage-sign/'.length);const [bucket,...parts]=rest.split('/');if(bucket!=='client-files'||!parts.length)return json({error:'Forbidden'},403);const objectPath=parts.map(decodeURIComponent).join('/');const up=await fetch(base+'/storage/v1/object/sign/'+bucket+'/'+objectPath.split('/').map(encodeURIComponent).join('/'),{method:'POST',headers:{...headers,'Content-Type':'application/json'},body:JSON.stringify({expiresIn:Number(url.searchParams.get('expiresIn'))||60})});const data=await up.json().catch(()=>({}));if(!up.ok)return json(data,up.status);return json({signedUrl:data.signedURL?.startsWith('http')?data.signedURL:base+'/storage/v1'+data.signedURL});}
  }
