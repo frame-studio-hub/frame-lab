@@ -41,5 +41,5 @@ async function loadAnalytics(){
   host.innerHTML=data.visits.length?data.visits.map(v=>`<tr><td>${new Date(v.created_at).toLocaleString('ru-RU')}</td><td class="analytics-ip">${esc(v.ip_address||'—')}</td><td>${esc(v.page_path)}</td><td>${esc(v.browser||'—')} / ${esc(v.operating_system||'—')}</td><td>${esc(v.device_type||'—')}</td></tr>`).join(''):'<tr><td colspan="5">Посещений за выбранный период пока нет.</td></tr>';
  }catch(e){host.innerHTML='<tr><td colspan="5">'+esc(e.message)+'</td></tr>';}
 }
-$('#analytics-refresh').addEventListener('click',loadAnalytics);$('#analytics-range').addEventListener('change',loadAnalytics);
+$('#analytics-refresh').addEventListener('click',loadAnalytics);$('#analytics-range').addEventListener('change',loadAnalytics);setInterval(()=>{if(!$('#analytics-panel').hidden)loadAnalytics();},30000);
 ensureAdmin();
