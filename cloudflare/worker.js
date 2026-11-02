@@ -6,9 +6,27 @@ async function valid(req,env){const raw=(req.headers.get('Cookie')||'').split(';
 function cookie(value,maxAge){return `${COOKIE}=${value}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${maxAge}`;}
 
 function parseAgent(ua=''){
- const browser=ua.includes('Edg/')?'Edge':ua.includes('Firefox/')?'Firefox':ua.includes('Chrome/')?'Chrome':ua.includes('Safari/')&&!ua.includes('Chrome/')?'Safari':'Other';
- const os=ua.includes('Windows')?'Windows':ua.includes('Mac OS X')?'macOS':ua.includes('Android')?'Android':/(iPhone|iPad|iPod)/.test(ua)?'iOS':ua.includes('Linux')?'Linux':'Other';
- const device=/(iPhone|Android.*Mobile|Mobile)/.test(ua)?'Mobile':/(iPad|Tablet)/.test(ua)?'Tablet':'Desktop';
+ const u=String(ua).toLowerCase();
+ // Browser detection: check branded/mobile variants before Chromium's generic token.
+ const browser=/samsungbrowser\//.test(u)?'Samsung Internet':/edg\//.test(u)?'Edge':/opr\//.test(u)?'Opera':/vivaldi\//.test(u)?'Vivaldi':/brave\//.test(u)?'Brave':/fxios\//.test(u)?'Firefox':/firefox\//.test(u)?'Firefox':/crios\//.test(u)?'Chrome':/chrome\//.test(u)?'Chrome':/safari\//.test(u)?'Safari':/duckduckgo\//.test(u)?'DuckDuckGo':'Other';
+ // iPhone/iPad tokens must be checked before "Mac OS X" (iOS Safari includes it).
+ let os='Other';
+ if(/iphone|ipad|ipod/.test(u)) os='iOS';
+ else if(/android/.test(u)) os='Android';
+ else if(/cros\s/.test(u)) os='ChromeOS';
+ else if(/windows phone|windows mobile/.test(u)) os='Windows Mobile';
+ else if(/windows nt/.test(u)) os='Windows';
+ else if(/macintosh|mac os x/.test(u)) os='macOS';
+ else if(/ubuntu/.test(u)) os='Ubuntu';
+ else if(/fedora/.test(u)) os='Fedora';
+ else if(/debian/.test(u)) os='Debian';
+ else if(/freebsd/.test(u)) os='FreeBSD';
+ else if(/openbsd/.test(u)) os='OpenBSD';
+ else if(/netbsd/.test(u)) os='NetBSD';
+ else if(/linux/.test(u)) os='Linux';
+ let device='Desktop';
+ if(/ipad|tablet/.test(u)) device='Tablet';
+ else if(/iphone|ipod|android.*mobile|windows phone|windows mobile|mobile/.test(u)) device='Mobile';
  return {browser,os,device};
 }
 async function supabase(env,path,init={}){
