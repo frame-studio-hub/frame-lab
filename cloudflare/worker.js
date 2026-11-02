@@ -33,7 +33,7 @@ async function supabase(env,path,init={}){
   if(!up.ok)return json({error:'Analytics unavailable'},502);
   const visit=await supabase(env,'site_visits',{method:'POST',headers:{Prefer:'return=minimal'},body:JSON.stringify([{visitor_id:visitor,page_path:String(body.path||'/').slice(0,500),referrer:String(body.referrer||'').slice(0,1000)||null}])});
   if(!visit.ok)return json({error:'Analytics unavailable'},502);
-  return json({ok:true},204);
+  return json({ok:true},200);
  }
 \n if(path==='/auth/login'&&req.method==='POST'){let body={};try{body=await req.json()}catch{};const u=String(body.username||''),p=String(body.password||'');if(u!==env.ADMIN_USERNAME||p!==env.ADMIN_PASSWORD)return json({error:'Unauthorized'},401);const exp=String(Math.floor(Date.now()/1000)+60*60*12),token=exp+'.'+await sign(exp,env.SESSION_SECRET);return json({ok:true},200,{'Set-Cookie':cookie(token,43200)});}
  if(path==='/auth/check'&&req.method==='GET'){if(!await valid(req,env))return json({error:'Unauthorized'},401);return json({id:env.ADMIN_USER_ID,username:env.ADMIN_USERNAME});}
