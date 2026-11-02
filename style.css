@@ -60,3 +60,21 @@
   .analytics-consent { backdrop-filter: none !important; }
   html { scroll-behavior: auto; }
 }
+
+/* Mobile motion: lightweight visual feedback without full-screen render loops. */
+@media (max-width:700px) and (prefers-reduced-motion:no-preference) {
+ .js .reveal {opacity:0;transform:translate3d(0,16px,0);transition:opacity .6s ease,transform .6s cubic-bezier(.2,.7,.2,1)}
+ .js .reveal.in-view {opacity:1;transform:translate3d(0,0,0)}
+ .hero-sculpture{display:block!important;width:86vw;height:86vw;right:-38%;top:7%;opacity:.38;filter:none;animation:mobile-drift 18s ease-in-out infinite}
+ .sculpture-loop{animation:mobile-loop 25s linear infinite}.loop-b{animation-duration:32s}.loop-c{animation-duration:28s}
+ .sculpture-glass{animation:mobile-glass 10s ease-in-out infinite}.sculpture-core{animation:core-turn 24s linear infinite}
+ .sculpture-beam{animation:beam-pulse 9s ease-in-out infinite}.hero-object{animation:mobile-object 8s ease-in-out infinite alternate}
+ .project-art,.choice-card,.service-plus,.project-arrow{transition:transform .35s ease,border-color .35s ease,color .35s ease}
+ .project-card:active .project-art,.choice-card:active{transform:scale(.985)}
+ .service-item:active .service-plus,.project-card:active .project-arrow{transform:translateX(4px);color:var(--lime)}
+ .planner-next:active,.planner-back:active{transform:scale(.975)}
+}
+@keyframes mobile-drift{0%,100%{transform:translate3d(0,0,0) rotate(-5deg)}50%{transform:translate3d(-3%,2%,0) rotate(4deg)}}
+@keyframes mobile-loop{to{transform:rotateX(67deg) rotateZ(332deg)}}
+@keyframes mobile-glass{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(5px,-9px,0) scale(1.025)}}
+@keyframes mobile-object{from{transform:translate3d(0,0,0)}to{transform:translate3d(0,-7px,0)}}
