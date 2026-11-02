@@ -45,3 +45,18 @@
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior:auto !important; animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
 }
+
+/* Mobile stability: never let decorative effects or reveal states block content. */
+@media (max-width: 700px) {
+  .js .reveal, .js .reveal.in-view { opacity: 1 !important; transform: none !important; }
+  .hero-sculpture { display: none !important; }
+  .sculpture-loop, .sculpture-glass, .sculpture-core, .sculpture-beam,
+  .hero-object, .ticker-track, .direction-cross, .interactive-cube {
+    animation: none !important;
+  }
+  .sculpture-glass { backdrop-filter: none !important; }
+  .noise { display: none !important; }
+  .cursor-glow { display: none !important; }
+  .analytics-consent { backdrop-filter: none !important; }
+  html { scroll-behavior: auto; }
+}
