@@ -33,7 +33,7 @@ export default {async fetch(req,env){const url=new URL(req.url),path=url.pathnam
    ? await supabase(env,'site_visitors?visitor_id=eq.'+visitor,{method:'PATCH',headers:{Prefer:'return=minimal'},body:JSON.stringify({last_seen:new Date().toISOString()})})
    : await supabase(env,'site_visitors',{method:'POST',headers:{Prefer:'return=minimal'},body:JSON.stringify([{visitor_id:visitor,ip_address:ip,user_agent:ua,browser:details.browser,operating_system:details.os,device_type:details.device}])});
   if(!up.ok)return json({error:'Analytics unavailable'},502);
-  const visit=await supabase(env,'site_visits',{method:'POST',headers:{Prefer:'return=minimal'},body:JSON.stringify([{visitor_id:visitor,page_path:String(body.path||'/').slice(0,500),referrer:String(body.referrer||'').slice(0,1000)||null}])});
+  const visit=await supabase(env,'site_visits',{method:'POST',headers:{Prefer:'return=minimal'},body:JSON.stringify([{visitor_id:visitor,page_path:String(body.path||'/').slice(0,500),ip_address:ip,referrer:String(body.referrer||'').slice(0,1000)||null}])});
   if(!visit.ok)return json({error:'Analytics unavailable'},502);
   return json({ok:true},200);
  }
@@ -48,7 +48,7 @@ export default {async fetch(req,env){const url=new URL(req.url),path=url.pathnam
    const to=url.searchParams.get('to')||new Date().toISOString();
    const q='created_at=gte.'+encodeURIComponent(from)+'&created_at=lte.'+encodeURIComponent(to);
    const [visitsRes,visitorsRes,liveRes]=await Promise.all([
-    supabase(env,'site_visits?select=id,visitor_id,page_path,referrer,created_at&'+q+'&order=created_at.desc&limit=10000'),
+    supabase(env,'site_visits?select=id,visitor_id,page_path,ip_address,referrer,created_at&'+q+'&order=created_at.desc&limit=10000'),
     supabase(env,'site_visitors?select=visitor_id,ip_address,browser,operating_system,device_type,first_seen,last_seen&order=last_seen.desc&limit=5000'),
     supabase(env,'site_visitors?select=visitor_id&last_seen=gte.'+encodeURIComponent(new Date(Date.now()-5*60000).toISOString()))
    ]);
@@ -58,7 +58,7 @@ export default {async fetch(req,env){const url=new URL(req.url),path=url.pathnam
    const visitorMap=new Map(visitors.map(v=>[v.visitor_id,v]));
    const hourly={},pages={},browsers={},systems={},devices={};
    for(const v of visits){const d=new Date(v.created_at);const h=String(d.getHours()).padStart(2,'0')+':00';hourly[h]=(hourly[h]||0)+1;pages[v.page_path]=(pages[v.page_path]||0)+1;const info=visitorMap.get(v.visitor_id)||{};for(const [obj,key] of [[browsers,'browser'],[systems,'operating_system'],[devices,'device_type']]){const k=info[key]||'Unknown';obj[k]=(obj[k]||0)+1;}}
-   const rows=visits.slice(0,500).map(v=>({ ...v, ...(visitorMap.get(v.visitor_id)||{}) }));
+   const rows=visits.slice(0,500).map(v=>({ ...(visitorMap.get(v.visitor_id)||{}), ...v }));
    const unique=new Set(visits.map(v=>v.visitor_id)).size;
    return json({total:visits.length,unique,online:live.length,hourly,pages,browsers,systems,devices,visits:rows,limited:visits.length>=10000});
   }
