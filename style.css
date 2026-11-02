@@ -78,3 +78,23 @@
 @keyframes mobile-loop{to{transform:rotateX(67deg) rotateZ(332deg)}}
 @keyframes mobile-glass{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(5px,-9px,0) scale(1.025)}}
 @keyframes mobile-object{from{transform:translate3d(0,0,0)}to{transform:translate3d(0,-7px,0)}}
+
+
+/* Final mobile override: explicitly wins over the earlier stability kill-switch. */
+@media (max-width:700px) and (prefers-reduced-motion:no-preference) {
+  .js .reveal { opacity:0 !important; transform:translate3d(0,18px,0) !important; transition:opacity .65s ease,transform .65s cubic-bezier(.2,.7,.2,1) !important; }
+  .js .reveal.in-view { opacity:1 !important; transform:translate3d(0,0,0) !important; }
+  .hero-sculpture { display:block !important; width:86vw; height:86vw; right:-38%; top:7%; opacity:.34; filter:none; animation:mobile-drift 19s ease-in-out infinite !important; }
+  .sculpture-loop { animation:mobile-loop 28s linear infinite !important; }
+  .sculpture-loop.loop-b { animation-duration:34s !important; }
+  .sculpture-loop.loop-c { animation-duration:31s !important; }
+  .sculpture-glass { animation:mobile-glass 11s ease-in-out infinite !important; backdrop-filter:none !important; }
+  .sculpture-core { animation:core-turn 30s linear infinite !important; }
+  .sculpture-beam { animation:beam-pulse 10s ease-in-out infinite !important; }
+  .hero-object { animation:mobile-object 8s ease-in-out infinite alternate !important; }
+  .ticker-track { animation:ticker 46s linear infinite !important; }
+  .direction-cross, .interactive-cube { animation:none !important; }
+}
+@media (max-width:700px) and (prefers-reduced-motion:reduce) {
+  .js .reveal, .js .reveal.in-view { opacity:1 !important; transform:none !important; }
+}
