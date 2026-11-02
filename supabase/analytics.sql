@@ -1,4 +1,4 @@
--- FRAME LAB site analytics. Run once in Supabase SQL Editor.
+-- FRAME LAB site analytics. Run once in Supabase SQL Editor.\ncreate extension if not exists pgcrypto;
 create table if not exists public.site_visitors (
   visitor_id uuid primary key,
   ip_address text,
