@@ -32,12 +32,7 @@ export default {async fetch(req,env){const url=new URL(req.url),path=url.pathnam
   const details=parseAgent(ua);
   // Cloudflare edge supplies CF-Connecting-IP. Keep common proxy fallbacks
   // for Pages/custom-proxy paths, and normalize forwarded lists to one address.
-  const rawIp=req.headers.get('CF-Connecting-IP')
-    ||req.headers.get('True-Client-IP')
-    ||req.headers.get('X-Real-IP')
-    ||req.headers.get('X-Forwarded-For')
-    ||'';
-  const ip=rawIp.split(',')[0].trim().slice(0,64);
+  const ip=''; // Do not collect or store visitor IP addresses.
   const key='sb_publishable_FkRZkn5CqQwaN9GbhxBpgg_fMSvotuF';
   const result=await fetch(env.SUPABASE_URL.replace(/\/$/,'')+'/rest/v1/rpc/track_site_visit',{
    method:'POST',
