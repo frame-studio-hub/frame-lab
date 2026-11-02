@@ -6,7 +6,11 @@ export async function onRequest(context) {
   const { request, next, env } = context;
   const pathname = new URL(request.url).pathname;
 
-  if (pathname.startsWith('/auth/') || pathname.startsWith('/api/') || pathname.startsWith('/analytics/') ) {
+  if (
+    pathname.startsWith('/auth/') ||
+    pathname.startsWith('/api/') ||
+    pathname.startsWith('/analytics/')
+  ) {
     return adminWorker.fetch(request, env);
   }
 
