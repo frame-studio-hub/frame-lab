@@ -153,14 +153,14 @@
       if (i % 9 === 0) { labCtx.beginPath(); labCtx.moveTo(x, y); labCtx.lineTo(x * .72, y * .72); labCtx.strokeStyle = 'rgba(199,255,66,.09)'; labCtx.lineWidth = .6; labCtx.stroke(); }
     });
     labCtx.restore();
-    if (!reduceMotion) labRaf = requestAnimationFrame(drawLab);
+    if (!reduceMotion && !coarsePointer) labRaf = requestAnimationFrame(drawLab);
   }
   if (labVisual) {
     labVisual.addEventListener('pointermove', e => { const r = labVisual.getBoundingClientRect(); labPointer = { x: (e.clientX - r.left) / r.width, y: (e.clientY - r.top) / r.height, active: true }; });
     labVisual.addEventListener('pointerleave', () => { labPointer.active = false; });
     modeButton?.addEventListener('click', () => { labMode = (labMode + 1) % modes.length; if (labState) labState.textContent = `FIELD: ${modes[labMode]}`; if (reduceMotion) drawLab(0); });
     resetButton?.addEventListener('click', () => { labMode = 0; labPointer = { x: .5, y: .5, active: false }; if (labState) labState.textContent = 'FIELD: ORBITAL'; resizeLab(); if (reduceMotion) drawLab(0); });
-    resizeLab(); if (reduceMotion) drawLab(0); else drawLab();
+    resizeLab(); if (reduceMotion || coarsePointer) drawLab(0); else drawLab();
     if ('ResizeObserver' in window) new ResizeObserver(resizeLab).observe(labVisual); else window.addEventListener('resize', resizeLab, { passive: true });
   }
   // Guided project planner: creates a client-controlled brief (no backend or auto-send).
@@ -259,6 +259,6 @@
   $('#year').textContent = new Date().getFullYear();
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) { cancelAnimationFrame(ambientFrame); cancelAnimationFrame(labRaf); }
-    else if (!reduceMotion && labCtx) drawLab();
+    else if (!reduceMotion && !coarsePointer && labCtx) drawLab();
   });
 })();
