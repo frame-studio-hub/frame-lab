@@ -31,7 +31,7 @@ function parseAgent(ua=''){
 }
 function projectBase(env){
  // Accept either the Supabase project root or a pasted REST endpoint.
- return String(env.SUPABASE_URL||'').replace(/\\/+$/,'').replace(/\\/rest\\/v1$/i,'');
+ return String(env.SUPABASE_URL||'').replace(/\/+$/,'').replace(/\/rest\/v1$/i,'');
 }
 async function supabase(env,path,init={}){
  const base=projectBase(env);
