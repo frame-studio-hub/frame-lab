@@ -21,5 +21,3 @@ function showVisitor(v){$('#detail-title').textContent=v.device_type||'Устр�
 document.querySelectorAll('[data-close]').forEach(x=>x.addEventListener('click',()=>$('#detail-modal').hidden=true));document.addEventListener('keydown',e=>{if(e.key==='Escape')$('#detail-modal').hidden=true;});
 document.querySelectorAll('[data-order-filter]').forEach(b=>b.addEventListener('click',()=>{orderFilter=b.dataset.orderFilter;document.querySelectorAll('[data-order-filter]').forEach(x=>x.classList.toggle('active',x===b));renderOrders();}));document.querySelectorAll('[data-review-filter]').forEach(b=>b.addEventListener('click',()=>{reviewFilter=b.dataset.reviewFilter;document.querySelectorAll('[data-review-filter]').forEach(x=>x.classList.toggle('active',x===b));renderReviews();}));$('#order-search').addEventListener('input',renderOrders);$('#visitor-search').addEventListener('input',renderVisitors);$('#visitor-range').addEventListener('change',loadAnalytics);$('#refresh').addEventListener('click',()=>{loadAll();if(view==='visitors')loadAnalytics();});
 boot();setInterval(()=>{if(!$('#app').hidden){loadAll();if(view==='visitors')loadAnalytics();}},60000);
-
-[exit 0]
