@@ -139,7 +139,7 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.m
   const onPointer = e => { targetX=(e.clientX/innerWidth-.5)*.85; targetY=(e.clientY/innerHeight-.5)*.55; };
   const onScroll = () => { const max=Math.max(1,document.documentElement.scrollHeight-innerHeight); scrollTarget=scrollY/max; const shouldRun=!document.hidden && scrollY > innerHeight * .58; canvas.style.opacity=shouldRun ? (mobile ? '.22' : '.34') : '0'; if(shouldRun && !active){active=true; animate();} else if(!shouldRun && active){active=false;cancelAnimationFrame(raf);renderer.clear();} };
   if (!mobile) window.addEventListener('pointermove',onPointer,{passive:true});
-  window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+  window.addEventListener('scroll',onScroll,{passive:true});
 
   const clock = new THREE.Clock();
   function animate() {
@@ -182,12 +182,12 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.m
     camera.position.z=(mobile?14.8:12.8)+Math.sin(chapter*.8)*.65;
     camera.lookAt(Math.sin(chapter)*.2,0,0);
     renderer.render(scene,camera);
-    if (!reducedMotion) raf=requestAnimationFrame(animate);
+    if (active && !reducedMotion) raf=requestAnimationFrame(animate);
   }
   function resize() { renderer.setPixelRatio(Math.min(devicePixelRatio||1,mobile?.8:1.25)); renderer.setSize(innerWidth,innerHeight,false); camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); }
   window.addEventListener('resize',resize,{passive:true});
-  document.addEventListener('visibilitychange',()=>{ if(document.hidden) cancelAnimationFrame(raf); else if(!reducedMotion) animate(); });
-  animate();
+  document.addEventListener('visibilitychange',()=>{ if(document.hidden){active=false;cancelAnimationFrame(raf);} else onScroll(); });
+  onScroll();
 
   function thirtyFour(){ return 34; }
 })();
