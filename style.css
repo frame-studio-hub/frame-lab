@@ -107,3 +107,15 @@
 .choice-icon .ui-arrow{width:23px;height:23px}
 .process-step .ui-arrow{width:15px;height:15px}
 .nord-art .ui-arrow{width:20px;height:20px}
+
+
+/* MOBILE SAFETY FIX: content must never depend on animation observers. */
+@media (max-width: 900px) {
+  .js .reveal, .js .reveal.in-view { opacity: 1 !important; visibility: visible !important; transform: none !important; }
+  .hero-copy, .hero-title, .site-header, main, main section { visibility: visible !important; }
+  #scene-3d, #ambient-canvas, .noise, .cursor-glow { display: none !important; }
+}
+@media (max-width: 700px) and (prefers-reduced-motion: no-preference) {
+  .hero-sculpture, .sculpture-loop, .sculpture-glass, .sculpture-core, .sculpture-beam,
+  .hero-object, .ticker-track, .direction-cross, .interactive-cube { animation: none !important; }
+}
