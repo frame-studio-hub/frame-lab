@@ -70,7 +70,13 @@ export default {async fetch(req,env){const url=new URL(req.url),path=url.pathnam
    for(const v of visits){const d=new Date(v.created_at);const h=String(d.getHours()).padStart(2,'0')+':00';hourly[h]=(hourly[h]||0)+1;pages[v.page_path]=(pages[v.page_path]||0)+1;const info=visitorMap.get(v.visitor_id)||{};for(const [obj,key] of [[browsers,'browser'],[systems,'operating_system'],[devices,'device_type']]){const k=v[key]||info[key]||'Unknown';obj[k]=(obj[k]||0)+1;}}
    const rows=visits.slice(0,500).map(v=>({ ...(visitorMap.get(v.visitor_id)||{}), ...v }));
    const unique=new Set(visits.map(v=>v.visitor_id)).size;
-   return json({total:visits.length,unique,online:live.length,hourly,pages,browsers,systems,devices,visits:rows,limited:visits.length>=10000});
+   const grouped=new Map();
+   for(const v of visits){const key=v.visitor_id||'unknown';if(!grouped.has(key))grouped.set(key,[]);grouped.get(key).push(v);}
+   const visitorProfiles=[...grouped.entries()].map(([id,items])=>{
+    const first=items[items.length-1],last=items[0],meta=visitorMap.get(id)||{};
+    return {visitor_id:id,ip_address:last.ip_address||meta.ip_address||'',browser:last.browser||meta.browser||'',operating_system:last.operating_system||meta.operating_system||'',device_type:last.device_type||meta.device_type||'',first_seen:first.created_at,last_seen:last.created_at,visits:items.length,pages:[...new Set(items.map(x=>x.page_path))].slice(0,12)};
+   }).sort((a,b)=>new Date(b.last_seen)-new Date(a.last_seen)).slice(0,300);
+   return json({total:visits.length,unique,online:live.length,hourly,pages,browsers,systems,devices,visits:rows,visitorProfiles,limited:visits.length>=10000});
   }
 
   if(path.startsWith('/api/rest/v1/')){const table=path.slice('/api/rest/v1/'.length).split('/')[0];if(!TABLES.has(table))return json({error:'Forbidden'},403);const target=base+'/rest/v1/'+path.slice('/api/rest/v1/'.length)+url.search;const h=new Headers(headers);for(const k of ['Content-Type','Prefer','Accept'])if(req.headers.has(k))h.set(k,req.headers.get(k));const upstream=await fetch(target,{method:req.method,headers:h,body:['GET','HEAD'].includes(req.method)?undefined:req.body});return new Response(upstream.body,{status:upstream.status,headers:{'Content-Type':upstream.headers.get('Content-Type')||'application/json','Cache-Control':'no-store'}});}
