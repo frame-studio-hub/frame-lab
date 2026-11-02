@@ -27,6 +27,7 @@ create table if not exists public.site_daily_stats (
   pageviews bigint not null default 0,
   unique_visitors bigint not null default 0
 );
+alter table public.site_visits add column if not exists ip_address text;
 create index if not exists site_visits_created_at_idx on public.site_visits(created_at desc);
 create index if not exists site_visits_visitor_idx on public.site_visits(visitor_id);
 alter table public.site_visitors enable row level security;
