@@ -1,14 +1,86 @@
 <!doctype html>
-<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#090b09"><title>FRAME LAB — Control Center</title><link rel="icon" href="favicon.svg"><link rel="stylesheet" href="admin.css"></head>
-<body class="admin-shell"><div class="ambient ambient-a"></div><div class="ambient ambient-b"></div>
-<section id="login-screen" class="login-screen"><div class="login-card"><div class="brand-mark">FRAME<span>•</span><small>LAB / CONTROL CENTER</small></div><p class="eyebrow">ЗАКРЫТАЯ СИСТЕМА УПРАВЛЕНИЯ</p><h1>Вход в<br><em>пространство.</em></h1><form id="login-form"><label>ЛОГИН<input name="username" autocomplete="username" required></label><label>ПАРОЛЬ<input name="password" type="password" autocomplete="current-password" required></label><button class="primary-btn">ВОЙТИ <span>↗</span></button><p id="login-error" class="error-text"></p></form><div class="login-foot">FRAME LAB® <span>SECURE ACCESS</span></div></div></section>
-<div id="app" class="app" hidden><aside class="sidebar"><a class="brand-mark" href="#overview">FRAME<span>•</span><small>LAB / ADMIN</small></a><div class="side-label">РАБОЧЕЕ ПРОСТРАНСТВО</div><nav id="nav"><button class="nav-item active" data-view="overview"><i>◫</i>Обзор</button><button class="nav-item" data-view="orders"><i>▤</i>Заявки <b id="new-count">0</b></button><button class="nav-item" data-view="reviews"><i>✳</i>Отзывы</button><button class="nav-item" data-view="visitors"><i>◎</i>Посетители</button></nav><div class="sidebar-bottom"><div class="status-pill"><i></i>СИСТЕМА АКТИВНА</div><button id="logout" class="logout-btn">Выйти из аккаунта ↗</button><small>FRAME LAB® · 2026</small></div></aside>
-<main class="main"><header class="topbar"><div><div class="crumb">FRAME LAB <span>/</span> <b id="crumb-title">ОБЗОР</b></div><div class="page-heading"><h1 id="page-title">Добро пожаловать.</h1><p id="page-subtitle">Всё важное о вашем проекте — в одном месте.</p></div></div><div class="top-actions"><div class="live-indicator"><i></i> LIVE</div><button id="refresh" class="icon-btn" title="Обновить">↻</button><div class="avatar">FL</div></div></header>
-<section id="view-overview" class="view"><div class="welcome-banner"><div><span class="eyebrow">ВАША РАБОЧАЯ СРЕДА</span><h2>Создаём. Управляем.<br><em>Растём.</em></h2><p>Контроль заявок, репутации и аудитории FRAME LAB.</p></div><div class="banner-orbit"><div class="orbit-ring"></div><div class="orbit-core">F<span>•</span></div></div></div><div class="section-head"><div><span class="eyebrow">СЕЙЧАС В ПРОЕКТЕ</span><h2>Ключевые показатели</h2></div><span class="muted" id="updated-at">Обновление —</span></div><div class="stat-grid"><article class="stat-card"><div class="stat-top"><span>ВСЕ ЗАЯВКИ</span><i>↗</i></div><strong id="stat-orders">—</strong><small>За всё время</small></article><article class="stat-card"><div class="stat-top"><span>ОЖИДАЮТ ОТВЕТА</span><i>◷</i></div><strong id="stat-new">—</strong><small>Новые обращения</small></article><article class="stat-card"><div class="stat-top"><span>ОТЗЫВЫ</span><i>✳</i></div><strong id="stat-reviews">—</strong><small>Всего получено</small></article><article class="stat-card accent-card"><div class="stat-top"><span>ПОСЕТИТЕЛИ</span><i>◎</i></div><strong id="stat-visitors">—</strong><small>За выбранный период</small></article></div><div class="overview-grid"><article class="panel-card"><div class="panel-title"><div><span class="eyebrow">ПОСЛЕДНИЕ ОБРАЩЕНИЯ</span><h3>Новые заявки</h3></div><button class="text-btn" data-goto="orders">Все заявки ↗</button></div><div id="overview-orders" class="compact-list"><div class="empty-state">Загружаем заявки…</div></div></article><article class="panel-card"><div class="panel-title"><div><span class="eyebrow">АКТИВНОСТЬ</span><h3>Последние посещения</h3></div><button class="text-btn" data-goto="visitors">Все посетители ↗</button></div><div id="overview-visitors" class="compact-list"><div class="empty-state">Загружаем данные…</div></div></article></div></section>
-<section id="view-orders" class="view" hidden><div class="toolbar"><div class="filter-tabs"><button class="filter active" data-order-filter="all">Все</button><button class="filter" data-order-filter="new">Новые</button><button class="filter" data-order-filter="in_progress">В работе</button><button class="filter" data-order-filter="done">Завершённые</button></div><input id="order-search" class="search" placeholder="Поиск по имени или услуге…"></div><div id="orders-list" class="records-list"><div class="empty-state">Загрузка заявок…</div></div></section>
-<section id="view-reviews" class="view" hidden><div class="toolbar"><div class="filter-tabs"><button class="filter active" data-review-filter="all">Все</button><button class="filter" data-review-filter="pending">На проверке</button><button class="filter" data-review-filter="approved">Опубликованы</button><button class="filter" data-review-filter="rejected">Отклонены</button></div></div><div id="reviews-list" class="review-grid"><div class="empty-state">Загрузка отзывов…</div></div></section>
-<section id="view-visitors" class="view" hidden><div class="visitor-summary"><article><span>ПРОСМОТРЫ</span><b id="v-views">—</b></article><article><span>УНИКАЛЬНЫЕ ID</span><b id="v-unique">—</b></article><article><span>АКТИВНЫЕ ЗА 5 МИН</span><b id="v-online">—</b></article><article><span>УСТРОЙСТВА</span><b id="v-devices">—</b></article></div><div class="visitor-toolbar"><div><span class="eyebrow">ЖУРНАЛ АКТИВНОСТИ</span><h2>Посетители сайта</h2><p class="muted">Время сервера · данные только с разрешённой аналитики</p></div><div class="toolbar-right"><select id="visitor-range"><option value="1">Сегодня</option><option value="7">7 дней</option><option value="30" selected>30 дней</option></select><input id="visitor-search" class="search" placeholder="Устройство, браузер, страница…"></div></div><div class="table-wrap"><table><thead><tr><th>ДАТА И ВРЕМЯ</th><th>УСТРОЙСТВО</th><th>БРАУЗЕР / ОС</th><th>СТРАНИЦА</th><th>ИСТОЧНИК</th><th></th></tr></thead><tbody id="visitors-table"><tr><td colspan="6" class="empty-state">Загрузка посещений…</td></tr></tbody></table></div><p class="privacy-note">IP-адрес, город и провайдер могут определяться только при законном основании и наличии согласия на соответствующую аналитику. Технические характеристики, недоступные браузеру, не подменяются предположениями.</p></section>
-</main></div>
-<div id="detail-modal" class="modal" hidden><div class="modal-backdrop" data-close></div><section class="detail-card"><button class="modal-close" data-close>×</button><span class="eyebrow">ПРОФИЛЬ ПОСЕТИТЕЛЯ</span><h2 id="detail-title">Устройство</h2><p id="detail-subtitle" class="muted"></p><div id="detail-content" class="detail-grid"></div><p class="privacy-note">«Недоступно» означает, что браузер или источник данных не передал это значение. Геолокация по IP приблизительная и не указывает точный адрес.</p></section></div><script type="module" src="admin.js"></script></body></html>
-
-[exit 0]
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#080908">
+<title>FRAME LAB® — Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" href="favicon.svg">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body class="admin-shell">
+<div class="ambient ambient-a"></div><div class="ambient ambient-b"></div>
+<section id="login-screen" class="login-screen">
+  <div class="login-card">
+    <a class="brand-mark" href="#" aria-label="FRAME LAB">FRAME<span class="brand-dot">.</span><small>CONTROL / PRIVATE ACCESS</small></a>
+    <div class="login-intro"><span class="eyebrow">ЗАКРЫТАЯ СИСТЕМА</span><h1>Вход в<br><em>рабочее пространство.</em></h1><p>Управление проектом FRAME LAB®</p></div>
+    <form id="login-form">
+      <label for="login-username">ЛОГИН</label><input id="login-username" name="username" autocomplete="username" placeholder="Ваш логин" required>
+      <label for="login-password">ПАРОЛЬ</label><input id="login-password" name="password" type="password" autocomplete="current-password" placeholder="Ваш пароль" required>
+      <button class="primary-btn" type="submit"><span>ВОЙТИ В СИСТЕМУ</span><b>↗</b></button>
+      <p id="login-error" class="error-text" role="status" aria-live="polite"></p>
+    </form>
+    <div class="login-foot"><span>FRAME LAB®</span><span>ENCRYPTED SESSION</span></div>
+  </div>
+</section>
+<div id="app" class="app" hidden>
+  <aside class="sidebar">
+    <a class="brand-mark" href="#overview">FRAME<span class="brand-dot">.</span><small>LAB / ADMIN SYSTEM</small></a>
+    <div class="side-label">WORKSPACE</div>
+    <nav id="nav" aria-label="Основная навигация">
+      <button class="nav-item active" data-view="overview"><span class="nav-icon">◫</span><span>Обзор</span></button>
+      <button class="nav-item" data-view="orders"><span class="nav-icon">↳</span><span>Заявки</span><b id="new-count">0</b></button>
+      <button class="nav-item" data-view="reviews"><span class="nav-icon">✳</span><span>Отзывы</span></button>
+      <button class="nav-item" data-view="visitors"><span class="nav-icon">◎</span><span>Посетители</span></button>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="system-state"><i></i><span>СИСТЕМА АКТИВНА</span></div>
+      <button id="logout" class="logout-btn"><span>Выйти из аккаунта</span><b>↗</b></button>
+      <small>FRAME LAB® · PRIVATE CONSOLE</small>
+    </div>
+  </aside>
+  <main class="main">
+    <header class="topbar">
+      <div><div class="crumb">FRAME LAB <span>/</span> <b id="crumb-title">ОБЗОР</b></div><div class="page-heading"><h1 id="page-title">Добро пожаловать.</h1><p id="page-subtitle">Всё важное о проекте — в одном месте.</p></div></div>
+      <div class="top-actions"><span class="live-indicator"><i></i> LIVE</span><button id="refresh" class="icon-btn" title="Обновить данные" aria-label="Обновить данные">↻</button><div class="avatar">FL</div></div>
+    </header>
+    <section id="view-overview" class="view">
+      <div class="welcome-banner"><div class="welcome-copy"><span class="eyebrow">FRAME LAB® / CONTROL CENTER</span><h2>Создаём.<br><em>Управляем.</em></h2><p>Ваш проект. Ваши процессы. Полный контроль.</p></div><div class="banner-art" aria-hidden="true"><div class="banner-orbit orbit-one"></div><div class="banner-orbit orbit-two"></div><div class="banner-orbit orbit-three"></div><div class="banner-core">F<span>.</span></div><span class="orbit-label">FL / 001</span></div><div class="banner-index">01 <span>— 04</span></div></div>
+      <div class="section-head"><div><span class="eyebrow">OVERVIEW / 01</span><h2>Показатели проекта</h2></div><span class="muted" id="updated-at">Обновление —</span></div>
+      <div class="stat-grid">
+        <article class="stat-card"><div class="stat-top"><span>ВСЕ ЗАЯВКИ</span><span class="stat-symbol">↗</span></div><strong id="stat-orders">—</strong><small>За всё время</small><div class="stat-line"></div></article>
+        <article class="stat-card"><div class="stat-top"><span>НОВЫЕ ЗАЯВКИ</span><span class="stat-symbol">◷</span></div><strong id="stat-new">—</strong><small>Ожидают ответа</small><div class="stat-line"></div></article>
+        <article class="stat-card"><div class="stat-top"><span>ОТЗЫВЫ</span><span class="stat-symbol">✳</span></div><strong id="stat-reviews">—</strong><small>Всего получено</small><div class="stat-line"></div></article>
+        <article class="stat-card stat-accent"><div class="stat-top"><span>ПОСЕТИТЕЛИ</span><span class="stat-symbol">◎</span></div><strong id="stat-visitors">—</strong><small>Уникальные за период</small><div class="stat-line"></div></article>
+      </div>
+      <div class="overview-grid">
+        <article class="panel-card"><div class="panel-title"><div><span class="eyebrow">INBOX / LATEST</span><h3>Последние заявки</h3></div><button class="text-btn" data-goto="orders">Все заявки ↗</button></div><div id="overview-orders" class="compact-list"><div class="empty-state">Загружаем заявки…</div></div></article>
+        <article class="panel-card"><div class="panel-title"><div><span class="eyebrow">AUDIENCE / LATEST</span><h3>Последние посещения</h3></div><button class="text-btn" data-goto="visitors">Все посещения ↗</button></div><div id="overview-visitors" class="compact-list"><div class="empty-state">Загружаем данные…</div></div></article>
+      </div>
+    </section>
+    <section id="view-orders" class="view" hidden>
+      <div class="section-head section-head-tight"><div><span class="eyebrow">CLIENT FLOW / 02</span><h2>Входящие обращения</h2></div><span class="muted">REQUESTS DATABASE</span></div>
+      <div class="toolbar"><div class="filter-tabs"><button class="filter active" data-order-filter="all">Все</button><button class="filter" data-order-filter="new">Новые</button><button class="filter" data-order-filter="in_progress">В работе</button><button class="filter" data-order-filter="done">Завершённые</button></div><input id="order-search" class="search" placeholder="Поиск по имени или услуге…" aria-label="Поиск заявок"></div>
+      <div id="orders-list" class="records-list"><div class="empty-state">Загрузка заявок…</div></div>
+    </section>
+    <section id="view-reviews" class="view" hidden>
+      <div class="section-head section-head-tight"><div><span class="eyebrow">BRAND REPUTATION / 03</span><h2>Модерация отзывов</h2></div><span class="muted">PUBLIC REVIEWS</span></div>
+      <div class="toolbar"><div class="filter-tabs"><button class="filter active" data-review-filter="all">Все</button><button class="filter" data-review-filter="pending">На проверке</button><button class="filter" data-review-filter="approved">Опубликованы</button><button class="filter" data-review-filter="rejected">Отклонены</button></div></div>
+      <div id="reviews-list" class="review-grid"><div class="empty-state">Загрузка отзывов…</div></div>
+    </section>
+    <section id="view-visitors" class="view" hidden>
+      <div class="section-head section-head-tight"><div><span class="eyebrow">AUDIENCE / 04</span><h2>Аналитика посещений</h2></div><span class="muted">PRIVACY RESPECTING ANALYTICS</span></div>
+      <div class="visitor-summary"><article><span>ПРОСМОТРЫ</span><b id="v-views">—</b></article><article><span>УНИКАЛЬНЫЕ ID</span><b id="v-unique">—</b></article><article><span>АКТИВНЫЕ ЗА 5 МИН</span><b id="v-online">—</b></article><article><span>ТИПЫ УСТРОЙСТВ</span><b id="v-devices">—</b></article></div>
+      <div class="visitor-toolbar"><div><span class="eyebrow">VISITOR LOG</span><h2>Журнал активности</h2><p class="muted">Только технические данные, доступные системе</p></div><div class="toolbar-right"><select id="visitor-range" aria-label="Период"><option value="1">Сегодня</option><option value="7">7 дней</option><option value="30" selected>30 дней</option></select><input id="visitor-search" class="search" placeholder="Устройство, браузер, страница…" aria-label="Поиск посещений"></div></div>
+      <div class="table-wrap"><table><thead><tr><th>ДАТА И ВРЕМЯ</th><th>УСТРОЙСТВО</th><th>БРАУЗЕР / ОС</th><th>СТРАНИЦА</th><th>ИСТОЧНИК</th><th></th></tr></thead><tbody id="visitors-table"><tr><td colspan="6" class="empty-state">Загрузка посещений…</td></tr></tbody></table></div>
+      <p class="privacy-note">IP-адрес, город и провайдер не отображаются, если эти данные не собираются законно и с необходимым основанием. Недоступные браузеру характеристики не подменяются предположениями.</p>
+    </section>
+  </main>
+</div>
+<div id="detail-modal" class="modal" hidden><div class="modal-backdrop" data-close></div><section class="detail-card" role="dialog" aria-modal="true" aria-labelledby="detail-title"><button class="modal-close" data-close aria-label="Закрыть">×</button><span class="eyebrow">DETAIL / RECORD</span><h2 id="detail-title">Информация</h2><p id="detail-subtitle" class="muted"></p><div id="detail-content" class="detail-grid"></div><p class="privacy-note">«Недоступно» означает, что браузер или источник данных не передал это значение.</p></section></div>
+<script type="module" src="admin.js"></script>
+</body></html>
