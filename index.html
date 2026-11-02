@@ -13,18 +13,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=mobile-fix-20261102">
-  <link rel="stylesheet" href="reviews.css?v=mobile-fix-20261102">
+  <link rel="stylesheet" href="style.css?v=mobile-polish-20261102">
+  <link rel="stylesheet" href="reviews.css?v=mobile-polish-20261102">
   <style>
-    /* Emergency mobile rendering fallback: content must never depend on animation JS/WebGL. */
-    @media (max-width: 700px) {
-      html, body { min-height: 100%; background: #090a09 !important; color: #f0f0e9 !important; }
-      body, main, header, section, footer { visibility: visible !important; }
-      body { opacity: 1 !important; }
-      #ambient-canvas, #scene-3d, .scene-label, .noise, .cursor-glow, .hero-sculpture { display: none !important; }
-      .js .reveal, .js .reveal.in-view { opacity: 1 !important; transform: none !important; visibility: visible !important; }
-      .hero, .hero-stage, .hero-copy { visibility: visible !important; opacity: 1 !important; }
-      .hero-object, .hero-orbit, .ticker-track, .direction-cross, .interactive-cube { animation: none !important; }
+    /* Mobile fallback: keep content readable without disabling the designed motion. */
+    @media (max-width:700px) {
+      html, body { min-height:100%; background:#090a09; color:#f0f0e9; }
+      body, main, header, section, footer { visibility:visible; }
+      body { opacity:1; }
     }
   </style>
   <script>document.documentElement.classList.add('js');</script>
