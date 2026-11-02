@@ -8,15 +8,11 @@
   // Scroll progress and soft cursor light.
   const progress = $('.scroll-progress span');
   const glow = $('.cursor-glow');
-  let pointerX = innerWidth / 2, pointerY = innerHeight / 2, glowX = pointerX, glowY = pointerY;
-  if (!coarsePointer && !reduceMotion) {
-    window.addEventListener('pointermove', e => { pointerX = e.clientX; pointerY = e.clientY; }, { passive: true });
-    const moveGlow = () => {
-      glowX += (pointerX - glowX) * .12; glowY += (pointerY - glowY) * .12;
-      if (glow) glow.style.left = `${glowX}px`, glow.style.top = `${glowY}px`;
-      requestAnimationFrame(moveGlow);
-    };
-    requestAnimationFrame(moveGlow);
+  if (!coarsePointer && !reduceMotion && glow) {
+    window.addEventListener('pointermove', e => {
+      glow.style.left = e.clientX + 'px';
+      glow.style.top = e.clientY + 'px';
+    }, { passive: true });
   }
   const updateScroll = () => {
     const max = document.documentElement.scrollHeight - innerHeight;
@@ -122,10 +118,10 @@
       if (p.y < 0) p.y = ambientH; if (p.y > ambientH) p.y = 0;
       aCtx.beginPath(); aCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2); aCtx.fillStyle = `rgba(199,255,66,${p.alpha})`; aCtx.fill();
     });
-    if (!reduceMotion) ambientFrame = requestAnimationFrame(drawAmbient);
+    // A single subtle particle frame is enough; avoid a permanent animation loop.
   }
-  resizeAmbient(); if (reduceMotion) drawAmbient(); else drawAmbient();
-  window.addEventListener('resize', resizeAmbient, { passive: true });
+  resizeAmbient(); drawAmbient();
+  window.addEventListener('resize', () => { resizeAmbient(); drawAmbient(); }, { passive: true });
 
   // Creative Lab interactive field.
   const labCanvas = $('#lab-canvas'), labCtx = labCanvas?.getContext('2d'), labVisual = $('#lab-visual');
@@ -263,6 +259,6 @@
   $('#year').textContent = new Date().getFullYear();
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) { cancelAnimationFrame(ambientFrame); cancelAnimationFrame(labRaf); }
-    else if (!reduceMotion) { drawAmbient(); drawLab(); }
+    else if (!reduceMotion && labCtx) drawLab();
   });
 })();
