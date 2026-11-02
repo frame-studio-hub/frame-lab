@@ -30,7 +30,14 @@ export default {async fetch(req,env){const url=new URL(req.url),path=url.pathnam
   if(!/^[0-9a-f-]{36}$/i.test(visitor))return json({error:'Invalid visitor'},400,cors);
   const ua=(req.headers.get('User-Agent')||'').slice(0,500);
   const details=parseAgent(ua);
-  const ip=(req.headers.get('CF-Connecting-IP')||'').slice(0,64)||'';
+  // Cloudflare edge supplies CF-Connecting-IP. Keep common proxy fallbacks
+  // for Pages/custom-proxy paths, and normalize forwarded lists to one address.
+  const rawIp=req.headers.get('CF-Connecting-IP')
+    ||req.headers.get('True-Client-IP')
+    ||req.headers.get('X-Real-IP')
+    ||req.headers.get('X-Forwarded-For')
+    ||'';
+  const ip=rawIp.split(',')[0].trim().slice(0,64);
   const key='sb_publishable_FkRZkn5CqQwaN9GbhxBpgg_fMSvotuF';
   const result=await fetch(env.SUPABASE_URL.replace(/\/$/,'')+'/rest/v1/rpc/track_site_visit',{
    method:'POST',
