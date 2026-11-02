@@ -18,24 +18,27 @@ async function supabase(env,path,init={}){
 
 export default {async fetch(req,env){const url=new URL(req.url),path=url.pathname;
 
- if(path==='/analytics/track'&&req.method==='POST'){
-  if(req.headers.get('Origin')!==url.origin)return json({error:'Forbidden'},403);
-  let body={};try{body=await req.json()}catch{return json({error:'Bad request'},400);}
+ if(path==='/analytics/track'){
+  const origin=req.headers.get('Origin')||'';
+  const allowed='https://frame-studio-hub.github.io';
+  const cors={'Access-Control-Allow-Origin':allowed,'Access-Control-Allow-Methods':'POST, OPTIONS','Access-Control-Allow-Headers':'Content-Type','Vary':'Origin'};
+  if(origin!==allowed)return json({error:'Forbidden'},403);
+  if(req.method==='OPTIONS')return new Response(null,{status:204,headers:cors});
+  if(req.method!=='POST')return json({error:'Method not allowed'},405,cors);
+  let body={};try{body=await req.json()}catch{return json({error:'Bad request'},400,cors);}
   const visitor=String(body.visitor_id||'');
-  if(!/^[0-9a-f-]{36}$/i.test(visitor))return json({error:'Invalid visitor'},400);
+  if(!/^[0-9a-f-]{36}$/i.test(visitor))return json({error:'Invalid visitor'},400,cors);
   const ua=(req.headers.get('User-Agent')||'').slice(0,500);
   const details=parseAgent(ua);
-  const ip=(req.headers.get('CF-Connecting-IP')||'').slice(0,64)||null;
-  const existing=await supabase(env,'site_visitors?visitor_id=eq.'+visitor+'&select=visitor_id&limit=1');
-  if(!existing.ok)return json({error:'Analytics unavailable'},502);
-  const found=await existing.json();
-  const up=found.length
-   ? await supabase(env,'site_visitors?visitor_id=eq.'+visitor,{method:'PATCH',headers:{Prefer:'return=minimal'},body:JSON.stringify({last_seen:new Date().toISOString()})})
-   : await supabase(env,'site_visitors',{method:'POST',headers:{Prefer:'return=minimal'},body:JSON.stringify([{visitor_id:visitor,ip_address:ip,user_agent:ua,browser:details.browser,operating_system:details.os,device_type:details.device}])});
-  if(!up.ok)return json({error:'Analytics unavailable'},502);
-  const visit=await supabase(env,'site_visits',{method:'POST',headers:{Prefer:'return=minimal'},body:JSON.stringify([{visitor_id:visitor,page_path:String(body.path||'/').slice(0,500),ip_address:ip,browser:details.browser,operating_system:details.os,device_type:details.device,referrer:String(body.referrer||'').slice(0,1000)||null}])});
-  if(!visit.ok)return json({error:'Analytics unavailable'},502);
-  return json({ok:true},200);
+  const ip=(req.headers.get('CF-Connecting-IP')||'').slice(0,64)||'';
+  const key='sb_publishable_FkRZkn5CqQwaN9GbhxBpgg_fMSvotuF';
+  const result=await fetch(env.SUPABASE_URL.replace(/\\/$/,'')+'/rest/v1/rpc/track_site_visit',{
+   method:'POST',
+   headers:{apikey:key,Authorization:'Bearer '+key,'Content-Type':'application/json'},
+   body:JSON.stringify({p_visitor_id:visitor,p_page_path:String(body.path||'/').slice(0,500),p_referrer:String(body.referrer||'').slice(0,1000),p_ip_address:ip,p_user_agent:ua,p_browser:details.browser,p_operating_system:details.os,p_device_type:details.device})
+  });
+  if(!result.ok)return json({error:'Analytics unavailable'},502,cors);
+  return json({ok:true},200,cors);
  }
 
  if(path==='/auth/login'&&req.method==='POST'){let body={};try{body=await req.json()}catch{};const u=String(body.username||''),p=String(body.password||'');if(u!==env.ADMIN_USERNAME||p!==env.ADMIN_PASSWORD)return json({error:'Unauthorized'},401);const exp=String(Math.floor(Date.now()/1000)+60*60*12),token=exp+'.'+await sign(exp,env.SESSION_SECRET);return json({ok:true},200,{'Set-Cookie':cookie(token,43200)});}
