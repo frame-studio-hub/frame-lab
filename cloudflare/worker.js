@@ -19,6 +19,7 @@ async function supabase(env,path,init={}){
 export default {async fetch(req,env){const url=new URL(req.url),path=url.pathname;
 
  if(path==='/analytics/track'&&req.method==='POST'){
+  if(req.headers.get('Origin')!==url.origin)return json({error:'Forbidden'},403);
   let body={};try{body=await req.json()}catch{return json({error:'Bad request'},400);}
   const visitor=String(body.visitor_id||'');
   if(!/^[0-9a-f-]{36}$/i.test(visitor))return json({error:'Invalid visitor'},400);
