@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#090a09">
+  <meta name="description" content="FRAME LAB® — независимое digital-агентство. Создаём сайты, айдентику и цифровые впечатления.">
+  <meta property="og:title" content="FRAME LAB® — Создаём цифровые впечатления">
+  <meta property="og:description" content="Независимое digital-агентство. Стратегия / Дизайн / Разработка.">
+  <meta property="og:type" content="website">
+  <title>FRAME LAB® — Создаём цифровые впечатления</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="reviews.css">
+  <script>document.documentElement.classList.add('js');</script>
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div>
+  <div class="scroll-progress" aria-hidden="true"><span></span></div>
+  <div class="cursor-glow" aria-hidden="true"></div>
+  <canvas id="ambient-canvas" aria-hidden="true"></canvas>
+  <canvas id="scene-3d" aria-hidden="true"></canvas>
+  <div class="scene-label mono" aria-hidden="true"><span>FL / СИСТЕМА 001</span><span>МАТЕРИЯ · СВЕТ · ФОРМА</span></div>
+
+  <header class="site-header" id="top">
+    <a class="brand" href="#top" aria-label="На главную FRAME LAB"><span>FRAME</span><i></i><sup>®</sup><small>НЕЗАВИСИМОЕ DIGITAL-АГЕНТСТВО</small></a>
+    <nav class="desktop-nav" aria-label="Основная навигация">
+      <a href="#about" >О НАС</a><a href="#work" >ПРОЕКТЫ</a><a href="#services" >УСЛУГИ</a><a href="#process" >ПРОЦЕСС</a><a href="#start" >БРИФ</a><a href="#reviews">ОТЗЫВЫ</a>
+    </nav>
+    <a class="header-contact magnetic" href="#contact">ОБСУДИТЬ ПРОЕКТ <span>↗</span></a>
+    <button class="menu-toggle" aria-label="Открыть меню" aria-expanded="false"><span></span><span></span></button>
+  </header>
+  <div class="mobile-menu" aria-hidden="true">
+    <a href="#about">О НАС <span>01</span></a><a href="#work">ПРОЕКТЫ <span>02</span></a><a href="#services">УСЛУГИ <span>03</span></a><a href="#process">ПРОЦЕСС <span>04</span></a><a href="#start">БРИФ <span>05</span></a><a href="#contact">КОНТАКТЫ <span>08</span></a>
+    <p>НЕЗАВИСИМОЕ DIGITAL-АГЕНТСТВО<br>СТРАТЕГИЯ / ДИЗАЙН / РАЗРАБОТКА</p>
+  </div>
+
+  <main>
+    <section class="hero section-pad" aria-labelledby="hero-title">
+      <div class="hero-meta mono"><span><b class="status-dot"></b> ОТКРЫТЫ К НОВЫМ ПРОЕКТАМ</span><span>РАБОТАЕМ В ЦИФРОВОМ ПРОСТРАНСТВЕ <i>↘</i></span></div>
+      <div class="hero-stage">
+        <div class="hero-sculpture" aria-hidden="true"><div class="sculpture-loop loop-a"></div><div class="sculpture-loop loop-b"></div><div class="sculpture-loop loop-c"></div><div class="sculpture-glass glass-a"></div><div class="sculpture-glass glass-b"></div><div class="sculpture-core"></div><div class="sculpture-beam"></div></div>
+        <div class="hero-orbit orbit-one" aria-hidden="true"><div class="orbit-core"></div></div>
+        <div class="hero-orbit orbit-two" aria-hidden="true"></div>
+        <div class="hero-object" aria-hidden="true"><div class="chrome-ball"></div><div class="glass-disc"></div><div class="lime-shard"></div></div>
+        <div class="hero-copy">
+          <p class="eyebrow mono reveal">НЕЗАВИСИМОЕ DIGITAL-АГЕНТСТВО <span>— 001 / 026</span></p>
+          <h1 id="hero-title" class="hero-title"><span class="title-line">СОЗДАЁМ</span><span class="title-line title-outline">ЦИФРОВЫЕ</span><span class="title-line">ВПЕЧАТЛЕНИЯ<span class="lime-dot">.</span></span></h1>
+          <div class="hero-bottom reveal">
+            <p>Превращаем смелые идеи<br>в выразительные цифровые решения.</p>
+            <a class="round-link" href="#work" aria-label="Посмотреть проекты"><span>↓</span></a>
+            <p class="hero-index mono">СТРАТЕГИЯ<br>ДИЗАЙН<br>РАЗРАБОТКА</p>
+          </div>
+        </div>
+      </div>
+      <div class="hero-foot mono"><span>ЛИСТАЙТЕ, ЧТОБЫ УЗНАТЬ</span><span>52° / 13° &nbsp; <i>ЗА РАМКАМИ ПРИВЫЧНОГО</i></span><span>СОЗДАЁМ БУДУЩЕЕ</span></div>
+    </section>
+
+    <div class="ticker" aria-label="Our philosophy"><div class="ticker-track"><span>МЫСЛИТЬ ШИРЕ РАМОК <b>✳</b> СОЗДАВАТЬ ЗНАЧИМОЕ <b>✳</b> СОЗДАВАТЬ СЛЕДУЮЩЕЕ <b>✳</b> МЫСЛИТЬ ШИРЕ РАМОК <b>✳</b> СОЗДАВАТЬ ЗНАЧИМОЕ <b>✳</b> СОЗДАВАТЬ СЛЕДУЮЩЕЕ <b>✳</b></span></div></div>
+
+    <section class="about section-pad" id="about">
+      <div class="section-kicker mono"><span>01 / КТО МЫ</span><span>РАМКА — ТОЛЬКО НАЧАЛО</span></div>
+      <div class="about-grid">
+        <h2 class="display-heading reveal">НЕ ПРОСТО<br>ДИЗАЙН.<br><em>МЫ СОЗДАЁМ</em><br>ВПЕЧАТЛЕНИЕ<span class="lime-dot">.</span></h2>
+        <div class="about-side reveal">
+          <div class="about-symbol" aria-hidden="true"><span>F</span><i></i><b></b></div>
+          <p class="lead">Сильный цифровой опыт не просит внимания. Он его заслуживает.</p>
+          <p class="body-copy">FRAME LAB — независимая креативная студия на пересечении стратегии, дизайна и технологий. Создаём айдентику, разрабатываем цифровые продукты и формируем выразительные визуальные миры.</p>
+          <a class="text-link" href="#services">ЧТО МЫ СОЗДАЁМ <span>↗</span></a>
+        </div>
+      </div>
+      <div class="about-strip mono"><span>СТРАТЕГИЯ СО СМЫСЛОМ</span><span>ДИЗАЙН С ХАРАКТЕРОМ</span><span>ТЕХНОЛОГИИ С ЦЕЛЬЮ</span></div>
+    </section>
+
+    <section class="work section-pad" id="work">
+      <div class="section-kicker mono"><span>02 / ИЗБРАННЫЕ ПРОЕКТЫ</span><span>ПРОСТРАНСТВО ЭКСПЕРИМЕНТА</span></div>
+      <div class="section-heading-row"><h2 class="display-heading reveal">СОЗДАНО,<br>ЧТОБЫ <em>ВПЕЧАТЛЯТЬ</em><span class="lime-dot">.</span></h2><p class="section-intro reveal">Коллекция визуальных исследований и концепций. Каждый проект — эксперимент с новым ощущением цифровой среды.</p></div>
+      <div class="filter-row mono" role="group" aria-label="Фильтр проектов">
+        <button class="filter-btn active" data-filter="all" aria-pressed="true">ВСЕ <sup>06</sup></button>
+        <button class="filter-btn" data-filter="branding" aria-pressed="false">АЙДЕНТИКА</button>
+        <button class="filter-btn" data-filter="web" aria-pressed="false">ВЕБ-ДИЗАЙН</button>
+        <button class="filter-btn" data-filter="digital" aria-pressed="false">ЦИФРОВОЕ</button>
+        <button class="filter-btn" data-filter="visual" aria-pressed="false">ВИЗУАЛЬНЫЙ КОНТЕНТ</button>
+      </div>
+      <div class="project-grid">
+        <article class="project-card project-large" data-category="branding" data-project="01" tabindex="0" role="button" aria-label="Открыть концепт AETHER">
+          <div class="project-art art-aether"><div class="aether-word">AETHER</div><div class="aether-orb"></div><div class="art-coordinate mono">РИС. 01 / СИСТЕМА АЙДЕНТИКИ</div><span class="art-label mono">ФОРМА / МАТЕРИЯ / СВЕТ</span></div>
+          <div class="project-info"><div><span class="project-type mono">АЙДЕНТИКА / КОНЦЕПТ</span><h3>AETHER®</h3></div><span class="project-arrow">↗</span></div>
+        </article>
+        <article class="project-card project-offset" data-category="web" data-project="02" tabindex="0" role="button" aria-label="Открыть концепт NØRD">
+          <div class="project-art art-nord"><div class="nord-panel"><span class="mono">NØRD / 001</span><strong>Less,<br>но<br>лучше.</strong><i>↗</i></div><div class="nord-orb"></div></div>
+          <div class="project-info"><div><span class="project-type mono">ВЕБ-ДИЗАЙН / КОНЦЕПТ</span><h3>NØRD STUDIO</h3></div><span class="project-arrow">↗</span></div>
+        </article>
+        <article class="project-card" data-category="digital" data-project="03" tabindex="0" role="button" aria-label="Открыть концепт VANTA">
+          <div class="project-art art-vanta"><div class="vanta-rings"><i></i><i></i><i></i></div><span class="vanta-name">VANTA<span>™</span></span><span class="mono vanta-caption">ЦИФРОВЫЕ ОБЪЕКТЫ / 03</span></div>
+          <div class="project-info"><div><span class="project-type mono">ЦИФРОВОЙ ПРОДУКТ / КОНЦЕПТ</span><h3>VANTA OBJECTS</h3></div><span class="project-arrow">↗</span></div>
+        </article>
+        <article class="project-card project-wide" data-category="visual" data-project="04" tabindex="0" role="button" aria-label="Открыть концепт FLUX">
+          <div class="project-art art-flux"><div class="flux-type">FLUX</div><div class="flux-shape"></div><span class="mono flux-meta">VISUAL STUDY — 04 / 06</span></div>
+          <div class="project-info"><div><span class="project-type mono">ВИЗУАЛЬНЫЙ КОНТЕНТ / КОНЦЕПТ</span><h3>FLUX CAMPAIGN</h3></div><span class="project-arrow">↗</span></div>
+        </article>
+        <article class="project-card" data-category="branding" data-project="05" tabindex="0" role="button" aria-label="Открыть концепт OBJECT 05">
+          <div class="project-art art-object"><div class="object-stack"><i></i><i></i><i></i></div><span class="object-number">05</span><span class="mono object-caption">ИССЛЕДОВАНИЕ КОНТРАСТА</span></div>
+          <div class="project-info"><div><span class="project-type mono">АРТ-ДИРЕКШН / КОНЦЕПТ</span><h3>OBJECT / 05</h3></div><span class="project-arrow">↗</span></div>
+        </article>
+        <article class="project-card project-offset" data-category="web" data-project="06" tabindex="0" role="button" aria-label="Открыть концепт SØL">
+          <div class="project-art art-sol"><div class="sol-sun"></div><div class="sol-copy"><span class="mono">SØL / ЦИФРОВОЕ ПРОСТРАНСТВО</span><strong>Найди<br>свой<br>ритм.</strong></div><span class="mono sol-bottom">ИНТЕРФЕЙС ДЛЯ СПОКОЙНОЙ ЖИЗНИ</span></div>
+          <div class="project-info"><div><span class="project-type mono">ВЕБ-ДИЗАЙН / КОНЦЕПТ</span><h3>SØL RETREAT</h3></div><span class="project-arrow">↗</span></div>
+        </article>
+      </div>
+      <p class="work-note mono">* ВСЕ ПРОЕКТЫ — АВТОРСКИЕ КОНЦЕПТУАЛЬНЫЕ ИССЛЕДОВАНИЯ.</p>
+    </section>
+
+    <section class="services section-pad" id="services">
+      <div class="section-kicker mono"><span>03 / ЧТО МЫ ДЕЛАЕМ</span><span>ОТ ПЕРВОЙ ИДЕИ ДО ПОСЛЕДНЕГО ПИКСЕЛЯ</span></div>
+      <div class="services-head"><h2 class="display-heading reveal">ИДЕИ — В<br><em>ЦИФРОВОЙ ОПЫТ</em><span class="lime-dot">.</span></h2><p class="section-intro reveal">Единый процесс и продуманный подход на каждом этапе.</p></div>
+      <div class="service-list">
+        <article class="service-item" tabindex="0"><span class="service-num mono">01</span><div class="service-main"><h3>Фирменный стиль</h3><p>Создаём визуальные системы, которые раскрывают характер бренда и помогают ему развиваться.</p></div><div class="service-detail detail-brand"><span>↗</span><b>ЗАЯВИ<br>О СЕБЕ.</b></div><span class="service-plus">↗</span></article>
+        <article class="service-item" tabindex="0"><span class="service-num mono">02</span><div class="service-main"><h3>Дизайн сайтов</h3><p>Проектируем сайты с выразительным визуальным языком, понятной структурой и смыслом.</p></div><div class="service-detail detail-web"><div class="mini-browser"><i></i><i></i><i></i><b>FRAME / DIGITAL</b><span>ВАЖНА<br>КАЖДАЯ ДЕТАЛЬ.</span></div></div><span class="service-plus">↗</span></article>
+        <article class="service-item" tabindex="0"><span class="service-num mono">03</span><div class="service-main"><h3>Разработка сайтов</h3><p>Разрабатываем быстрые адаптивные сайты, где детали, производительность и интерактив работают вместе.</p></div><div class="service-detail detail-code"><span>01&nbsp; const idea =</span><b>experience();</b><span>02&nbsp; build(impact);</span></div><span class="service-plus">↗</span></article>
+        <article class="service-item" tabindex="0"><span class="service-num mono">04</span><div class="service-main"><h3>Креативное направление</h3><p>Формируем цельное видение, объединяющее концепцию, изображение, движение и сообщение.</p></div><div class="service-detail detail-direction"><div class="direction-cross">✳</div><span>SEE IT<br>DIFFERENTLY</span></div><span class="service-plus">↗</span></article>
+        <article class="service-item" tabindex="0"><span class="service-num mono">05</span><div class="service-main"><h3>Цифровой контент</h3><p>Создаём визуальные материалы и контент-системы, которые притягивают внимание.</p></div><div class="service-detail detail-content"><div class="content-frame"></div><span>FRAME / 005</span></div><span class="service-plus">↗</span></article>
+        <article class="service-item" tabindex="0"><span class="service-num mono">06</span><div class="service-main"><h3>Интерактивные решения</h3><p>Создаём иммерсивные цифровые впечатления, в которые хочется погрузиться.</p></div><div class="service-detail detail-interactive"><div class="interactive-cube"></div></div><span class="service-plus">↗</span></article>
+      </div>
+    </section>
+
+    <section class="process section-pad" id="process">
+      <div class="section-kicker mono"><span>04 / КАК МЫ РАБОТАЕМ</span><span>ЯСНОСТЬ НА КАЖДОМ ЭТАПЕ</span></div>
+      <div class="process-layout"><div><h2 class="display-heading reveal">СОЗДАЁМ<br><em>ОСОЗНАННО</em><span class="lime-dot">.</span></h2><p class="process-intro">Сильный результат начинается с правильных вопросов. Работаем вместе, вдумчиво и фокусируемся на главном.</p></div>
+        <div class="process-steps">
+          <div class="process-line"><span></span></div>
+          <button class="process-step active" data-step="0"><span class="step-num mono">01</span><span class="step-name">ПОГРУЖЕНИЕ</span><span class="step-desc">Изучаем задачу, аудиторию, цели и возможности проекта.</span><i>↗</i></button>
+          <button class="process-step" data-step="1"><span class="step-num mono">02</span><span class="step-name">СТРАТЕГИЯ</span><span class="step-desc">Находим точное направление и определяем, каким должен быть результат.</span><i>↗</i></button>
+          <button class="process-step" data-step="2"><span class="step-num mono">03</span><span class="step-name">ДИЗАЙН</span><span class="step-desc">Исследуем, уточняем и создаём выразительный визуальный язык.</span><i>↗</i></button>
+          <button class="process-step" data-step="3"><span class="step-num mono">04</span><span class="step-name">РАЗРАБОТКА</span><span class="step-desc">Превращаем выбранную концепцию в работающий адаптивный продукт.</span><i>↗</i></button>
+          <button class="process-step" data-step="4"><span class="step-num mono">05</span><span class="step-name">ЗАПУСК</span><span class="step-desc">Проверяем детали, запускаем проект и планируем следующий шаг.</span><i>↗</i></button>
+        </div></div>
+    </section>
+
+    <section class="lab section-pad" id="lab">
+      <div class="section-kicker mono"><span>05 / ТВОРЧЕСКАЯ ЛАБОРАТОРИЯ</span><span>ЭКСПЕРИМЕНТ — ЧАСТЬ ПРОЦЕССА</span></div>
+      <div class="lab-grid"><div class="lab-copy"><h2 class="display-heading reveal">ЛЮБОПЫТСТВО<br>В <em>ДВИЖЕНИИ</em><span class="lime-dot">.</span></h2><p class="lead">Не каждому эксперименту нужно техническое задание.</p><p class="body-copy">Пространство для экспериментов с материалами, движением и неожиданными взаимодействиями. Перемещайте курсор и меняйте поведение системы.</p><div class="lab-controls"><button class="lab-button" id="lab-mode">СМЕНИТЬ ДВИЖЕНИЕ <span>↗</span></button><button class="lab-button" id="lab-reset">СБРОСИТЬ <span>↺</span></button></div><div class="material-switch" role="group" aria-label="Выбрать материал"><span class="mono">МАТЕРИАЛ СЦЕНЫ</span><button type="button" class="material-btn active" data-material-mode="glass" aria-pressed="true">СТЕКЛО</button><button type="button" class="material-btn" data-material-mode="chrome" aria-pressed="false">ХРОМ</button><button type="button" class="material-btn" data-material-mode="lime" aria-pressed="false">ЛАЙМ</button></div></div>
+        <div class="lab-visual" id="lab-visual"><canvas id="lab-canvas" aria-label="Интерактивное поле частиц"></canvas><div class="lab-hud mono"><span>FL / EXPERIMENT 001</span><span id="lab-state">FIELD: ORBITAL</span><span>ДВИГАЙТЕ КУРСОР ↗</span></div><div class="lab-center-label">ФОРМА<br>СЛЕДУЕТ ЗА<br><em>ИДЕЕЙ.</em></div><div class="lab-corner mono">LIVE SYSTEM<br>NO. 001—026</div></div></div>
+    </section>
+
+    <section class="start-project section-pad" id="start">
+      <div class="section-kicker mono"><span>06 / ПОДОБРАТЬ РЕШЕНИЕ</span><span>НЕ НУЖНО ЗНАТЬ ТЕХНИЧЕСКИЕ ТЕРМИНЫ</span></div>
+      <div class="start-heading"><h2 class="display-heading reveal">РАССКАЖИТЕ<br>О <em>ВАШЕЙ ИДЕЕ</em><span class="lime-dot">.</span></h2><p class="section-intro">Ответьте на несколько простых вопросов. Мы соберём понятный бриф, чтобы разговор начался предметно.</p></div>
+      <div class="planner-shell">
+        <div class="planner-top"><div><span class="mono">КОНСТРУКТОР ПРОЕКТА</span><p id="planner-step-label">ШАГ 01 / 03 — ЧТО НУЖНО СОЗДАТЬ?</p></div><div class="planner-progress" aria-label="Прогресс заполнения"><span id="planner-progress-fill"></span></div></div>
+        <form id="project-planner">
+          <div class="planner-step active" data-planner-step="0">
+            <fieldset><legend>Какой результат вам нужен?</legend><p class="field-hint">Выберите направление, которое ближе всего к вашей задаче.</p><div class="choice-grid">
+              <label class="choice-card"><input type="radio" name="service" value="Сайт под ключ" required><span class="choice-icon">↗</span><b>Сайт под ключ</b><small>Дизайн и разработка вместе</small></label>
+              <label class="choice-card"><input type="radio" name="service" value="Лендинг"><span class="choice-icon">▤</span><b>Лендинг</b><small>Одна страница для продукта или услуги</small></label>
+              <label class="choice-card"><input type="radio" name="service" value="Интернет-магазин"><span class="choice-icon">◫</span><b>Интернет-магазин</b><small>Каталог, товары и оформление заказа</small></label>
+              <label class="choice-card"><input type="radio" name="service" value="Дизайн интерфейса"><span class="choice-icon">⌘</span><b>Дизайн интерфейса</b><small>Макеты сайта или цифрового продукта</small></label>
+              <label class="choice-card"><input type="radio" name="service" value="Фирменный стиль"><span class="choice-icon">✳</span><b>Фирменный стиль</b><small>Логотип и визуальная система бренда</small></label>
+              <label class="choice-card"><input type="radio" name="service" value="Редизайн"><span class="choice-icon">⟳</span><b>Редизайн</b><small>Обновить существующий проект</small></label>
+              <label class="choice-card"><input type="radio" name="service" value="Пока не знаю"><span class="choice-icon">?</span><b>Пока не знаю</b><small>Помогите выбрать решение</small></label>
+            </div></fieldset>
+            <div class="planner-actions"><span class="field-hint">Можно выбрать один вариант</span><button class="planner-next" type="button" data-next>ДАЛЕЕ <span>→</span></button></div>
+          </div>
+          <div class="planner-step" data-planner-step="1" hidden>
+            <fieldset><legend>Немного о задаче</legend><p class="field-hint">Это поможет предложить решение под ваш бизнес, а не просто красивую картинку.</p>
+              <div class="form-grid"><label class="form-field">Чем занимается ваш бизнес?<input name="business" type="text" placeholder="Например: студия интерьера, кафе, эксперт"></label>
+                <label class="form-field">Главная цель<select name="goal"><option value="Привлекать новых клиентов">Привлекать новых клиентов</option><option value="Продавать товары или услуги онлайн">Продавать товары или услуги онлайн</option><option value="Презентовать компанию и услуги">Презентовать компанию и услуги</option><option value="Обновить образ бренда">Обновить образ бренда</option><option value="Упростить работу пользователей">Упростить работу пользователей</option><option value="Пока формулирую задачу">Пока формулирую задачу</option></select></label>
+                <label class="form-field">Когда хотелось бы запуститься?<select name="deadline"><option value="Сроки гибкие">Сроки гибкие</option><option value="В течение месяца">В течение месяца</option><option value="Через 1–2 месяца">Через 1–2 месяца</option><option value="Через 3 месяца или позже">Через 3 месяца или позже</option><option value="Есть конкретная дата">Есть конкретная дата</option></select></label>
+                <label class="form-field">Что уже подготовлено?<select name="materials"><option value="Есть логотип и материалы">Есть логотип и материалы</option><option value="Есть только часть материалов">Есть только часть материалов</option><option value="Пока ничего нет">Пока ничего нет</option><option value="Есть действующий сайт">Есть действующий сайт</option></select></label>
+                <label class="form-field form-field-wide">Ссылка на сайт или референс (необязательно)<input name="reference" type="url" placeholder="https://"></label>
+                <label class="form-field form-field-wide">Что важно учесть? (необязательно)<textarea name="details" rows="3" placeholder="Опишите пожелания обычными словами — без технических терминов"></textarea></label>
+              </div>
+            </fieldset>
+            <div class="planner-actions"><button class="planner-back" type="button" data-back>← НАЗАД</button><button class="planner-next" type="button" data-next>ДАЛЕЕ <span>→</span></button></div>
+          </div>
+          <div class="planner-step" data-planner-step="2" hidden>
+            <fieldset><legend>Куда отправить ответ?</legend><p class="field-hint">Оставьте удобный способ связи. После сборки брифа вы сможете скопировать его и отправить нам в Instagram.</p>
+              <div class="form-grid"><label class="form-field">Как к вам обращаться?<input name="client" type="text" placeholder="Ваше имя" required></label><label class="form-field">Контакт для связи<input name="contact" type="text" placeholder="Instagram, Telegram, e-mail или телефон" required></label>
+                <label class="form-field form-field-wide">Ориентир по бюджету<select name="budget"><option value="Пока не определён — нужна консультация">Пока не определён — нужна консультация</option><option value="Есть ориентир, готов обсудить">Есть ориентир, готов обсудить</option><option value="Есть утверждённый бюджет">Есть утверждённый бюджет</option><option value="Хочу сначала понять возможный объём работ">Хочу сначала понять возможный объём работ</option></select></label></div>
+              <label class="consent-line"><input type="checkbox" name="consent" required><span>Согласен(на) использовать указанные контакты для ответа на мою заявку.</span></label>
+            </fieldset>
+            <div class="planner-actions"><button class="planner-back" type="button" data-back>← НАЗАД</button><button class="planner-next" type="submit">СОБРАТЬ БРИФ <span>↗</span></button></div>
+          </div>
+          <div class="planner-result" id="planner-result" hidden aria-live="polite"><div class="result-mark">✓</div><span class="mono">БРИФ СОБРАН</span><h3>Отличное начало.</h3><p>Заявка отправлена в FRAME LAB. Сохраните текст брифа для себя — мы свяжемся с вами по указанному контакту.</p><pre id="brief-output"></pre><div class="result-actions"><button type="button" class="planner-next" id="copy-brief">СКОПИРОВАТЬ БРИФ <span>⧉</span></button><a class="planner-next" id="instagram-brief" href="https://www.instagram.com/frame.lab.co/" target="_blank" rel="noopener noreferrer">ОТКРЫТЬ INSTAGRAM <span>↗</span></a><button type="button" class="planner-back" id="restart-brief">ЗАПОЛНИТЬ ЗАНОВО ↺</button></div><p class="copy-status" id="copy-status" role="status"></p></div>
+        </form>
+      </div>
+      <div class="clarity-strip"><div><b>Без сложных терминов</b><span>Отвечайте так, как удобно вам.</span></div><div><b>Без скрытой цены</b><span>Стоимость обсуждаем после понимания объёма.</span></div><div><b>Без обязательств</b><span>Бриф — начало диалога, а не договор.</span></div></div>
+    </section>
+
+    <section class="reviews section-pad" id="reviews">
+      <div class="section-kicker mono"><span>07 / МНЕНИЕ КЛИЕНТОВ</span><span>ОТЗЫВЫ ПРОХОДЯТ МОДЕРАЦИЮ</span></div>
+      <div class="reviews-heading"><h2 class="display-heading reveal">ВАЖНО<br><em>ДОВЕРИЕ.</em><span class="lime-dot">.</span></h2><p class="section-intro">Здесь публикуются отзывы людей, которые действительно работали с FRAME LAB. Каждый отзыв проверяется перед публикацией.</p></div>
+      <div class="reviews-list" id="public-reviews"><p class="reviews-empty">Загружаем отзывы…</p></div>
+      <div class="review-form-shell"><div><span class="mono">ВАШ ОПЫТ</span><h3>Работали с нами?</h3><p>Поделитесь впечатлением. После проверки отзыв появится на сайте.</p></div>
+        <form id="review-form" class="review-form"><div class="form-grid"><label class="form-field">Ваше имя<input name="author" maxlength="60" required placeholder="Как к вам обращаться?"></label><label class="form-field">Проект / компания<input name="project" maxlength="90" placeholder="Необязательно"></label></div>
+          <label class="form-field">Оценка<select name="rating" required><option value="5">★★★★★ — 5 из 5</option><option value="4">★★★★☆ — 4 из 5</option><option value="3">★★★☆☆ — 3 из 5</option><option value="2">★★☆☆☆ — 2 из 5</option><option value="1">★☆☆☆☆ — 1 из 5</option></select></label>
+          <label class="form-field">Ваш отзыв<textarea name="body" rows="4" maxlength="1200" required placeholder="Расскажите о сотрудничестве…"></textarea></label>
+          <label class="consent-line"><input type="checkbox" name="consent" required><span>Согласен(на) на публикацию отзыва после модерации.</span></label>
+          <button class="planner-next" type="submit">ОТПРАВИТЬ ОТЗЫВ <span>↗</span></button><p class="form-status" id="review-status" role="status"></p>
+        </form>
+      </div>
+    </section>
+
+    <section class="faq section-pad" id="faq">
+      <div class="section-kicker mono"><span>08 / ВОПРОСЫ И ОТВЕТЫ</span><span>БЕЗ СЕКРЕТОВ — ТОЛЬКО ДЕЛО</span></div>
+      <div class="faq-layout"><h2 class="display-heading reveal">НЕСКОЛЬКО<br><em>ВАЖНЫХ</em><br>ВОПРОСОВ<span class="lime-dot">.</span></h2><div class="faq-list">
+        <details><summary>С какими проектами вы работаете?<span>+</span></summary><p>Фирменный стиль, сайты, цифровой контент и интерактивные решения. Нам близки проекты с ясной целью и интересом к продуманному креативу.</p></details>
+        <details><summary>Вы занимаетесь и дизайном, и разработкой?<span>+</span></summary><p>Да. Объединяем стратегию, дизайн и фронтенд-разработку, сохраняя связь между идеей и её реализацией.</p></details>
+        <details><summary>Сколько стоит проект?<span>+</span></summary><p>Стоимость зависит от задачи, объёма, количества уникальных экранов и нужных функций. После короткого обсуждения FRAME LAB подготовит предложение с составом работ и стоимостью. Бриф на сайте помогает собрать вводные, но не подменяет индивидуальную оценку.</p></details>
+        <details><summary>Сколько времени занимает разработка?<span>+</span></summary><p>Срок зависит от масштаба проекта, готовности материалов и скорости согласований. Ориентир по срокам фиксируем после определения объёма работ.</p></details>
+        <details><summary>Что нужно подготовить перед стартом?<span>+</span></summary><p>Достаточно рассказать о бизнесе, задаче и желаемом результате. Логотип, тексты, фотографии и примеры нравящихся решений полезны, но если чего-то пока нет — укажите это в брифе.</p></details>
+        <details><summary>С чего начинается работа?<span>+</span></summary><p>С разговора. Расскажите, что вы создаёте, какая задача стоит и что хотите изменить. Вместе определим объём и следующие шаги.</p></details>
+        <details><summary>Работаете ли вы с командами из других стран?<span>+</span></summary><p>Да. Процесс полностью адаптирован для удалённой работы. Формат, сроки и коммуникацию согласуем в начале.</p></details>
+      </div></div>
+    </section>
+
+    <section class="contact section-pad" id="contact">
+      <div class="contact-top mono"><span>09 / ЕСТЬ ИДЕЯ?</span><span>СЛЕДУЮЩИЙ КАДР ЗА ВАМИ</span></div>
+      <div class="contact-art" aria-hidden="true"><div class="contact-ring ring-a"></div><div class="contact-ring ring-b"></div><div class="contact-glass"></div><div class="contact-light"></div></div>
+      <h2 class="contact-title">ДАВАЙТЕ<br>СОЗДАДИМ<br><em>НЕЧТО ВАЖНОЕ.</em></h2>
+      <div class="contact-bottom"><p>Есть задача, мысль<br>или пока только идея?</p><a class="start-button magnetic" href="https://www.instagram.com/frame.lab.co/" target="_blank" rel="noopener noreferrer"><span>НАЧАТЬ ПРОЕКТ</span><b>↗</b></a><div class="contact-social mono"><span>СЛЕДИТЕ ЗА ПРОЦЕССОМ</span><a href="https://www.instagram.com/frame.lab.co/" target="_blank" rel="noopener noreferrer">INSTAGRAM ↗</a></div></div>
+      <footer class="site-footer mono"><a class="footer-brand" href="#top">FRAME LAB<span>®</span></a><span>СОЗДАЁМ ЦИФРОВЫЕ ВПЕЧАТЛЕНИЯ.</span><span>© <span id="year"></span> FRAME LAB. ВСЕ ПРАВА ЗАЩИЩЕНЫ.</span><a href="#top">НАВЕРХ ↑</a><a href="admin.html" class="admin-entry">ADMIN ↗</a></footer>
+    </section>
+  </main>
+
+  <div class="project-modal" id="project-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-backdrop" data-close-modal></div><div class="modal-panel"><button class="modal-close" aria-label="Закрыть описание проекта" data-close-modal>×</button><span class="mono modal-kicker" id="modal-kicker">КОНЦЕПТ / 01</span><h2 id="modal-title">AETHER®</h2><p id="modal-description">Исследование фирменной идентичности.</p><div class="modal-meta mono"><span id="modal-category">АЙДЕНТИКА</span><span>АВТОРСКИЙ КОНЦЕПТ</span></div><p class="modal-disclaimer">Это авторское концептуальное исследование для портфолио FRAME LAB. Проект не является заказной клиентской работой.</p><a class="text-link" id="modal-project-link" href="https://www.instagram.com/frame.lab.co/" target="_blank" rel="noopener noreferrer">ОБСУДИТЬ ПРОЕКТ <span>↗</span></a></div>
+  </div>
+  <script src="script.js" defer></script>
+  <script type="module" src="site-backend.js"></script>
+  <script type="module" src="three-scene.js"></script>
+</body>
+</html>
