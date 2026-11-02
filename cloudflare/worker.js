@@ -56,7 +56,7 @@ export default {async fetch(req,env){const url=new URL(req.url),path=url.pathnam
   // for Pages/custom-proxy paths, and normalize forwarded lists to one address.
   const ip=''; // Do not collect or store visitor IP addresses.
   const key='sb_publishable_FkRZkn5CqQwaN9GbhxBpgg_fMSvotuF';
-  const result=await fetch(env.SUPABASE_URL.replace(/\/$/,'')+'/rest/v1/rpc/track_site_visit',{
+  const result=await fetch(projectBase(env)+'/rest/v1/rpc/track_site_visit',{
    method:'POST',
    headers:{apikey:key,Authorization:'Bearer '+key,'Content-Type':'application/json'},
    body:JSON.stringify({p_visitor_id:visitor,p_page_path:String(body.path||'/').slice(0,500),p_referrer:String(body.referrer||'').slice(0,1000),p_ip_address:ip,p_user_agent:ua,p_browser:details.browser,p_operating_system:details.os,p_device_type:details.device})
@@ -68,7 +68,7 @@ export default {async fetch(req,env){const url=new URL(req.url),path=url.pathnam
  if(path==='/auth/login'&&req.method==='POST'){let body={};try{body=await req.json()}catch{};const u=String(body.username||''),p=String(body.password||'');if(u!==env.ADMIN_USERNAME||p!==env.ADMIN_PASSWORD)return json({error:'Unauthorized'},401);const exp=String(Math.floor(Date.now()/1000)+60*60*12),token=exp+'.'+await sign(exp,env.SESSION_SECRET);return json({ok:true},200,{'Set-Cookie':cookie(token,43200)});}
  if(path==='/auth/check'&&req.method==='GET'){if(!await valid(req,env))return json({error:'Unauthorized'},401);return json({id:env.ADMIN_USER_ID,username:env.ADMIN_USERNAME});}
  if(path==='/auth/logout'&&req.method==='POST')return json({ok:true},200,{'Set-Cookie':cookie('',0)});
- if(path.startsWith('/api/')){if(!await valid(req,env))return json({error:'Unauthorized'},401);const base=env.SUPABASE_URL.replace(/\/$/,'');const headers={'apikey':env.SUPABASE_SERVICE_ROLE_KEY,'Authorization':`Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`};
+ if(path.startsWith('/api/')){if(!await valid(req,env))return json({error:'Unauthorized'},401);const base=projectBase(env);const headers={'apikey':env.SUPABASE_SERVICE_ROLE_KEY,'Authorization':`Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`};
 
   if(path==='/api/analytics'&&req.method==='GET'){
    const from=url.searchParams.get('from')||new Date(Date.now()-30*86400000).toISOString();
