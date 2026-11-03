@@ -63,9 +63,9 @@ async function handle(req,env){const url=new URL(req.url),path=url.pathname;
     p_city:cleanText(cf.city,100),p_provider:provider,
     p_screen_width:cleanInt(body.screen_width,1,20000),p_screen_height:cleanInt(body.screen_height,1,20000),
     p_language:cleanText(body.language,40),p_timezone:cleanText(body.timezone,100),p_color_scheme:cleanText(body.color_scheme,20),
-    p_cpu_cores:cleanInt(body.cpu_cores,1,512),p_device_memory_gb:Number.isFinite(Number(body.device_memory_gb))?Number(body.device_memory_gb):null,
+    p_cpu_cores:cleanInt(body.cpu_cores,1,512),p_device_memory_gb:body.device_memory_gb!=null&&Number.isFinite(Number(body.device_memory_gb))?Number(body.device_memory_gb):null,
     p_gpu_renderer:cleanText(body.gpu_renderer,250),
-    p_battery_level:Number.isFinite(Number(body.battery_level))?Number(body.battery_level):null,
+    p_battery_level:body.battery_level!=null&&Number.isFinite(Number(body.battery_level))?Number(body.battery_level):null,
     p_battery_charging:typeof body.battery_charging==='boolean'?body.battery_charging:null
    })
   });
@@ -125,7 +125,7 @@ async function handle(req,env){const url=new URL(req.url),path=url.pathname;
    for(const v of visits){const key=v.visitor_id||'unknown';if(!grouped.has(key))grouped.set(key,[]);grouped.get(key).push(v);}
    const visitorProfiles=[...grouped.entries()].map(([id,items])=>{
     const first=items[items.length-1],last=items[0],meta=visitorMap.get(id)||{};
-    return {visitor_id:id,ip_address:last.ip_address||meta.ip_address||'',browser:last.browser||meta.browser||'',operating_system:last.operating_system||meta.operating_system||'',device_type:last.device_type||meta.device_type||'',first_seen:first.created_at,last_seen:last.created_at,visits:items.length,pages:[...new Set(items.map(x=>x.page_path))].slice(0,12)};
+    return {visitor_id:id,ip_address:last.ip_address||meta.ip_address||'',city:last.city||meta.city||null,provider:last.provider||meta.provider||null,browser:last.browser||meta.browser||'',operating_system:last.operating_system||meta.operating_system||'',device_type:last.device_type||meta.device_type||'',screen_width:last.screen_width??null,screen_height:last.screen_height??null,language:last.language??null,timezone:last.timezone??null,color_scheme:last.color_scheme??null,cpu_cores:last.cpu_cores??null,device_memory_gb:last.device_memory_gb??null,gpu_renderer:last.gpu_renderer??null,battery_level:last.battery_level??null,battery_charging:last.battery_charging??null,referrer:last.referrer??null,page_path:last.page_path??'/',first_seen:first.created_at,last_seen:last.created_at,created_at:last.created_at,visits:items.length,pages:[...new Set(items.map(x=>x.page_path))].slice(0,12)};
    }).sort((a,b)=>new Date(b.last_seen)-new Date(a.last_seen)).slice(0,300);
    return json({total:visits.length,unique,online:live.length,hourly,pages,browsers,systems,devices,visits:rows,visitorProfiles,limited:visits.length>=10000});
   }
