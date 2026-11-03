@@ -65,10 +65,10 @@ export default {async fetch(req,env){const url=new URL(req.url),path=url.pathnam
   return json({ok:true},200,cors);
  }
 
- if(path==='/auth/login'&&req.method==='POST'){let body={};try{body=await req.json()}catch{};const u=String(body.username||''),p=String(body.password||'');if(u!==env.ADMIN_USERNAME||p!==env.ADMIN_PASSWORD)return json({error:'Unauthorized'},401);const exp=String(Math.floor(Date.now()/1000)+60*60*12),token=exp+'.'+await sign(exp,env.SESSION_SECRET);return json({ok:true},200,{'Set-Cookie':cookie(token,43200)});}
- if(path==='/auth/check'&&req.method==='GET'){if(!await valid(req,env))return json({error:'Unauthorized'},401);return json({id:env.ADMIN_USER_ID,username:env.ADMIN_USERNAME});}
+ if(path==='/auth/login'&&req.method==='POST'){if(!env.ADMIN_USERNAME||!env.ADMIN_PASSWORD||!env.SESSION_SECRET)return json({error:'Админка не настроена: в Preview не подключены секреты авторизации. Это ошибка конфигурации сайта, а не логина или пароля.'},503);let body={};try{body=await req.json()}catch{};const u=String(body.username||''),p=String(body.password||'');if(u!==env.ADMIN_USERNAME||p!==env.ADMIN_PASSWORD)return json({error:'Unauthorized'},401);const exp=String(Math.floor(Date.now()/1000)+60*60*12),token=exp+'.'+await sign(exp,env.SESSION_SECRET);return json({ok:true},200,{'Set-Cookie':cookie(token,43200)});}
+ if(path==='/auth/check'&&req.method==='GET'){if(!env.SESSION_SECRET)return json({error:'Админка не настроена: отсутствует SESSION_SECRET в Preview.'},503);if(!await valid(req,env))return json({error:'Unauthorized'},401);return json({id:env.ADMIN_USER_ID,username:env.ADMIN_USERNAME});}
  if(path==='/auth/logout'&&req.method==='POST')return json({ok:true},200,{'Set-Cookie':cookie('',0)});
- if(path.startsWith('/api/')){if(!await valid(req,env))return json({error:'Unauthorized'},401);const base=projectBase(env);const headers={'apikey':env.SUPABASE_SERVICE_ROLE_KEY,'Authorization':`Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`};
+ if(path.startsWith('/api/')){if(!env.SESSION_SECRET||!env.SUPABASE_SERVICE_ROLE_KEY)return json({error:'Админка не настроена: в Preview отсутствуют серверные секреты.'},503);if(!await valid(req,env))return json({error:'Unauthorized'},401);const base=projectBase(env);const headers={'apikey':env.SUPABASE_SERVICE_ROLE_KEY,'Authorization':`Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`};
 
   if(path==='/api/analytics'&&req.method==='GET'){
    const from=url.searchParams.get('from')||new Date(Date.now()-30*86400000).toISOString();
