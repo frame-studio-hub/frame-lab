@@ -2,7 +2,7 @@ const COOKIE='frame_admin_session';
 const TABLES=new Set(['requests','reviews','request_notes','request_activity','request_messages','request_files','site_visitors','site_visits','site_daily_stats']);
 const json=(data,status=200,headers={})=>new Response(JSON.stringify(data),{status,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store',...headers}});
 async function sign(value,secret){const key=await crypto.subtle.importKey('raw',new TextEncoder().encode(secret),{name:'HMAC',hash:'SHA-256'},false,['sign']);const sig=await crypto.subtle.sign('HMAC',key,new TextEncoder().encode(value));return btoa(String.fromCharCode(...new Uint8Array(sig))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');}
-async function valid(req,env){const raw=(req.headers.get('Cookie')||'').split(';').map(x=>x.trim()).find(x=>x.startsWith(COOKIE+'='))?.slice(COOKIE.length+1);if(!raw)return false;const [exp,sig]=raw.split('.');if(!exp||!sig||Number(exp)<Date.now()/1000)return false;return (await sign(exp,env.SESSION_SECRET))===sig;}
+async function valid(req,env){const bearer=(req.headers.get('Authorization')||'').replace(/^Bearer\\s+/i,'');const raw=bearer||((req.headers.get('Cookie')||'').split(';').map(x=>x.trim()).find(x=>x.startsWith(COOKIE+'='))?.slice(COOKIE.length+1));if(!raw)return false;const [exp,sig]=raw.split('.');if(!exp||!sig||Number(exp)<Date.now()/1000)return false;return (await sign(exp,env.SESSION_SECRET))===sig;}
 function cookie(value,maxAge){return `${COOKIE}=${value}; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=${maxAge}`;}
 
 function parseAgent(ua=''){
@@ -61,9 +61,9 @@ async function handle(req,env){const url=new URL(req.url),path=url.pathname;
   return json({ok:true},200,cors);
  }
 
- if(path==='/auth/login'&&req.method==='POST'){let body={};try{body=await req.json()}catch{};const u=String(body.username||''),p=String(body.password||'');if(u!==env.ADMIN_USERNAME||p!==env.ADMIN_PASSWORD)return json({error:'Unauthorized'},401);const exp=String(Math.floor(Date.now()/1000)+60*60*12),token=exp+'.'+await sign(exp,env.SESSION_SECRET);return json({ok:true},200,{'Set-Cookie':cookie(token,43200)});}
+ if(path==='/auth/login'&&req.method==='POST'){let body={};try{body=await req.json()}catch{};const u=String(body.username||''),p=String(body.password||'');if(u!==env.ADMIN_USERNAME||p!==env.ADMIN_PASSWORD)return json({error:'Unauthorized'},401);const exp=String(Math.floor(Date.now()/1000)+60*60*12),token=exp+'.'+await sign(exp,env.SESSION_SECRET);return json({ok:true,token},200);}
  if(path==='/auth/check'&&req.method==='GET'){if(!await valid(req,env))return json({error:'Unauthorized'},401);return json({id:env.ADMIN_USER_ID,username:env.ADMIN_USERNAME});}
- if(path==='/auth/logout'&&req.method==='POST')return json({ok:true},200,{'Set-Cookie':cookie('',0)});
+ if(path==='/auth/logout'&&req.method==='POST')return json({ok:true});
  if(path.startsWith('/api/')){if(!await valid(req,env))return json({error:'Unauthorized'},401);const base=env.SUPABASE_URL.replace(/\/$/,'');const headers={'apikey':env.SUPABASE_SERVICE_ROLE_KEY,'Authorization':`Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`};
 
   if(path==='/api/analytics'&&req.method==='GET'){
@@ -102,7 +102,7 @@ async function handle(req,env){const url=new URL(req.url),path=url.pathname;
 export default {async fetch(req,env){
  const origin=req.headers.get('Origin')||'';
  const allowed='https://frame-studio-hub.github.io';
- const cors={'Access-Control-Allow-Origin':allowed,'Access-Control-Allow-Credentials':'true','Access-Control-Allow-Methods':'GET, POST, PATCH, DELETE, OPTIONS','Access-Control-Allow-Headers':'Content-Type, Prefer, Accept','Vary':'Origin'};
+ const cors={'Access-Control-Allow-Origin':allowed,'Access-Control-Allow-Credentials':'true','Access-Control-Allow-Methods':'GET, POST, PATCH, DELETE, OPTIONS','Access-Control-Allow-Headers':'Content-Type, Prefer, Accept, Authorization','Vary':'Origin'};
  if(origin && origin!==allowed)return json({error:'Forbidden'},403);
  if(req.method==='OPTIONS')return new Response(null,{status:204,headers:origin===allowed?cors:{}});
  const response=await handle(req,env);
