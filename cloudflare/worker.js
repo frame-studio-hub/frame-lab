@@ -3,7 +3,7 @@ const TABLES=new Set(['requests','reviews','request_notes','request_activity','r
 const json=(data,status=200,headers={})=>new Response(JSON.stringify(data),{status,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store',...headers}});
 async function sign(value,secret){const key=await crypto.subtle.importKey('raw',new TextEncoder().encode(secret),{name:'HMAC',hash:'SHA-256'},false,['sign']);const sig=await crypto.subtle.sign('HMAC',key,new TextEncoder().encode(value));return btoa(String.fromCharCode(...new Uint8Array(sig))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');}
 async function valid(req,env){const raw=(req.headers.get('Cookie')||'').split(';').map(x=>x.trim()).find(x=>x.startsWith(COOKIE+'='))?.slice(COOKIE.length+1);if(!raw)return false;const [exp,sig]=raw.split('.');if(!exp||!sig||Number(exp)<Date.now()/1000)return false;return (await sign(exp,env.SESSION_SECRET))===sig;}
-function cookie(value,maxAge){return `${COOKIE}=${value}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${maxAge}`;}
+function cookie(value,maxAge){return `${COOKIE}=${value}; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=${maxAge}`;}
 
 function parseAgent(ua=''){
  const u=String(ua).toLowerCase();
@@ -34,7 +34,7 @@ async function supabase(env,path,init={}){
  return fetch(base+'/rest/v1/'+path,{...init,headers:{apikey:env.SUPABASE_SERVICE_ROLE_KEY,Authorization:'Bearer '+env.SUPABASE_SERVICE_ROLE_KEY,'Content-Type':'application/json',...(init.headers||{})}});
 }
 
-export default {async fetch(req,env){const url=new URL(req.url),path=url.pathname;
+async function handle(req,env){const url=new URL(req.url),path=url.pathname;
 
  if(path==='/analytics/track'){
   const origin=req.headers.get('Origin')||'';
@@ -97,4 +97,16 @@ export default {async fetch(req,env){const url=new URL(req.url),path=url.pathnam
   if(path.startsWith('/api/storage-sign/')){const rest=path.slice('/api/storage-sign/'.length);const [bucket,...parts]=rest.split('/');if(bucket!=='client-files'||!parts.length)return json({error:'Forbidden'},403);const objectPath=parts.map(decodeURIComponent).join('/');const up=await fetch(base+'/storage/v1/object/sign/'+bucket+'/'+objectPath.split('/').map(encodeURIComponent).join('/'),{method:'POST',headers:{...headers,'Content-Type':'application/json'},body:JSON.stringify({expiresIn:Number(url.searchParams.get('expiresIn'))||60})});const data=await up.json().catch(()=>({}));if(!up.ok)return json(data,up.status);return json({signedUrl:data.signedURL?.startsWith('http')?data.signedURL:base+'/storage/v1'+data.signedURL});}
  }
  return fetch(req);
+}
+
+export default {async fetch(req,env){
+ const origin=req.headers.get('Origin')||'';
+ const allowed='https://frame-studio-hub.github.io';
+ const cors={'Access-Control-Allow-Origin':allowed,'Access-Control-Allow-Credentials':'true','Access-Control-Allow-Methods':'GET, POST, PATCH, DELETE, OPTIONS','Access-Control-Allow-Headers':'Content-Type, Prefer, Accept','Vary':'Origin'};
+ if(origin && origin!==allowed)return json({error:'Forbidden'},403);
+ if(req.method==='OPTIONS')return new Response(null,{status:204,headers:origin===allowed?cors:{}});
+ const response=await handle(req,env);
+ const headers=new Headers(response.headers);
+ if(origin===allowed)for(const [k,v] of Object.entries(cors))headers.set(k,v);
+ return new Response(response.body,{status:response.status,statusText:response.statusText,headers});
 }};
