@@ -61,6 +61,32 @@ async function handle(req,env){const url=new URL(req.url),path=url.pathname;
   return json({ok:true},200,cors);
  }
 
+
+ if(path==='/public/reviews'&&req.method==='GET'){
+  const result=await supabase(env,'reviews?select=id,created_at,author,project,rating,body&status=eq.approved&order=created_at.desc&limit=30');
+  const data=await result.json().catch(()=>[]);
+  if(!result.ok)return json({error:'Reviews unavailable'},502);
+  return json({reviews:data});
+ }
+ if(path==='/public/reviews'&&req.method==='POST'){
+  let body={};try{body=await req.json()}catch{return json({error:'Bad request'},400);}
+  const author=String(body.author||'').trim().slice(0,60),project=String(body.project||'').trim().slice(0,90),review=String(body.body||'').trim().slice(0,1200),rating=Number(body.rating);
+  if(!author||!review||!Number.isInteger(rating)||rating<1||rating>5)return json({error:'Заполните имя, отзыв и оценку.'},400);
+  const result=await supabase(env,'reviews',{method:'POST',headers:{Prefer:'return=minimal'},body:JSON.stringify({author,project,rating,body:review,status:'pending'})});
+  if(!result.ok){const e=await result.json().catch(()=>({}));return json({error:e.message||'Не удалось сохранить отзыв'},502);}
+  return json({ok:true,message:'Отзыв отправлен на модерацию.'},201);
+ }
+ if(path==='/public/requests'&&req.method==='POST'){
+  let body={};try{body=await req.json()}catch{return json({error:'Bad request'},400);}
+  const str=(key,max=2000)=>String(body[key]||'').trim().slice(0,max);
+  const client=str('client',120),contact=str('contact',240),service=str('service',160);
+  if(!client||!contact||!service)return json({error:'Укажите имя, контакт и услугу.'},400);
+  const row={client,contact,service,business:str('business',300),goal:str('goal',500),deadline:str('deadline',200),materials:str('materials',300),reference:str('reference',1000),details:str('details',5000),budget:str('budget',300),brief:str('brief',10000),status:'new'};
+  const result=await supabase(env,'requests',{method:'POST',headers:{Prefer:'return=minimal'},body:JSON.stringify(row)});
+  if(!result.ok){const e=await result.json().catch(()=>({}));return json({error:e.message||'Не удалось сохранить заявку'},502);}
+  return json({ok:true,message:'Заявка успешно отправлена.'},201);
+ }
+
  if(path==='/auth/login'&&req.method==='POST'){let body={};try{body=await req.json()}catch{};const u=String(body.username||''),p=String(body.password||'');if(u!==env.ADMIN_USERNAME||p!==env.ADMIN_PASSWORD)return json({error:'Unauthorized'},401);const exp=String(Math.floor(Date.now()/1000)+60*60*12),token=exp+'.'+await sign(exp,env.SESSION_SECRET);return json({ok:true,token},200);}
  if(path==='/auth/check'&&req.method==='GET'){if(!await valid(req,env))return json({error:'Unauthorized'},401);return json({id:env.ADMIN_USER_ID,username:env.ADMIN_USERNAME});}
  if(path==='/auth/logout'&&req.method==='POST')return json({ok:true});
