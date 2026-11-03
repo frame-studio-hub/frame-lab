@@ -48,14 +48,26 @@ async function handle(req,env){const url=new URL(req.url),path=url.pathname;
   if(!/^[0-9a-f-]{36}$/i.test(visitor))return json({error:'Invalid visitor'},400,cors);
   const ua=(req.headers.get('User-Agent')||'').slice(0,500);
   const details=parseAgent(ua);
-  // Cloudflare edge supplies CF-Connecting-IP. Keep common proxy fallbacks
-  // for Pages/custom-proxy paths, and normalize forwarded lists to one address.
-  const ip=''; // Do not collect or store visitor IP addresses.
+  const cf=req.cf||{};
+  const ip=(req.headers.get('CF-Connecting-IP')||'').slice(0,64);
+  const provider=String(cf.asOrganization|| (cf.asn?'AS'+cf.asn:'') || '').slice(0,160);
+  const cleanInt=(v,min,max)=>Number.isInteger(Number(v))&&Number(v)>=min&&Number(v)<=max?Number(v):null;
+  const cleanText=(v,max)=>typeof v==='string'?v.trim().slice(0,max):null;
   const key='sb_publishable_FkRZkn5CqQwaN9GbhxBpgg_fMSvotuF';
   const result=await fetch(env.SUPABASE_URL.replace(/\/$/,'')+'/rest/v1/rpc/track_site_visit',{
    method:'POST',
    headers:{apikey:key,Authorization:'Bearer '+key,'Content-Type':'application/json'},
-   body:JSON.stringify({p_visitor_id:visitor,p_page_path:String(body.path||'/').slice(0,500),p_referrer:String(body.referrer||'').slice(0,1000),p_ip_address:ip,p_user_agent:ua,p_browser:details.browser,p_operating_system:details.os,p_device_type:details.device})
+   body:JSON.stringify({
+    p_visitor_id:visitor,p_page_path:String(body.path||'/').slice(0,500),p_referrer:String(body.referrer||'').slice(0,1000),
+    p_ip_address:ip,p_user_agent:ua,p_browser:details.browser,p_operating_system:details.os,p_device_type:details.device,
+    p_city:cleanText(cf.city,100),p_provider:provider,
+    p_screen_width:cleanInt(body.screen_width,1,20000),p_screen_height:cleanInt(body.screen_height,1,20000),
+    p_language:cleanText(body.language,40),p_timezone:cleanText(body.timezone,100),p_color_scheme:cleanText(body.color_scheme,20),
+    p_cpu_cores:cleanInt(body.cpu_cores,1,512),p_device_memory_gb:Number.isFinite(Number(body.device_memory_gb))?Number(body.device_memory_gb):null,
+    p_gpu_renderer:cleanText(body.gpu_renderer,250),
+    p_battery_level:Number.isFinite(Number(body.battery_level))?Number(body.battery_level):null,
+    p_battery_charging:typeof body.battery_charging==='boolean'?body.battery_charging:null
+   })
   });
   if(!result.ok)return json({error:'Analytics unavailable'},502,cors);
   return json({ok:true},200,cors);
@@ -97,8 +109,8 @@ async function handle(req,env){const url=new URL(req.url),path=url.pathname;
    const to=url.searchParams.get('to')||new Date().toISOString();
    const q='created_at=gte.'+encodeURIComponent(from)+'&created_at=lte.'+encodeURIComponent(to);
    const [visitsRes,visitorsRes,liveRes]=await Promise.all([
-    supabase(env,'site_visits?select=id,visitor_id,page_path,ip_address,browser,operating_system,device_type,referrer,created_at&'+q+'&order=created_at.desc&limit=10000'),
-    supabase(env,'site_visitors?select=visitor_id,ip_address,browser,operating_system,device_type,first_seen,last_seen&order=last_seen.desc&limit=5000'),
+    supabase(env,'site_visits?select=id,visitor_id,page_path,ip_address,browser,operating_system,device_type,referrer,city,provider,screen_width,screen_height,language,timezone,color_scheme,cpu_cores,device_memory_gb,gpu_renderer,battery_level,battery_charging,created_at&'+q+'&order=created_at.desc&limit=10000'),
+    supabase(env,'site_visitors?select=visitor_id,ip_address,browser,operating_system,device_type,city,provider,first_seen,last_seen&order=last_seen.desc&limit=5000'),
     supabase(env,'site_visitors?select=visitor_id&last_seen=gte.'+encodeURIComponent(new Date(Date.now()-5*60000).toISOString()))
    ]);
    if(!visitsRes.ok||!visitorsRes.ok||!liveRes.ok)return json({error:'Analytics query failed'},502);
