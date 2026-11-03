@@ -2,7 +2,7 @@ const COOKIE='frame_admin_session';
 const TABLES=new Set(['requests','reviews','request_notes','request_activity','request_messages','request_files','site_visitors','site_visits','site_daily_stats']);
 const json=(data,status=200,headers={})=>new Response(JSON.stringify(data),{status,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store',...headers}});
 async function sign(value,secret){const key=await crypto.subtle.importKey('raw',new TextEncoder().encode(secret),{name:'HMAC',hash:'SHA-256'},false,['sign']);const sig=await crypto.subtle.sign('HMAC',key,new TextEncoder().encode(value));return btoa(String.fromCharCode(...new Uint8Array(sig))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');}
-async function valid(req,env){const bearer=(req.headers.get('Authorization')||'').replace(/^Bearer\\s+/i,'');const raw=bearer||((req.headers.get('Cookie')||'').split(';').map(x=>x.trim()).find(x=>x.startsWith(COOKIE+'='))?.slice(COOKIE.length+1));if(!raw)return false;const [exp,sig]=raw.split('.');if(!exp||!sig||Number(exp)<Date.now()/1000)return false;return (await sign(exp,env.SESSION_SECRET))===sig;}
+async function valid(req,env){const bearer=(req.headers.get('Authorization')||'').replace(/^Bearer\s+/i,'');const raw=bearer||((req.headers.get('Cookie')||'').split(';').map(x=>x.trim()).find(x=>x.startsWith(COOKIE+'='))?.slice(COOKIE.length+1));if(!raw)return false;const [exp,sig]=raw.split('.');if(!exp||!sig||Number(exp)<Date.now()/1000)return false;return (await sign(exp,env.SESSION_SECRET))===sig;}
 function cookie(value,maxAge){return `${COOKIE}=${value}; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=${maxAge}`;}
 
 function parseAgent(ua=''){
