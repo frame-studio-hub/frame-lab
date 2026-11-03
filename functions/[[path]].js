@@ -9,7 +9,8 @@ export async function onRequest(context) {
   if (
     pathname.startsWith('/auth/') ||
     pathname.startsWith('/api/') ||
-    pathname.startsWith('/analytics/')
+    pathname.startsWith('/analytics/') ||
+    pathname.startsWith('/public/')
   ) {
     return adminWorker.fetch(request, env);
   }
