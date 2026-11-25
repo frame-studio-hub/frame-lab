@@ -9,6 +9,148 @@
     || navigator.connection?.saveData === true;
   if (lowPower) document.documentElement.classList.add('lite-device');
 
+
+  // Gravity-distortion starfield: background-only, static on touch/low-power devices.
+  const gravityCanvas = $('#gravity-canvas');
+  const gravityCtx = gravityCanvas?.getContext('2d');
+  let gravityWidth = 0, gravityHeight = 0, gravityDpr = 1;
+  let gravityStars = [], gravityRaf = 0, gravityTimer = 0, gravityVisible = false;
+  const gravitySections = $$('.hero,.visual-interlude,.work,.object-gallery,.services,.process,.lab,.start-project,.reviews,.faq,.contact');
+  const gravityLightSections = $$('.about');
+  const gravityVisibility = new Map();
+  const gravityLightVisibility = new Map();
+  let gravitySeed = 72631;
+  const gravityRandom = () => {
+    gravitySeed = (gravitySeed * 1664525 + 1013904223) >>> 0;
+    return gravitySeed / 4294967296;
+  };
+  function resizeGravity() {
+    if (!gravityCanvas || !gravityCtx) return;
+    gravityWidth = Math.max(1, window.innerWidth);
+    gravityHeight = Math.max(1, window.innerHeight);
+    gravityDpr = lowPower || coarsePointer ? 1 : Math.min(window.devicePixelRatio || 1, 1.25);
+    gravityCanvas.width = Math.round(gravityWidth * gravityDpr);
+    gravityCanvas.height = Math.round(gravityHeight * gravityDpr);
+    gravityCtx.setTransform(gravityDpr, 0, 0, gravityDpr, 0, 0);
+    gravitySeed = 72631;
+    const count = lowPower || coarsePointer ? 88 : 248;
+    gravityStars = Array.from({ length: count }, () => {
+      const tint = gravityRandom();
+      return {
+        x: gravityRandom(), y: gravityRandom(),
+        radius: .42 + gravityRandom() * .9,
+        alpha: .3 + gravityRandom() * .68,
+        phase: gravityRandom() * Math.PI * 2,
+        tint: tint < .12 ? 0 : tint < .28 ? 1 : 2
+      };
+    });
+    drawGravity(0);
+  }
+  function gravityWarp(x, y, cx, cy, strength, phase) {
+    const dx = x - cx, dy = y - cy;
+    const d2 = dx * dx + dy * dy;
+    const swirl = strength / (d2 + 6400) * (1 + Math.sin(phase) * .045);
+    const pull = strength * .19 / (d2 + 5200);
+    return {
+      x: x - dx * pull - dy * swirl,
+      y: y - dy * pull + dx * swirl
+    };
+  }
+  function scheduleGravity() {
+    if (!gravityVisible || reduceMotion || coarsePointer || lowPower || document.hidden || gravityRaf || gravityTimer) return;
+    gravityTimer = window.setTimeout(() => {
+      gravityTimer = 0;
+      if (gravityVisible && !document.hidden) gravityRaf = requestAnimationFrame(drawGravity);
+    }, 50);
+  }
+  function drawGravity(time = 0) {
+    if (!gravityCtx || !gravityWidth || !gravityHeight) return;
+    gravityRaf = 0;
+    const phase = (time || performance.now()) * .00016;
+    gravityCtx.clearRect(0, 0, gravityWidth, gravityHeight);
+    const lensX = gravityWidth * (.68 + Math.sin(phase * .7) * .018);
+    const lensY = gravityHeight * (.46 + Math.cos(phase * .53) * .024);
+    const lens2X = gravityWidth * (.18 + Math.cos(phase * .42) * .012);
+    const lens2Y = gravityHeight * (.77 + Math.sin(phase * .61) * .018);
+
+    const halo = gravityCtx.createRadialGradient(lensX, lensY, 0, lensX, lensY, Math.max(gravityWidth, gravityHeight) * .34);
+    halo.addColorStop(0, 'rgba(111,151,185,.045)');
+    halo.addColorStop(.35, 'rgba(76,111,147,.022)');
+    halo.addColorStop(1, 'rgba(76,111,147,0)');
+    gravityCtx.fillStyle = halo;
+    gravityCtx.fillRect(0, 0, gravityWidth, gravityHeight);
+
+    gravityStars.forEach(star => {
+      const x0 = star.x * gravityWidth;
+      const y0 = star.y * gravityHeight;
+      let point = gravityWarp(x0, y0, lensX, lensY, 2450, phase + star.phase);
+      point = gravityWarp(point.x, point.y, lens2X, lens2Y, 920, phase * .78 + star.phase);
+      const twinkle = lowPower || reduceMotion || coarsePointer ? 1 : .78 + Math.sin(phase * 2.1 + star.phase) * .22;
+      const colors = [
+        'rgba(205,225,244,' + (star.alpha * twinkle) + ')',
+        'rgba(139,205,198,' + (star.alpha * .76 * twinkle) + ')',
+        'rgba(181,157,231,' + (star.alpha * .68 * twinkle) + ')'
+      ];
+      gravityCtx.beginPath();
+      gravityCtx.arc(point.x, point.y, star.radius, 0, Math.PI * 2);
+      gravityCtx.fillStyle = colors[star.tint];
+      gravityCtx.fill();
+      const dx = point.x - x0, dy = point.y - y0;
+      if (Math.hypot(dx, dy) > 2.8 && star.radius > .75) {
+        gravityCtx.beginPath();
+        gravityCtx.moveTo(x0, y0);
+        gravityCtx.lineTo(point.x, point.y);
+        gravityCtx.strokeStyle = 'rgba(136,181,213,' + (.065 * twinkle) + ')';
+        gravityCtx.lineWidth = .55;
+        gravityCtx.stroke();
+      }
+    });
+
+    // Very faint lens arcs: a shader-like distortion cue, kept entirely behind content.
+    gravityCtx.save();
+    gravityCtx.translate(lensX, lensY);
+    gravityCtx.rotate(-.22 + Math.sin(phase) * .025);
+    for (let i = 0; i < 5; i++) {
+      const radius = 42 + i * 27;
+      gravityCtx.beginPath();
+      gravityCtx.ellipse(0, 0, radius * 1.55, radius * .56, 0, -.34, Math.PI * 1.56);
+      gravityCtx.strokeStyle = 'rgba(156,190,219,' + (.035 - i * .005) + ')';
+      gravityCtx.lineWidth = .8;
+      gravityCtx.stroke();
+    }
+    gravityCtx.restore();
+    scheduleGravity();
+  }
+  if (gravityCanvas && gravityCtx) {
+    resizeGravity();
+    if ('IntersectionObserver' in window) {
+      const gravityObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.target.matches('.about')) gravityLightVisibility.set(entry.target, entry.isIntersecting);
+          else gravityVisibility.set(entry.target, entry.isIntersecting);
+        });
+        gravityVisible = ![...gravityLightVisibility.values()].some(Boolean) && [...gravityVisibility.values()].some(Boolean);
+        if (gravityVisible && !reduceMotion && !coarsePointer && !lowPower && !document.hidden) {
+          if (!gravityRaf && !gravityTimer) gravityRaf = requestAnimationFrame(drawGravity);
+        } else {
+          if (gravityTimer) window.clearTimeout(gravityTimer);
+          gravityTimer = 0;
+          cancelAnimationFrame(gravityRaf);
+          gravityRaf = 0;
+        }
+      }, { threshold: 0, rootMargin: '0px' });
+      gravitySections.forEach(section => gravityObserver.observe(section));
+      gravityLightSections.forEach(section => gravityObserver.observe(section));
+    } else {
+      gravityVisible = true;
+      if (!reduceMotion && !coarsePointer && !lowPower) scheduleGravity();
+    }
+    window.addEventListener('resize', () => {
+      resizeGravity();
+      if (!gravityRaf && !gravityTimer) drawGravity(0);
+    }, { passive: true });
+  }
+
   // Scroll progress and soft cursor light.
   const progress = $('.scroll-progress span');
   const glow = $('.cursor-glow');
@@ -438,8 +580,17 @@
       labTimer = 0;
       cancelAnimationFrame(labRaf);
       labRaf = 0;
-    } else if (labInView && !reduceMotion && !coarsePointer && !lowPower && labCtx && !labRaf && !labTimer) {
-      labRaf = requestAnimationFrame(drawLab);
+      if (gravityTimer) window.clearTimeout(gravityTimer);
+      gravityTimer = 0;
+      cancelAnimationFrame(gravityRaf);
+      gravityRaf = 0;
+    } else {
+      if (labInView && !reduceMotion && !coarsePointer && !lowPower && labCtx && !labRaf && !labTimer) {
+        labRaf = requestAnimationFrame(drawLab);
+      }
+      if (gravityVisible && !reduceMotion && !coarsePointer && !lowPower && gravityCtx && !gravityRaf && !gravityTimer) {
+        gravityRaf = requestAnimationFrame(drawGravity);
+      }
     }
   });
 })();

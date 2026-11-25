@@ -1774,3 +1774,113 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 @media(max-width:380px){
   .lab-copy .display-heading{font-size:clamp(32px,10vw,36px);line-height:.91}
 }
+
+
+/* ==========================================================
+   FRAME LAB / LIQUID CTA + GRAVITY BACKGROUND / PASS 06
+   References: organic morphing call-to-action + lens-distorted starfield.
+   The distortion is isolated to background canvas; content stays crisp.
+   ========================================================== */
+.ambient-backdrop #gravity-canvas{
+  position:absolute;inset:0;display:block;width:100%;height:100%;
+  z-index:0;opacity:.46;pointer-events:none;
+}
+.ambient-glow,.ambient-ribbon,.ambient-grid{z-index:1}
+.ambient-glow{mix-blend-mode:screen}
+.ambient-grid{pointer-events:none}
+@media(max-width:900px){
+  .ambient-backdrop #gravity-canvas{opacity:.34}
+}
+@media(max-width:650px){
+  .ambient-backdrop #gravity-canvas{opacity:.2}
+}
+
+/* A button remains quiet at rest, then swells into a liquid silhouette. */
+.liquid-cta{
+  position:relative;isolation:isolate;overflow:hidden;
+  transition:
+    border-radius .58s cubic-bezier(.2,.8,.2,1),
+    background-color .38s,color .32s,border-color .32s,
+    box-shadow .42s,translate .3s;
+}
+.liquid-cta>*{position:relative;z-index:2}
+.liquid-cta:after{
+  content:"";position:absolute;z-index:0;inset:-24%;
+  pointer-events:none;opacity:0;
+  border-radius:58% 42% 61% 39% / 52% 43% 57% 48%;
+  background:
+    radial-gradient(ellipse at 27% 36%,rgba(255,103,190,.94),transparent 39%),
+    radial-gradient(ellipse at 76% 65%,rgba(130,95,255,.92),transparent 43%),
+    radial-gradient(ellipse at 52% 10%,rgba(247,167,227,.68),transparent 45%),
+    linear-gradient(125deg,#22152b,#302044 55%,#171225);
+  transform:scale(.62) rotate(-15deg);
+  transition:opacity .35s,transform .72s cubic-bezier(.2,.8,.2,1),border-radius .6s;
+}
+.liquid-cta:hover{
+  border-radius:42% 58% 39% 61% / 56% 42% 58% 44%;
+  translate:0 -2px;
+}
+.liquid-cta:hover:after,.liquid-cta:focus-visible:after{
+  opacity:1;
+  transform:scale(1.08) rotate(7deg);
+  border-radius:39% 61% 54% 46% / 42% 56% 44% 58%;
+}
+.liquid-cta:active{
+  border-radius:48% 52% 45% 55% / 48% 48% 52% 52%;
+  translate:0 0;
+}
+.liquid-cta:before{z-index:1;opacity:.8}
+.liquid-cta:hover:before{opacity:.34}
+.header-contact.liquid-cta{
+  border-color:rgba(199,255,66,.5);
+  background:rgba(10,13,10,.72);
+}
+.header-contact.liquid-cta:hover{
+  color:#fff7ff;
+  background:#17101f;
+  border-color:rgba(221,150,255,.76);
+  box-shadow:0 0 0 1px rgba(229,156,255,.09),0 10px 32px rgba(173,83,217,.22);
+}
+.header-contact.liquid-cta:hover .ui-arrow,
+.start-button.liquid-cta:hover .ui-arrow{transform:translate(2px,-2px);color:#fff}
+.start-button.liquid-cta{
+  border:1px solid rgba(199,255,66,.72);
+  overflow:hidden;
+}
+.start-button.liquid-cta:hover{
+  color:#fff7ff;
+  background:#17101f;
+  border-color:rgba(221,150,255,.76);
+  box-shadow:0 15px 42px rgba(173,83,217,.24),0 0 24px rgba(255,103,190,.12);
+}
+.start-button.liquid-cta b{transition:transform .35s,color .25s}
+.start-button.liquid-cta:hover b{transform:translate(2px,-2px);color:#fff}
+@media(hover:none),(pointer:coarse){
+  .liquid-cta,.liquid-cta:after{transition:none}
+  .liquid-cta:hover{border-radius:inherit;translate:0 0}
+  .liquid-cta:hover:after{opacity:0;transform:scale(.62) rotate(-15deg)}
+}
+@media(prefers-reduced-motion:reduce){
+  .liquid-cta,.liquid-cta:after,.liquid-cta:before{transition:none!important}
+}
+.lite-device .liquid-cta:after{transition:opacity .2s}
+.lite-device .ambient-backdrop #gravity-canvas{opacity:.16}
+
+/* Let the gravity field breathe through the dark hero surface; light chapter remains opaque. */
+.hero{
+  background:
+    radial-gradient(ellipse at 74% 39%,rgba(199,255,66,.094),transparent 27%),
+    radial-gradient(ellipse at 58% 78%,rgba(116,145,76,.09),transparent 36%),
+    linear-gradient(180deg,rgba(11,13,9,.86) 0%,rgba(9,11,8,.88) 100%);
+}
+.ambient-backdrop #gravity-canvas{opacity:.62}
+@media(max-width:900px){.ambient-backdrop #gravity-canvas{opacity:.4}}
+@media(max-width:650px){.ambient-backdrop #gravity-canvas{opacity:.26}}
+.header-contact.liquid-cta .liquid-label{
+  color:inherit;font-size:9px;letter-spacing:.1em;margin:0;display:inline;
+}
+.header-contact.liquid-cta .liquid-arrow{
+  display:grid;place-items:center;color:var(--lime);font-size:14px;margin-left:9px;
+  transition:color .25s,transform .3s;
+}
+.header-contact.liquid-cta:hover .liquid-arrow{color:#fff}
