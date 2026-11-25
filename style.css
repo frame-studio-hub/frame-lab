@@ -3068,12 +3068,12 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 }
 
 
-/* Canvas liquid effect — preserve each control's own dimensions and layout. */
+/* Reference liquid canvas — preserve each control's own box model and label layout. */
 .liquid-cta{position:relative!important;isolation:isolate!important;overflow:visible!important;background:transparent!important;border-color:transparent!important;box-shadow:none!important;transform:none}
 .liquid-cta::before,.liquid-cta::after{display:none!important;content:none!important}
 .liquid-cta>.liquid-canvas-layer{position:absolute!important;z-index:0!important;display:block!important;max-width:none!important;pointer-events:none!important;overflow:visible!important}
 .liquid-cta>*:not(.liquid-canvas-layer){position:relative;z-index:2}
-.liquid-cta:hover,.liquid-cta:focus-visible{background:transparent!important;box-shadow:none!important;transform:none}
+.liquid-cta:hover,.liquid-cta:focus-visible{background:transparent!important;box-shadow:none!important;transform:none!important}
 .liquid-cta:active{transform:none!important}
 .liquid-cta.active,.liquid-cta[aria-pressed="true"]{background:transparent!important;box-shadow:none!important}
 @media(prefers-reduced-motion:reduce){.liquid-cta>.liquid-canvas-layer{display:none!important}.liquid-cta{background:#292729!important;border-radius:999px!important}}
