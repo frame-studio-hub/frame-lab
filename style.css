@@ -3027,3 +3027,42 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
   .project-orbit-node.is-loop-clone{pointer-events:auto}
 }
 
+
+
+/* FRAME LAB — canvas liquid button, adapted from supplied reference */
+.header-contact.liquid-cta,
+.start-button.liquid-cta{
+  position:relative!important;isolation:isolate;overflow:visible!important;
+  display:flex;align-items:center;justify-content:center;
+  min-height:54px;padding:0 24px;border:0!important;border-radius:999px!important;
+  background:transparent!important;color:#fff!important;box-shadow:none!important;
+  transform:none;transition:color .2s ease;
+}
+.header-contact.liquid-cta{min-width:190px;gap:0}
+.start-button.liquid-cta{min-width:220px;gap:26px}
+.header-contact.liquid-cta .liquid-label,
+.start-button.liquid-cta>span,
+.start-button.liquid-cta>b{
+  position:relative;z-index:3;color:#fff!important;margin:0;
+  font:500 10px var(--mono);letter-spacing:.1em;white-space:nowrap;
+}
+.start-button.liquid-cta>b{font-size:18px}
+.header-contact.liquid-cta .liquid-arrow{display:none}
+.header-contact.liquid-cta .liquid-label{font-size:10px}
+.liquid-canvas-layer{
+  position:absolute;inset:-38px -42px;width:calc(100% + 84px);height:calc(100% + 76px);
+  z-index:1;pointer-events:none;overflow:visible;
+}
+.header-contact.liquid-cta:hover,
+.start-button.liquid-cta:hover{color:#fff!important;transform:none!important;box-shadow:none!important}
+.header-contact.liquid-cta:focus-visible,
+.start-button.liquid-cta:focus-visible{outline:1px solid rgba(231,190,210,.8);outline-offset:5px}
+@media(max-width:700px){
+ .header-contact.liquid-cta{min-width:0;min-height:46px;padding:0 16px}
+ .start-button.liquid-cta{min-height:52px;min-width:205px}
+ .liquid-canvas-layer{inset:-25px -28px;width:calc(100% + 56px);height:calc(100% + 50px)}
+}
+@media(prefers-reduced-motion:reduce){
+ .liquid-canvas-layer{display:none}
+ .header-contact.liquid-cta,.start-button.liquid-cta{background:#292729!important}
+}
