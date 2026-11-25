@@ -2426,3 +2426,330 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 @media(max-width:900px){
   .project-orbit-caption span:first-child{display:none}
 }
+
+/* ==========================================================
+   FRAME LAB / PROJECT DECK 2.0
+   Replace the floating card orbit with a cinematic 3D coverflow.
+   The selected concept gets the whole stage; neighbours add depth.
+   ========================================================== */
+@media(min-width:901px){
+  .project-orbit-module{
+    padding:24px clamp(10px,1.5vw,22px) 18px;
+    border-radius:3px;
+    border:1px solid rgba(222,235,214,.14);
+    background:
+      radial-gradient(ellipse at 50% 50%,color-mix(in srgb,var(--deck-accent,#c7ff42) 12%,transparent),transparent 40%),
+      radial-gradient(ellipse at var(--orbit-light-x,50%) var(--orbit-light-y,48%),rgba(184,220,182,.12),transparent 45%),
+      linear-gradient(145deg,rgba(17,24,18,.88),rgba(6,9,7,.97));
+    box-shadow:inset 0 1px rgba(255,255,255,.035),0 35px 100px rgba(0,0,0,.18);
+  }
+  .project-orbit-heading{
+    min-height:38px;
+    padding:0 4px 11px;
+    border-bottom:1px solid rgba(238,242,228,.1);
+  }
+  .project-orbit-heading>div:first-child{
+    display:flex;align-items:center;gap:8px;
+    font-size:8px;letter-spacing:.15em;
+  }
+  .orbit-current{
+    display:flex;align-items:center;gap:10px;
+    font-size:9px;letter-spacing:.14em;color:#e3ebda;
+    transition:color .25s;
+  }
+  .orbit-current:before{
+    content:"NOW SHOWING";font-size:6px;letter-spacing:.16em;color:#798576;
+  }
+  .project-orbit-scene{
+    height:clamp(470px,43vw,610px);
+    margin:0;
+    perspective:1500px;
+    perspective-origin:50% 48%;
+    overflow:hidden;
+    cursor:grab;
+    touch-action:pan-y;
+    --deck-accent:#c7ff42;
+    background:
+      radial-gradient(ellipse at 50% 56%,rgba(160,193,151,.09),transparent 36%),
+      linear-gradient(180deg,rgba(10,14,10,.04),rgba(0,0,0,.24));
+  }
+  .project-orbit-scene:before{
+    content:"";position:absolute;z-index:0;left:50%;top:50%;
+    width:min(68vw,900px);height:min(22vw,260px);
+    transform:translate(-50%,-50%) rotate(-17deg);
+    border:1px solid color-mix(in srgb,var(--deck-accent) 19%,transparent);
+    border-radius:50%;pointer-events:none;
+    box-shadow:0 0 80px color-mix(in srgb,var(--deck-accent) 5%,transparent);
+    transition:border-color .5s,box-shadow .5s;
+  }
+  .project-orbit-scene:after{
+    content:"";position:absolute;z-index:0;inset:0;pointer-events:none;
+    background:
+      radial-gradient(circle at 50% 48%,transparent 0 22%,rgba(0,0,0,.08) 48%,rgba(0,0,0,.3) 100%),
+      linear-gradient(90deg,rgba(6,9,7,.75),transparent 23% 77%,rgba(6,9,7,.75));
+  }
+  .project-orbit-grid{
+    z-index:0;opacity:.18;background-size:68px 68px;
+    mask-image:radial-gradient(ellipse at 50% 50%,black,transparent 74%);
+  }
+  .project-deck-backdrop{
+    position:absolute;z-index:1;inset:0;display:grid;place-items:center;
+    overflow:hidden;pointer-events:none;
+  }
+  .deck-backdrop-mark{
+    position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);
+    font:800 clamp(125px,20vw,290px)/.8 var(--sans);
+    letter-spacing:-.13em;color:rgba(218,233,207,.025);
+    white-space:nowrap;
+  }
+  .deck-backdrop-coordinate{
+    position:absolute;left:18px;bottom:16px;
+    color:rgba(193,207,181,.36);font-size:7px;letter-spacing:.17em;
+  }
+  .deck-backdrop-axis{
+    position:absolute;left:50%;top:8%;bottom:8%;width:1px;
+    background:linear-gradient(transparent,rgba(199,255,66,.12),transparent);
+  }
+  .project-orbit-core,.project-orbit-lens{display:none!important}
+  .project-orbit-ring{
+    position:absolute;z-index:3;inset:0;
+    display:block;transform:none!important;
+    transform-style:preserve-3d;
+    perspective:1500px;
+    transition:none!important;
+    pointer-events:none;
+  }
+  .project-orbit-node{
+    position:absolute;left:50%;top:50%;
+    display:block;width:clamp(320px,31vw,440px);
+    height:clamp(370px,38vw,500px);
+    padding:0;border:1px solid rgba(231,240,221,.19);
+    border-radius:17px;overflow:hidden;
+    background:linear-gradient(145deg,rgba(23,31,23,.98),rgba(7,11,8,.99));
+    color:#eff4e9;text-align:left;cursor:pointer;
+    transform-style:preserve-3d;backface-visibility:hidden;
+    transform-origin:center center;
+    transition:opacity .35s,filter .4s,border-color .35s,box-shadow .45s;
+    box-shadow:0 32px 90px rgba(0,0,0,.46),inset 0 1px rgba(255,255,255,.07);
+    will-change:transform;
+    isolation:isolate;
+  }
+  .project-orbit-node:before{
+    content:"";position:absolute;z-index:0;inset:0;pointer-events:none;opacity:.75;
+    background:
+      radial-gradient(ellipse at 50% 4%,color-mix(in srgb,var(--deck-accent,#c7ff42) 20%,transparent),transparent 48%),
+      linear-gradient(145deg,rgba(255,255,255,.065),transparent 36%,rgba(0,0,0,.22));
+  }
+  .project-orbit-node:after{
+    content:"";position:absolute;z-index:7;inset:0;pointer-events:none;
+    border-radius:inherit;opacity:.5;
+    background:linear-gradient(125deg,rgba(255,255,255,.12),transparent 20% 72%,rgba(0,0,0,.28));
+  }
+  .project-orbit-node.is-current{
+    border-color:color-mix(in srgb,var(--deck-accent,#c7ff42) 72%,white 8%);
+    box-shadow:
+      0 40px 110px rgba(0,0,0,.55),
+      0 0 0 1px color-mix(in srgb,var(--deck-accent,#c7ff42) 18%,transparent),
+      0 0 65px color-mix(in srgb,var(--deck-accent,#c7ff42) 13%,transparent),
+      inset 0 1px rgba(255,255,255,.15);
+  }
+  .project-orbit-node:hover{
+    border-color:color-mix(in srgb,var(--deck-accent,#c7ff42) 85%,white 8%);
+    box-shadow:0 42px 115px rgba(0,0,0,.58),0 0 70px color-mix(in srgb,var(--deck-accent,#c7ff42) 20%,transparent);
+  }
+  .project-orbit-node:focus-visible{outline:2px solid var(--deck-accent,#c7ff42);outline-offset:6px}
+  .orbit-node-surface{
+    position:relative;z-index:1;display:flex;flex-direction:column;
+    height:100%;padding:19px 20px 17px;overflow:hidden;
+    border-radius:inherit;
+    background:
+      radial-gradient(ellipse at 50% 48%,rgba(185,214,180,.045),transparent 60%),
+      linear-gradient(160deg,rgba(255,255,255,.025),transparent 48%);
+  }
+  .orbit-node-code{
+    font-size:8px;letter-spacing:.16em;color:#a6b39f;
+    display:flex;align-items:center;justify-content:space-between;
+  }
+  .orbit-node-code:after{
+    content:"● LIVE";font-size:6px;letter-spacing:.14em;color:var(--deck-accent,#c7ff42);
+  }
+  .orbit-art{
+    position:relative;display:grid;place-items:center;flex:1;min-height:0;
+    margin:16px 0 15px;border-radius:10px;overflow:hidden;
+    box-shadow:inset 0 1px rgba(255,255,255,.34),0 18px 40px rgba(0,0,0,.2);
+    transition:filter .5s,transform .7s cubic-bezier(.2,.8,.2,1);
+  }
+  .orbit-art:after{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(circle at 50% 50%,rgba(255,255,255,.14),transparent 53%),linear-gradient(135deg,rgba(255,255,255,.11),transparent 42%,rgba(0,0,0,.12));
+    mix-blend-mode:screen;
+  }
+  .project-orbit-node.is-current .orbit-art{transform:scale(1.015)}
+  .orbit-node-surface strong{
+    font-size:clamp(30px,3vw,42px);font-weight:600;letter-spacing:-.075em;line-height:.95;
+  }
+  .orbit-node-surface>small{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-top:11px;padding-top:10px;border-top:1px solid rgba(238,242,228,.15);
+    font:8px var(--mono);letter-spacing:.15em;color:var(--deck-accent,#c7ff42);
+  }
+  .orbit-node-surface>small:after{content:"↗";font-size:16px}
+  .orbit-art-aether:before{width:clamp(150px,16vw,210px);box-shadow:inset -24px -28px 38px #030805,0 18px 44px rgba(0,0,0,.45)}
+  .orbit-art-nord:before{font-size:clamp(45px,5vw,68px);text-shadow:0 8px 22px rgba(15,24,16,.14)}
+  .orbit-art-nord i{width:clamp(70px,8vw,105px);height:clamp(70px,8vw,105px);right:7%;bottom:-9%}
+  .orbit-art-vanta i{width:75%;height:42%;border-color:rgba(218,238,212,.82)}
+  .orbit-art-vanta i:nth-child(2){width:62%;height:82%}
+  .orbit-art-vanta i:nth-child(3){width:52%;height:92%}
+  .orbit-art-flux i{width:clamp(90px,10vw,145px);height:clamp(170px,19vw,240px)}
+  .orbit-art-object i{width:clamp(90px,10vw,135px);height:clamp(125px,14vw,180px)}
+  .orbit-art-sol i{width:clamp(135px,16vw,210px);box-shadow:0 25px 50px rgba(0,0,0,.28)}
+  .project-orbit-caption{
+    z-index:8;left:18px;right:18px;bottom:13px;
+    color:#a3ad9d;font-size:7px;letter-spacing:.15em;
+  }
+  .project-orbit-caption span:first-child{color:var(--deck-accent,#c7ff42)}
+  .project-orbit-foot{padding:14px 4px 0;border-top:1px solid rgba(238,242,228,.1)}
+  .project-orbit-module:has(.orbit-auto-running) .orbit-live-dot{animation:deckPulse 1.5s ease-in-out infinite}
+  @keyframes deckPulse{50%{box-shadow:0 0 0 7px color-mix(in srgb,var(--lime) 10%,transparent),0 0 18px var(--lime)}}
+}
+@media(max-width:900px){
+  .project-orbit-scene{height:270px;perspective:none}
+  .project-orbit-ring{transform:none!important;transition:none}
+  .project-orbit-node{transform:none!important;opacity:.82}
+  .project-deck-backdrop{display:none}
+}
+
+/* Extra tactile details across the site: hero light follows pointer, nav tracks the chapter. */
+.hero:after{
+  content:"";position:absolute;z-index:1;inset:0;pointer-events:none;opacity:.8;
+  background:radial-gradient(ellipse 520px 420px at var(--hero-light-x,72%) var(--hero-light-y,44%),rgba(199,255,66,.105),transparent 72%);
+  transition:opacity .3s;
+}
+.hero-stage{z-index:2}
+.desktop-nav a{position:relative}
+.desktop-nav a:after{
+  content:"";position:absolute;left:0;right:0;bottom:-9px;height:1px;
+  transform:scaleX(0);transform-origin:left;background:var(--lime);
+  transition:transform .28s cubic-bezier(.2,.75,.2,1);
+}
+.desktop-nav a:hover:after,.desktop-nav a.is-current:after,.desktop-nav a:focus-visible:after{transform:scaleX(1)}
+.desktop-nav a.is-current{color:var(--lime)}
+@media(max-width:900px){.hero:after{opacity:.34}}
+@media(prefers-reduced-motion:reduce){
+ .desktop-nav a:after{transition:none}
+ .project-orbit-node{will-change:auto}
+}
+
+/* Deck motion details: progress telemetry, moving material and optical sweep. */
+.project-deck-progress{
+  position:relative;z-index:9;width:100%;height:2px;margin:0 0 8px;
+  overflow:hidden;background:rgba(225,238,216,.09)
+}
+.project-deck-progress span{
+  display:block;width:0;height:100%;
+  background:linear-gradient(90deg,rgba(199,255,66,.22),var(--deck-accent,#c7ff42));
+  box-shadow:0 0 12px var(--deck-accent,#c7ff42);
+  transition:width .12s linear
+}
+@keyframes deckFloatA{
+  0%,100%{transform:translate3d(0,0,0) rotate(-2deg)}
+  50%{transform:translate3d(0,-11px,0) rotate(2deg)}
+}
+@keyframes deckFloatB{
+  0%,100%{transform:translate3d(0,0,0) rotate(0deg)}
+  50%{transform:translate3d(0,-8px,0) rotate(-5deg)}
+}
+@keyframes deckOrbitLines{
+  0%,100%{transform:rotate(-27deg) scale(1)}
+  50%{transform:rotate(-19deg) scale(1.04)}
+}
+@keyframes deckOpticalSweep{
+  0%,62%{transform:translateX(-125%) rotate(14deg);opacity:0}
+  72%{opacity:.8}
+  100%{transform:translateX(125%) rotate(14deg);opacity:0}
+}
+@media(min-width:901px){
+  .orbit-node-surface:after{
+    content:"";position:absolute;z-index:6;inset:-20% -50%;
+    pointer-events:none;opacity:0;
+    background:linear-gradient(112deg,transparent 38%,rgba(244,255,239,.17) 49%,transparent 60%);
+    transform:translateX(-125%) rotate(14deg)
+  }
+  .project-orbit-node.is-current .orbit-node-surface:after{
+    opacity:1;animation:deckOpticalSweep 7.8s ease-in-out infinite
+  }
+  .orbit-art-aether:before,.orbit-art-sol i{animation:deckFloatA 8.5s ease-in-out infinite}
+  .orbit-art-nord i,.orbit-art-flux i{animation:deckFloatB 7.2s ease-in-out infinite}
+  .orbit-art-vanta i{animation:deckOrbitLines 12s ease-in-out infinite}
+  .orbit-art-vanta i:nth-child(2){animation-direction:reverse;animation-duration:15s}
+  .orbit-art-object i{animation:deckFloatB 9s ease-in-out infinite}
+  .orbit-art-object i:nth-child(2){animation-delay:-3s}
+  .project-orbit-scene.is-dragging{cursor:grabbing}
+  .project-orbit-scene.is-dragging .project-orbit-node{transition:none}
+  .project-orbit-scene.is-dragging .project-orbit-node.is-current{filter:brightness(1.1)}
+}
+@media(max-width:900px){
+  .project-deck-progress{margin-bottom:5px}
+  .orbit-node-surface:after{display:none}
+  .orbit-art-aether:before,.orbit-art-sol i,.orbit-art-nord i,.orbit-art-flux i,.orbit-art-vanta i,.orbit-art-object i{animation:none}
+}
+@media(prefers-reduced-motion:reduce){
+  .project-deck-progress span{transition:none}
+  .orbit-node-surface:after,.orbit-art-aether:before,.orbit-art-sol i,.orbit-art-nord i,.orbit-art-flux i,.orbit-art-vanta i,.orbit-art-object i{animation:none!important}
+}
+
+/* FINAL DECK REFINEMENT / separated three-card layout + precise hover pause */
+@media(min-width:1101px){
+  .project-orbit-module{padding:23px clamp(12px,1.6vw,24px) 17px}
+  .project-orbit-scene{height:clamp(440px,39vw,550px);perspective:1800px;perspective-origin:50% 49%}
+  .project-orbit-node{
+    width:clamp(300px,28vw,390px);
+    height:clamp(340px,34vw,450px);
+    border-radius:18px;
+    transition:opacity .5s cubic-bezier(.2,.75,.2,1),filter .5s,border-color .4s,box-shadow .55s;
+  }
+  .project-orbit-node.is-current{
+    border-color:color-mix(in srgb,var(--deck-accent,#c7ff42) 82%,white 8%);
+    box-shadow:
+      0 42px 100px rgba(0,0,0,.55),
+      0 0 0 1px color-mix(in srgb,var(--deck-accent,#c7ff42) 18%,transparent),
+      0 0 50px color-mix(in srgb,var(--deck-accent,#c7ff42) 10%,transparent),
+      inset 0 1px rgba(255,255,255,.16);
+  }
+  .orbit-node-surface{padding:18px 19px 16px}
+  .orbit-node-surface strong{font-size:clamp(28px,2.65vw,38px)}
+  .orbit-art{margin:13px 0 12px;border-radius:11px}
+  .project-orbit-node:not(.is-current) .orbit-node-surface:after{display:none}
+  .project-orbit-scene:not(.is-dragging){cursor:default}
+  .project-orbit-scene.is-dragging{cursor:grabbing}
+  .project-orbit-node{cursor:pointer}
+  .project-orbit-node.is-current .orbit-art{transform:scale(1.025)}
+  .project-orbit-node.is-current .orbit-art-aether:before,
+  .project-orbit-node.is-current .orbit-art-sol i{animation:deckFloatA 7.5s ease-in-out infinite}
+  .project-orbit-node.is-current .orbit-art-nord i,
+  .project-orbit-node.is-current .orbit-art-flux i{animation:deckFloatB 6.7s ease-in-out infinite}
+  .project-orbit-node.is-current .orbit-art-vanta i{animation:deckOrbitLines 11s ease-in-out infinite}
+  .project-orbit-node.is-current .orbit-art-object i{animation:deckFloatB 8s ease-in-out infinite}
+  .project-orbit-ring.orbit-auto-running .project-orbit-node{will-change:transform,opacity}
+  .project-orbit-scene.is-dragging .project-orbit-node{transition:none!important}
+}
+@media(max-width:1100px){
+  .project-orbit-scene{height:270px;perspective:none;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain}
+  .project-orbit-scene::-webkit-scrollbar{display:none}
+  .project-orbit-ring{position:relative;inset:auto;width:max-content;height:248px;display:flex;align-items:center;gap:12px;padding:9px 20px;transform:none!important;transition:none!important;pointer-events:auto}
+  .project-orbit-node{position:relative;left:auto;top:auto;flex:0 0 215px;width:215px;height:225px;transform:none!important;opacity:.82!important;z-index:auto!important;filter:none!important;pointer-events:auto!important;scroll-snap-align:center;backface-visibility:visible}
+  .project-orbit-node.is-current{opacity:1!important;transform:translateY(-2px)!important}
+  .project-orbit-core,.project-orbit-lens,.project-deck-backdrop{display:none!important}
+  .project-orbit-caption{display:none}
+  .project-orbit-node .orbit-art:after{display:none}
+}
+@media(max-width:650px){
+  .project-orbit-scene{height:252px}
+  .project-orbit-ring{height:230px}
+  .project-orbit-node{flex-basis:min(218px,72vw);width:min(218px,72vw);height:210px}
+}
+@media(max-width:380px){
+  .project-orbit-scene{height:224px}
+  .project-orbit-ring{height:205px;gap:9px;padding-inline:14px}
+  .project-orbit-node{flex-basis:210px;width:210px;height:188px}
+}

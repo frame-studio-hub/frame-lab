@@ -254,12 +254,14 @@
   $$('[data-close-modal]').forEach(el => el.addEventListener('click', closeProjectModal));
 
 
-  // PROJECT CONSTELLATION — autonomous 3D rotation, paused only while the visitor interacts.
+  // PROJECT DECK — cinematic 3D coverflow, with autonomous movement and drag.
   const orbit = $('#project-orbit-scene');
   const orbitRing = $('#project-orbit-ring');
   const orbitNodes = $$('.project-orbit-node');
   const orbitCurrent = $('#orbit-current');
-  const orbitDesktop = window.matchMedia('(min-width: 901px)');
+  const orbitProgressFill = $('#project-deck-progress-fill');
+  const orbitCaption = $('.project-orbit-caption span:first-child');
+  const orbitDesktop = window.matchMedia('(min-width: 1101px)');
   let orbitIndex = 0;
   let orbitAngle = 0;
   let orbitFrame = 0;
@@ -268,6 +270,9 @@
   let orbitPointerInside = false;
   let orbitFocusInside = false;
   let orbitResumeTimer = 0;
+  let orbitDrag = null;
+  let suppressOrbitClick = false;
+  const orbitAccents = ['#c7ff42','#c5d8c7','#b8a8ff','#e1b58a','#d7ded0','#e8d8a4'];
   const orbitNames = [
     'AETHER® / IDENTITY SYSTEM','NØRD STUDIO / DIGITAL EXPERIENCE',
     'VANTA OBJECTS / DIGITAL PRODUCT','FLUX CAMPAIGN / VISUAL CONTENT',
@@ -281,23 +286,48 @@
       node.setAttribute('aria-pressed', String(active));
     });
     if (orbitCurrent) orbitCurrent.textContent = orbitNames[orbitIndex];
+    orbit?.style.setProperty('--deck-accent', orbitAccents[orbitIndex]);
+  }
+
+  function layoutProjectDeck() {
+    if (!orbit || !orbitDesktop.matches) return;
+    const width = orbit.clientWidth || window.innerWidth;
+    // Keep the three visible covers physically separated at every desktop width.
+    const spread = Math.max(0, Math.min(540, width * .43, width / 2 - 120));
+    orbitNodes.forEach((node, i) => {
+      const raw = ((i * 60 - orbitAngle + 540) % 360) - 180;
+      const offset = raw / 60;
+      const distance = Math.abs(offset);
+      const visible = distance < 1.52;
+      const scale = distance < .5 ? 1 : .66;
+      const x = offset * spread;
+      const z = distance < .5 ? 48 : -105;
+      const rotateY = distance < .5 ? 0 : Math.max(-17, Math.min(17, -offset * 10));
+      const opacity = distance < .5 ? 1 : visible ? .9 : 0;
+      node.style.transform = 'translate(-50%,-50%) translate3d(' + x.toFixed(2) + 'px,0,' + z + 'px) rotateY(' + rotateY.toFixed(2) + 'deg) scale(' + scale + ')';
+      node.style.opacity = String(opacity);
+      node.style.zIndex = String(distance < .5 ? 30 : visible ? 20 : 0);
+      node.style.pointerEvents = visible ? 'auto' : 'none';
+      node.style.filter = distance < .5 ? 'none' : 'saturate(.8) brightness(.78)';
+      node.style.setProperty('--deck-accent', orbitAccents[i]);
+    });
   }
 
   function renderOrbitAngle(angle) {
     orbitAngle = ((angle % 360) + 360) % 360;
-    if (!orbitRing) return;
-    orbitRing.style.setProperty('--orbit-angle', (-orbitAngle).toFixed(2) + 'deg');
+    if (orbitProgressFill) orbitProgressFill.style.width = (orbitAngle / 360 * 100).toFixed(2) + '%';
     const nextIndex = Math.round(orbitAngle / 60) % orbitNodes.length;
     if (nextIndex !== orbitIndex) {
       orbitIndex = nextIndex;
       syncOrbitSelection();
     }
+    layoutProjectDeck();
   }
 
   function canOrbitRun() {
     return orbitDesktop.matches && orbitInView && !reduceMotion &&
       !document.hidden && !orbitPointerInside && !orbitFocusInside &&
-      !modal?.classList.contains('open');
+      !orbitDrag && !modal?.classList.contains('open');
   }
 
   function stopOrbitMotion() {
@@ -313,8 +343,8 @@
     if (!orbitLastTime) orbitLastTime = timestamp;
     const delta = Math.min(timestamp - orbitLastTime, 80);
     orbitLastTime = timestamp;
-    // One complete revolution in 48 seconds: slow enough to read each project.
-    renderOrbitAngle(orbitAngle + delta * (360 / 48000));
+    // The full deck rotates slowly; every project gets a clear hero moment.
+    renderOrbitAngle(orbitAngle + delta * (360 / 64000));
     orbitFrame = requestAnimationFrame(drawOrbit);
   }
 
@@ -330,16 +360,15 @@
     orbitIndex = (index + orbitNodes.length) % orbitNodes.length;
     stopOrbitMotion();
     if (orbitResumeTimer) window.clearTimeout(orbitResumeTimer);
-    orbitRing?.classList.remove('orbit-auto-running');
     orbitAngle = orbitIndex * 60;
-    orbitRing?.style.setProperty('--orbit-angle', (-orbitAngle) + 'deg');
     syncOrbitSelection();
+    layoutProjectDeck();
     if (scrollToActive && window.innerWidth <= 900) {
       orbitNodes[orbitIndex]?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block:'nearest', inline:'center' });
     }
     orbitResumeTimer = window.setTimeout(() => {
       orbitResumeTimer = 0;
-      startOrbitMotion();
+      if (!orbitPointerInside && !orbitFocusInside) startOrbitMotion();
     }, 950);
   }
 
@@ -357,19 +386,51 @@
       startOrbitMotion();
     }
 
-    orbit.addEventListener('pointerenter', () => {
+    // Empty space never pauses playback: use delegated hit-testing on actual project cards only.
+    let hoveredOrbitCard = null;
+    const resumeAfterCardLeave = () => {
+      if (orbitResumeTimer) window.clearTimeout(orbitResumeTimer);
+      orbitResumeTimer = window.setTimeout(() => {
+        orbitResumeTimer = 0;
+        if (!hoveredOrbitCard && !orbitFocusInside) startOrbitMotion();
+      }, 220);
+    };
+    orbit.addEventListener('pointerover', event => {
+      const card = event.target.closest?.('.project-orbit-node');
+      if (!card || !orbit.contains(card) || card === hoveredOrbitCard) return;
+      hoveredOrbitCard = card;
       orbitPointerInside = true;
+      if (orbitResumeTimer) window.clearTimeout(orbitResumeTimer);
+      orbitResumeTimer = 0;
       stopOrbitMotion();
+    });
+    orbit.addEventListener('pointerout', event => {
+      const from = event.target.closest?.('.project-orbit-node');
+      const to = event.relatedTarget?.closest?.('.project-orbit-node');
+      if (!from || from === to) return;
+      if (to && orbit.contains(to)) {
+        hoveredOrbitCard = to;
+        orbitPointerInside = true;
+        stopOrbitMotion();
+        return;
+      }
+      hoveredOrbitCard = null;
+      orbitPointerInside = false;
+      resumeAfterCardLeave();
     });
     orbit.addEventListener('pointerleave', () => {
-      orbitPointerInside = false;
       orbit.style.setProperty('--orbit-light-x','50%');
       orbit.style.setProperty('--orbit-light-y','50%');
-      startOrbitMotion();
+      hoveredOrbitCard = null;
+      orbitPointerInside = false;
+      resumeAfterCardLeave();
     });
-    orbit.addEventListener('focusin', () => {
-      orbitFocusInside = true;
-      stopOrbitMotion();
+    orbit.addEventListener('focusin', event => {
+      // Keyboard focus pins a card; mouse click focus must not freeze the scene after pointer leave.
+      if (event.target.matches?.(':focus-visible')) {
+        orbitFocusInside = true;
+        stopOrbitMotion();
+      }
     });
     orbit.addEventListener('focusout', event => {
       if (!orbit.contains(event.relatedTarget)) {
@@ -378,7 +439,46 @@
       }
     });
 
+    // Drag the deck like a physical carousel; a drag never accidentally opens a card.
+    orbit.addEventListener('pointerdown', event => {
+      if (!orbitDesktop.matches || event.button !== 0 || event.target.closest('a')) return;
+      orbitDrag = { pointerId:event.pointerId, startX:event.clientX, startAngle:orbitAngle, moved:false };
+      // Do not capture a click: capture begins only after a real drag threshold.
+      stopOrbitMotion();
+    });
+    orbit.addEventListener('pointermove', event => {
+      if (orbitDrag && orbitDrag.pointerId === event.pointerId) {
+        const dx = event.clientX - orbitDrag.startX;
+        if (Math.abs(dx) > 6 && !orbitDrag.moved) {
+          orbitDrag.moved = true;
+          orbit.classList.add('is-dragging');
+          if (orbitCaption) orbitCaption.textContent = 'DRAGGING / RELEASE TO PLAY';
+          try { orbit.setPointerCapture(event.pointerId); } catch (_) {}
+        }
+        if (orbitDrag.moved) {
+          const width = orbit.clientWidth || window.innerWidth;
+          const spread = Math.max(0, Math.min(540, width * .43, width / 2 - 120));
+          renderOrbitAngle(orbitDrag.startAngle - (dx / spread) * 60);
+        }
+      }
+    }, { passive:true });
+    const finishOrbitDrag = event => {
+      if (!orbitDrag || (event && orbitDrag.pointerId !== event.pointerId)) return;
+      if (orbitDrag.moved) {
+        suppressOrbitClick = true;
+        window.setTimeout(() => { suppressOrbitClick = false; }, 350);
+      }
+      orbit.classList.remove('is-dragging');
+      if (orbitCaption) orbitCaption.textContent = 'AUTO DECK / DRAG TO EXPLORE';
+      orbitDrag = null;
+      if (!orbit.matches(':hover')) orbitPointerInside = false;
+      if (!orbitFocusInside) startOrbitMotion();
+    };
+    orbit.addEventListener('pointerup', finishOrbitDrag);
+    orbit.addEventListener('pointercancel', finishOrbitDrag);
+
     orbitNodes.forEach((node, index) => node.addEventListener('click', () => {
+      if (suppressOrbitClick) return;
       setOrbitIndex(index);
       openProjectModal(node.dataset.project);
     }));
@@ -406,12 +506,14 @@
       }, { passive:true });
     }
 
+    window.addEventListener('resize', layoutProjectDeck, { passive:true });
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) stopOrbitMotion();
       else startOrbitMotion();
     });
     orbitDesktop.addEventListener?.('change', () => {
       stopOrbitMotion();
+      layoutProjectDeck();
       startOrbitMotion();
     });
   }
@@ -752,6 +854,23 @@
   });
 
 
+  // Chapter-aware navigation: the active section gets a live underline.
+  const desktopNavLinks = $$('.desktop-nav a[href^="#"]');
+  const navSectionTargets = desktopNavLinks.map(link => $(link.getAttribute('href'))).filter(Boolean);
+  if ('IntersectionObserver' in window && desktopNavLinks.length && !reduceMotion) {
+    const sectionNavObserver = new IntersectionObserver(entries => {
+      const visible = entries.filter(entry => entry.isIntersecting).sort((a,b) => b.intersectionRatio - a.intersectionRatio)[0];
+      if (!visible) return;
+      desktopNavLinks.forEach(link => {
+        const active = link.getAttribute('href') === '#' + visible.target.id;
+        link.classList.toggle('is-current', active);
+        if (active) link.setAttribute('aria-current','location');
+        else link.removeAttribute('aria-current');
+      });
+    }, { rootMargin:'-34% 0px -54% 0px', threshold:[0,.12,.3,.55] });
+    navSectionTargets.forEach(section => sectionNavObserver.observe(section));
+  }
+
   // Motion direction: cursor ring, pointer-led hero light, section tracking and tactile feedback.
   document.documentElement.classList.add('motion-ready');
 
@@ -766,12 +885,17 @@
       if (!heroFrame) heroFrame = requestAnimationFrame(() => {
         heroObject.style.setProperty('--hero-x', heroX.toFixed(1) + 'px');
         heroObject.style.setProperty('--hero-y', heroY.toFixed(1) + 'px');
+        const rect = hero.getBoundingClientRect();
+        hero.style.setProperty('--hero-light-x', ((event.clientX - rect.left) / rect.width * 100).toFixed(1) + '%');
+        hero.style.setProperty('--hero-light-y', ((event.clientY - rect.top) / rect.height * 100).toFixed(1) + '%');
         heroFrame = 0;
       });
     }, { passive: true });
     hero.addEventListener('pointerleave', () => {
       heroObject.style.setProperty('--hero-x', '0px');
       heroObject.style.setProperty('--hero-y', '0px');
+      hero.style.setProperty('--hero-light-x', '72%');
+      hero.style.setProperty('--hero-light-y', '44%');
     });
   }
 
