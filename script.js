@@ -959,6 +959,10 @@
     bindDetailLight('.review-card', .85);
   }
 
+  // Apply the reference liquid morph to every compact interactive button and CTA.
+  // Structural controls (hamburger, modal close, orbit cards and index rows) keep their native geometry.
+  document.querySelectorAll('button:not(.menu-toggle):not(.modal-close):not(.project-orbit-node):not(.project-index-row), .header-contact, .start-button, .instagram-brief').forEach(control => control.classList.add('liquid-cta'));
+
   // One consistent liquid-glass interaction language for segmented controls and CTAs.
   document.querySelectorAll('.filter-btn,.project-view-btn,.project-mono-toggle,.material-btn,.lab-button,.project-orbit-controls button,.planner-next,.planner-back,.process-step').forEach(control => control.classList.add('liquid-cta'));
 
