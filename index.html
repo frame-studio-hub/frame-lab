@@ -12,9 +12,9 @@
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=frame-motion-20261125-v3">
-  <link rel="stylesheet" href="reviews.css?v=frame-motion-20261125-v3">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=frame-motion-20261125-v4">
+  <link rel="stylesheet" href="reviews.css?v=frame-motion-20261125-v4">
   <style>
     /* Mobile fallback: keep content readable without disabling the designed motion. */
     @media (max-width:700px) {
@@ -29,20 +29,25 @@
   <div class="noise" aria-hidden="true"></div>
   <div class="scroll-progress" aria-hidden="true"><span></span></div>
   <div class="cursor-glow" aria-hidden="true"></div>
-  <canvas id="ambient-canvas" aria-hidden="true"></canvas>
-  <canvas id="scene-3d" aria-hidden="true"></canvas>
-  <div class="scene-label mono" aria-hidden="true"><span>FL / СИСТЕМА 001</span><span>МАТЕРИЯ · СВЕТ · ФОРМА</span></div>
+  <div class="ambient-backdrop" aria-hidden="true">
+    <span class="ambient-glow ambient-glow-a"></span>
+    <span class="ambient-glow ambient-glow-b"></span>
+    <span class="ambient-glow ambient-glow-c"></span>
+    <span class="ambient-ribbon ambient-ribbon-a"></span>
+    <span class="ambient-ribbon ambient-ribbon-b"></span>
+    <span class="ambient-grid"></span>
+  </div>
 
   <header class="site-header" id="top">
     <a class="brand" href="#top" aria-label="На главную FRAME LAB"><span>FRAME</span><i></i><sup>®</sup><small>НЕЗАВИСИМОЕ DIGITAL-АГЕНТСТВО</small></a>
     <nav class="desktop-nav" aria-label="Основная навигация">
-      <a href="#about" >О НАС</a><a href="#work" >ПРОЕКТЫ</a><a href="#services" >УСЛУГИ</a><a href="#process" >ПРОЦЕСС</a><a href="#start" >БРИФ</a><a href="#reviews">ОТЗЫВЫ</a>
+      <a href="#about" >О НАС</a><a href="#work" >ПРОЕКТЫ</a><a href="#objects" >3D</a><a href="#services" >УСЛУГИ</a><a href="#process" >ПРОЦЕСС</a><a href="#start" >БРИФ</a><a href="#reviews">ОТЗЫВЫ</a>
     </nav>
     <a class="header-contact magnetic" href="#contact">ОБСУДИТЬ ПРОЕКТ <span><svg class="ui-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M8 6h10v10"/></svg></span></a>
     <button class="menu-toggle" aria-label="Открыть меню" aria-expanded="false"><span></span><span></span></button>
   </header>
   <div class="mobile-menu" aria-hidden="true">
-    <a href="#about">О НАС <span>01</span></a><a href="#work">ПРОЕКТЫ <span>02</span></a><a href="#services">УСЛУГИ <span>03</span></a><a href="#process">ПРОЦЕСС <span>04</span></a><a href="#start">БРИФ <span>05</span></a><a href="#contact">КОНТАКТЫ <span>08</span></a>
+    <a href="#about">О НАС <span>01</span></a><a href="#work">ПРОЕКТЫ <span>02</span></a><a href="#objects">3D-ОБЪЕКТЫ <span>03</span></a><a href="#services">УСЛУГИ <span>04</span></a><a href="#process">ПРОЦЕСС <span>05</span></a><a href="#start">БРИФ <span>07</span></a><a href="#contact">КОНТАКТЫ <span>10</span></a>
     <p>НЕЗАВИСИМОЕ DIGITAL-АГЕНТСТВО<br>СТРАТЕГИЯ / ДИЗАЙН / РАЗРАБОТКА</p>
   </div>
 
@@ -140,6 +145,58 @@
       <p class="work-note mono">* ВСЕ ПРОЕКТЫ — АВТОРСКИЕ КОНЦЕПТУАЛЬНЫЕ ИССЛЕДОВАНИЯ.</p>
     </section>
 
+
+    <section class="object-gallery section-pad" id="objects">
+      <div class="section-kicker mono"><span>03 / DIGITAL OBJECTS</span><span>ФОРМА · СВЕТ · МАТЕРИЯ</span></div>
+      <div class="object-gallery-heading">
+        <h2 class="display-heading reveal">ЦИФРОВАЯ<br><em>МАТЕРИЯ</em><span class="lime-dot">.</span></h2>
+        <p class="section-intro reveal">Три самостоятельных объекта. Разные материалы, отражения и геометрия — собранные в лёгкие интерактивные 3D-сцены.</p>
+      </div>
+      <div class="object-grid">
+        <article class="object-card object-card-prism">
+          <div class="object-card-meta mono"><span>01 / PRISM</span><span>OPTICAL GLASS</span></div>
+          <div class="object-stage">
+            <div class="object-halo"></div>
+            <div class="model-prism" aria-hidden="true">
+              <span class="prism-face prism-face-a"></span><span class="prism-face prism-face-b"></span>
+              <span class="prism-face prism-face-c"></span><span class="prism-face prism-face-d"></span>
+              <span class="prism-body"></span><span class="prism-glint"></span>
+            </div>
+            <span class="object-coordinate mono">52° 31' / FL</span>
+          </div>
+          <div class="object-card-caption"><div><span class="mono">REFRACTION / 001</span><h3>Prism One</h3></div><span class="object-index">01</span></div>
+        </article>
+        <article class="object-card object-card-orbit">
+          <div class="object-card-meta mono"><span>02 / ORBIT</span><span>LIQUID METAL</span></div>
+          <div class="object-stage">
+            <div class="object-halo"></div>
+            <div class="model-orbit" aria-hidden="true">
+              <span class="orbit-sphere"></span><span class="orbit-loop orbit-loop-a"></span>
+              <span class="orbit-loop orbit-loop-b"></span><span class="orbit-loop orbit-loop-c"></span>
+              <span class="orbit-spark"></span>
+            </div>
+            <span class="object-coordinate mono">FIELD / 002</span>
+          </div>
+          <div class="object-card-caption"><div><span class="mono">MOTION / 002</span><h3>Solaris</h3></div><span class="object-index">02</span></div>
+        </article>
+        <article class="object-card object-card-cube">
+          <div class="object-card-meta mono"><span>03 / CUBE</span><span>CHROMATIC ALLOY</span></div>
+          <div class="object-stage">
+            <div class="object-halo"></div>
+            <div class="model-cube" aria-hidden="true">
+              <span class="cube-face cube-front"></span><span class="cube-face cube-back"></span>
+              <span class="cube-face cube-right"></span><span class="cube-face cube-left"></span>
+              <span class="cube-face cube-top"></span><span class="cube-face cube-bottom"></span>
+              <span class="cube-core"></span>
+            </div>
+            <span class="object-coordinate mono">VOLUME / 003</span>
+          </div>
+          <div class="object-card-caption"><div><span class="mono">STRUCTURE / 003</span><h3>Chromatic</h3></div><span class="object-index">03</span></div>
+        </article>
+      </div>
+      <div class="object-gallery-foot mono"><span>CSS 3D / REAL-TIME LIGHT STUDIES</span><span>NO HEAVY WEBGL REQUIRED</span></div>
+    </section>
+
     <section class="services section-pad" id="services">
       <div class="section-kicker mono"><span>03 / ЧТО МЫ ДЕЛАЕМ</span><span>ОТ ПЕРВОЙ ИДЕИ ДО ПОСЛЕДНЕГО ПИКСЕЛЯ</span></div>
       <div class="services-head"><h2 class="display-heading reveal">ИДЕИ — В<br><em>ЦИФРОВОЙ ОПЫТ</em><span class="lime-dot">.</span></h2><p class="section-intro reveal">Единый процесс и продуманный подход на каждом этапе.</p></div>
@@ -154,7 +211,7 @@
     </section>
 
     <section class="process section-pad" id="process">
-      <div class="section-kicker mono"><span>04 / КАК МЫ РАБОТАЕМ</span><span>ЯСНОСТЬ НА КАЖДОМ ЭТАПЕ</span></div>
+      <div class="section-kicker mono"><span>05 / КАК МЫ РАБОТАЕМ</span><span>ЯСНОСТЬ НА КАЖДОМ ЭТАПЕ</span></div>
       <div class="process-layout"><div><h2 class="display-heading reveal">СОЗДАЁМ<br><em>ОСОЗНАННО</em><span class="lime-dot">.</span></h2><p class="process-intro">Сильный результат начинается с правильных вопросов. Работаем вместе, вдумчиво и фокусируемся на главном.</p></div>
         <div class="process-steps">
           <div class="process-line"><span></span></div>
@@ -167,13 +224,13 @@
     </section>
 
     <section class="lab section-pad" id="lab">
-      <div class="section-kicker mono"><span>05 / ТВОРЧЕСКАЯ ЛАБОРАТОРИЯ</span><span>ЭКСПЕРИМЕНТ — ЧАСТЬ ПРОЦЕССА</span></div>
+      <div class="section-kicker mono"><span>06 / ТВОРЧЕСКАЯ ЛАБОРАТОРИЯ</span><span>ЭКСПЕРИМЕНТ — ЧАСТЬ ПРОЦЕССА</span></div>
       <div class="lab-grid"><div class="lab-copy"><h2 class="display-heading reveal">ЛЮБОПЫТСТВО<br>В <em>ДВИЖЕНИИ</em><span class="lime-dot">.</span></h2><p class="lead">Не каждому эксперименту нужно техническое задание.</p><p class="body-copy">Пространство для экспериментов с материалами, движением и неожиданными взаимодействиями. Перемещайте курсор и меняйте поведение системы.</p><div class="lab-controls"><button class="lab-button" id="lab-mode">СМЕНИТЬ ДВИЖЕНИЕ <span><svg class="ui-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M8 6h10v10"/></svg></span></button><button class="lab-button" id="lab-reset">СБРОСИТЬ <span>↺</span></button></div><div class="material-switch" role="group" aria-label="Выбрать материал"><span class="mono">МАТЕРИАЛ СЦЕНЫ</span><button type="button" class="material-btn active" data-material-mode="glass" aria-pressed="true">СТЕКЛО</button><button type="button" class="material-btn" data-material-mode="chrome" aria-pressed="false">ХРОМ</button><button type="button" class="material-btn" data-material-mode="lime" aria-pressed="false">ЛАЙМ</button></div></div>
         <div class="lab-visual" id="lab-visual"><canvas id="lab-canvas" aria-label="Интерактивное поле частиц"></canvas><div class="lab-hud mono"><span>FL / EXPERIMENT 001</span><span id="lab-state">FIELD: ORBITAL</span><span>ДВИГАЙТЕ КУРСОР <svg class="ui-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M8 6h10v10"/></svg></span></div><div class="lab-center-label">ФОРМА<br>СЛЕДУЕТ ЗА<br><em>ИДЕЕЙ.</em></div><div class="lab-corner mono">LIVE SYSTEM<br>NO. 001—026</div></div></div>
     </section>
 
     <section class="start-project section-pad" id="start">
-      <div class="section-kicker mono"><span>06 / ПОДОБРАТЬ РЕШЕНИЕ</span><span>НЕ НУЖНО ЗНАТЬ ТЕХНИЧЕСКИЕ ТЕРМИНЫ</span></div>
+      <div class="section-kicker mono"><span>07 / ПОДОБРАТЬ РЕШЕНИЕ</span><span>НЕ НУЖНО ЗНАТЬ ТЕХНИЧЕСКИЕ ТЕРМИНЫ</span></div>
       <div class="start-heading"><h2 class="display-heading reveal">РАССКАЖИТЕ<br>О <em>ВАШЕЙ ИДЕЕ</em><span class="lime-dot">.</span></h2><p class="section-intro">Ответьте на несколько простых вопросов. Мы соберём понятный бриф, чтобы разговор начался предметно.</p></div>
       <div class="planner-shell">
         <div class="planner-top"><div><span class="mono">КОНСТРУКТОР ПРОЕКТА</span><p id="planner-step-label">ШАГ 01 / 03 — ЧТО НУЖНО СОЗДАТЬ?</p></div><div class="planner-progress" aria-label="Прогресс заполнения"><span id="planner-progress-fill"></span></div></div>
@@ -231,7 +288,7 @@
     </section>
 
     <section class="faq section-pad" id="faq">
-      <div class="section-kicker mono"><span>08 / ВОПРОСЫ И ОТВЕТЫ</span><span>БЕЗ СЕКРЕТОВ — ТОЛЬКО ДЕЛО</span></div>
+      <div class="section-kicker mono"><span>09 / ВОПРОСЫ И ОТВЕТЫ</span><span>БЕЗ СЕКРЕТОВ — ТОЛЬКО ДЕЛО</span></div>
       <div class="faq-layout"><h2 class="display-heading reveal">НЕСКОЛЬКО<br><em>ВАЖНЫХ</em><br>ВОПРОСОВ<span class="lime-dot">.</span></h2><div class="faq-list">
         <details><summary>С какими проектами вы работаете?<span>+</span></summary><p>Фирменный стиль, сайты, цифровой контент и интерактивные решения. Нам близки проекты с ясной целью и интересом к продуманному креативу.</p></details>
         <details><summary>Вы занимаетесь и дизайном, и разработкой?<span>+</span></summary><p>Да. Объединяем стратегию, дизайн и фронтенд-разработку, сохраняя связь между идеей и её реализацией.</p></details>
@@ -244,7 +301,7 @@
     </section>
 
     <section class="contact section-pad" id="contact">
-      <div class="contact-top mono"><span>09 / ЕСТЬ ИДЕЯ?</span><span>СЛЕДУЮЩИЙ КАДР ЗА ВАМИ</span></div>
+      <div class="contact-top mono"><span>10 / ЕСТЬ ИДЕЯ?</span><span>СЛЕДУЮЩИЙ КАДР ЗА ВАМИ</span></div>
       <div class="contact-art" aria-hidden="true"><div class="contact-ring ring-a"></div><div class="contact-ring ring-b"></div><div class="contact-glass"></div><div class="contact-light"></div></div>
       <h2 class="contact-title">ДАВАЙТЕ<br>СОЗДАДИМ<br><em>НЕЧТО ВАЖНОЕ.</em></h2>
       <div class="contact-bottom"><p>Есть задача, мысль<br>или пока только идея?</p><a class="start-button magnetic" href="https://www.instagram.com/frame.lab.co/" target="_blank" rel="noopener noreferrer"><span>НАЧАТЬ ПРОЕКТ</span><b><svg class="ui-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M8 6h10v10"/></svg></b></a><div class="contact-social mono"><span>СЛЕДИТЕ ЗА ПРОЦЕССОМ</span><a href="https://www.instagram.com/frame.lab.co/" target="_blank" rel="noopener noreferrer">INSTAGRAM <svg class="ui-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M8 6h10v10"/></svg></a></div></div>
@@ -258,6 +315,5 @@
   <script src="script.js" defer></script>
   <script src="analytics.js" defer></script>
   <script src="site-backend.js" defer></script>
-  <script type="module" src="three-scene.js"></script>
-</body>
+  </body>
 </html>
