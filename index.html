@@ -13,8 +13,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=frame-motion-20261125-v6">
-  <link rel="stylesheet" href="reviews.css?v=frame-motion-20261125-v6">
+  <link rel="stylesheet" href="style.css?v=frame-motion-20261125-v7">
+  <link rel="stylesheet" href="reviews.css?v=frame-motion-20261125-v7">
   <style>
     /* Mobile fallback: keep content readable without disabling the designed motion. */
     @media (max-width:700px) {
@@ -117,6 +117,46 @@
         <button class="filter-btn" data-filter="digital" aria-pressed="false">ЦИФРОВОЕ</button>
         <button class="filter-btn" data-filter="visual" aria-pressed="false">ВИЗУАЛЬНЫЙ КОНТЕНТ</button>
       </div>
+
+      <div class="project-orbit-module" id="project-constellation">
+        <div class="project-orbit-heading">
+          <div class="mono"><span class="orbit-live-dot"></span> 02.1 / PROJECT CONSTELLATION</div>
+          <span class="mono orbit-current" id="orbit-current">AETHER® / IDENTITY SYSTEM</span>
+          <div class="project-orbit-controls">
+            <button type="button" id="orbit-prev" aria-label="Предыдущий проект">←</button>
+            <button type="button" id="orbit-next" aria-label="Следующий проект">→</button>
+          </div>
+        </div>
+        <div class="project-orbit-scene" id="project-orbit-scene" aria-label="Орбита проектов. Выберите проект или поверните сферу.">
+          <div class="project-orbit-grid" aria-hidden="true"></div>
+          <div class="project-orbit-core" aria-hidden="true"><span>FL</span><small>SELECTED<br>WORK / 2026</small></div>
+          <div class="project-orbit-lens project-orbit-lens-a" aria-hidden="true"></div>
+          <div class="project-orbit-lens project-orbit-lens-b" aria-hidden="true"></div>
+          <div class="project-orbit-ring" id="project-orbit-ring">
+            <button class="project-orbit-node is-current" type="button" style="--slot:0" data-project="01" aria-label="Открыть AETHER">
+              <span class="orbit-node-surface"><span class="orbit-node-code mono">01 / IDENTITY</span><span class="orbit-art orbit-art-aether"></span><strong>AETHER®</strong><small>OPEN CONCEPT ↗</small></span>
+            </button>
+            <button class="project-orbit-node" type="button" style="--slot:1" data-project="02" aria-label="Открыть NØRD STUDIO">
+              <span class="orbit-node-surface"><span class="orbit-node-code mono">02 / DIGITAL</span><span class="orbit-art orbit-art-nord"><i></i></span><strong>NØRD</strong><small>OPEN CONCEPT ↗</small></span>
+            </button>
+            <button class="project-orbit-node" type="button" style="--slot:2" data-project="03" aria-label="Открыть VANTA OBJECTS">
+              <span class="orbit-node-surface"><span class="orbit-node-code mono">03 / OBJECTS</span><span class="orbit-art orbit-art-vanta"><i></i><i></i><i></i></span><strong>VANTA</strong><small>OPEN CONCEPT ↗</small></span>
+            </button>
+            <button class="project-orbit-node" type="button" style="--slot:3" data-project="04" aria-label="Открыть FLUX CAMPAIGN">
+              <span class="orbit-node-surface"><span class="orbit-node-code mono">04 / CAMPAIGN</span><span class="orbit-art orbit-art-flux"><i></i></span><strong>FLUX</strong><small>OPEN CONCEPT ↗</small></span>
+            </button>
+            <button class="project-orbit-node" type="button" style="--slot:4" data-project="05" aria-label="Открыть OBJECT 05">
+              <span class="orbit-node-surface"><span class="orbit-node-code mono">05 / ART DIRECTION</span><span class="orbit-art orbit-art-object"><i></i><i></i></span><strong>OBJECT 05</strong><small>OPEN CONCEPT ↗</small></span>
+            </button>
+            <button class="project-orbit-node" type="button" style="--slot:5" data-project="06" aria-label="Открыть SØL RETREAT">
+              <span class="orbit-node-surface"><span class="orbit-node-code mono">06 / EXPERIENCE</span><span class="orbit-art orbit-art-sol"><i></i></span><strong>SØL</strong><small>OPEN CONCEPT ↗</small></span>
+            </button>
+          </div>
+          <div class="project-orbit-caption mono"><span>DRAG WITH ARROWS</span><span>360° / SIX CREATIVE DIRECTIONS</span></div>
+        </div>
+        <div class="project-orbit-foot mono"><span>INTERACTIVE PROJECT INDEX</span><span>SELECT A FORM TO OPEN ITS CASE</span></div>
+      </div>
+
       <div class="project-grid">
         <article class="project-card project-large" data-category="branding" data-project="01" tabindex="0" role="button" aria-label="Открыть концепт AETHER">
           <div class="project-art art-aether"><div class="aether-word">AETHER</div><div class="aether-orb"></div><div class="art-coordinate mono">РИС. 01 / СИСТЕМА АЙДЕНТИКИ</div><span class="art-label mono">ФОРМА / МАТЕРИЯ / СВЕТ</span></div>
@@ -143,6 +183,23 @@
           <div class="project-info"><div><span class="project-type mono">ВЕБ-ДИЗАЙН / КОНЦЕПТ</span><h3>SØL RETREAT</h3></div><span class="project-arrow"><svg class="ui-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M8 6h10v10"/></svg></span></div>
         </article>
       </div>
+
+      <div class="work-editorial-feature">
+        <div class="editorial-artboard" aria-hidden="true">
+          <span class="editorial-index mono">FL / VISUAL RESEARCH 026</span>
+          <span class="editorial-axis editorial-axis-x"></span><span class="editorial-axis editorial-axis-y"></span>
+          <span class="editorial-ring editorial-ring-a"></span><span class="editorial-ring editorial-ring-b"></span>
+          <span class="editorial-glass"></span><span class="editorial-shard"></span>
+          <span class="editorial-coordinate mono">55° 45' / 37° 37'</span>
+        </div>
+        <div class="editorial-feature-copy">
+          <span class="mono">THE FRAME / CREATIVE PRACTICE 2026</span>
+          <h3>НЕ ПРОСТО<br><em>КРАСИВО.</em><br>ТОЧНО В ЦЕЛЬ.</h3>
+          <p>Сначала идея. Затем визуальная система. И только потом — детали, которые делают впечатление цельным.</p>
+          <a class="editorial-link mono" href="#services">КАК МЫ СОЗДАЁМ <span>↗</span></a>
+        </div>
+      </div>
+
       <p class="work-note mono">* ВСЕ ПРОЕКТЫ — АВТОРСКИЕ КОНЦЕПТУАЛЬНЫЕ ИССЛЕДОВАНИЯ.</p>
     </section>
 
@@ -200,28 +257,37 @@
 
     <section class="services section-pad" id="services">
       <div class="section-kicker mono"><span>04 / ЧТО МЫ ДЕЛАЕМ</span><span>ОТ ПЕРВОЙ ИДЕИ ДО ПОСЛЕДНЕГО ПИКСЕЛЯ</span></div>
-      <div class="services-head"><h2 class="display-heading reveal">ИДЕИ — В<br><em>ЦИФРОВОЙ ОПЫТ</em><span class="lime-dot">.</span></h2><p class="section-intro reveal">Единый процесс и продуманный подход на каждом этапе.</p></div>
+      <div class="services-head"><h2 class="display-heading reveal">ЧТО МЫ<br><em>СДЕЛАЕМ</em><span class="lime-dot">.</span></h2><p class="section-intro reveal">Выберите задачу. Простыми словами объясняем, что именно сделаем и что вы получите в итоге.</p></div>
       <div class="service-list">
-        <article class="service-item" tabindex="0"><span class="service-num mono">01</span><div class="service-main"><h3>Фирменный стиль</h3><p>Создаём визуальные системы, которые раскрывают характер бренда и помогают ему развиваться.</p></div><div class="service-detail detail-brand"><span><svg class="ui-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M8 6h10v10"/></svg></span><b>ЗАЯВИ<br>О СЕБЕ.</b></div><span class="service-plus"><svg class="ui-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M8 6h10v10"/></svg></span></article>
-        <article class="service-item" tabindex="0"><span class="service-num mono">02</span><div class="service-main"><h3>Дизайн сайтов</h3><p>Проектируем сайты с выразительным визуальным языком, понятной структурой и смыслом.</p></div><div class="service-detail detail-web"><div class="mini-browser"><i></i><i></i><i></i><b>FRAME / DIGITAL</b><span>ВАЖНА<br>КАЖДАЯ ДЕТАЛЬ.</span></div></div><span class="service-plus"><svg class="ui-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M8 6h10v10"/></svg></span></article>
-        <article class="service-item" tabindex="0"><span class="service-num mono">03</span><div class="service-main"><h3>Разработка сайтов</h3><p>Разрабатываем быстрые адаптивные сайты, где детали, производительность и интерактив работают вместе.</p></div><div class="service-detail detail-code"><span>01&nbsp; const idea =</span><b>experience();</b><span>02&nbsp; build(impact);</span></div><span class="service-plus"><svg class="ui-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M8 6h10v10"/></svg></span></article>
-        <article class="service-item" tabindex="0"><span class="service-num mono">04</span><div class="service-main"><h3>Креативное направление</h3><p>Формируем цельное видение, объединяющее концепцию, изображение, движение и сообщение.</p></div><div class="service-detail detail-direction"><div class="direction-cross">✳</div><span>SEE IT<br>DIFFERENTLY</span></div><span class="service-plus"><svg class="ui-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M8 6h10v10"/></svg></span></article>
-        <article class="service-item" tabindex="0"><span class="service-num mono">05</span><div class="service-main"><h3>Цифровой контент</h3><p>Создаём визуальные материалы и контент-системы, которые притягивают внимание.</p></div><div class="service-detail detail-content"><div class="content-frame"></div><span>FRAME / 005</span></div><span class="service-plus"><svg class="ui-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M8 6h10v10"/></svg></span></article>
-        <article class="service-item" tabindex="0"><span class="service-num mono">06</span><div class="service-main"><h3>Интерактивные решения</h3><p>Создаём иммерсивные цифровые впечатления, в которые хочется погрузиться.</p></div><div class="service-detail detail-interactive"><div class="interactive-cube"></div></div><span class="service-plus"><svg class="ui-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M8 6h10v10"/></svg></span></article>
+        <article class="service-item" tabindex="0"><span class="service-num mono">01</span><div class="service-main"><h3>Фирменный стиль</h3><p>Придумываем, как будет выглядеть ваш бренд: логотип, цвета, шрифты и общий стиль.</p><div class="service-result"><span>НА ВЫХОДЕ</span>Логотип и единый стиль для всех материалов.</div></div><div class="service-detail detail-brand"><span><svg class="ui-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M8 6h10v10"/></svg></span><b>ЗАЯВИ<br>О СЕБЕ.</b></div><span class="service-plus"><svg class="ui-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M8 6h10v10"/></svg></span></article>
+        <article class="service-item" tabindex="0"><span class="service-num mono">02</span><div class="service-main"><h3>Дизайн сайтов</h3><p>Рисуем будущий сайт: где будет текст, фотографии, кнопки и нужные разделы. Пока без программирования.</p><div class="service-result"><span>НА ВЫХОДЕ</span>Готовый макет, который можно посмотреть и согласовать.</div></div><div class="service-detail detail-web"><div class="mini-browser"><i></i><i></i><i></i><b>FRAME / DIGITAL</b><span>ВАЖНА<br>КАЖДАЯ ДЕТАЛЬ.</span></div></div><span class="service-plus"><svg class="ui-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M8 6h10v10"/></svg></span></article>
+        <article class="service-item" tabindex="0"><span class="service-num mono">03</span><div class="service-main"><h3>Разработка сайтов</h3><p>Превращаем согласованный макет в настоящий сайт. Настраиваем кнопки, формы и отображение на телефоне.</p><div class="service-result"><span>НА ВЫХОДЕ</span>Работающий сайт для телефона и компьютера.</div></div><div class="service-detail detail-code"><span>01&nbsp; const idea =</span><b>experience();</b><span>02&nbsp; build(impact);</span></div><span class="service-plus"><svg class="ui-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M8 6h10v10"/></svg></span></article>
+        <article class="service-item" tabindex="0"><span class="service-num mono">04</span><div class="service-main"><h3>Креативное направление</h3><p>Продумываем общую идею проекта: настроение, подачу, стиль и то, чем вы отличаетесь от других.</p><div class="service-result"><span>НА ВЫХОДЕ</span>Понятная творческая концепция и направление.</div></div><div class="service-detail detail-direction"><div class="direction-cross">✳</div><span>SEE IT<br>DIFFERENTLY</span></div><span class="service-plus"><svg class="ui-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M8 6h10v10"/></svg></span></article>
+        <article class="service-item" tabindex="0"><span class="service-num mono">05</span><div class="service-main"><h3>Цифровой контент</h3><p>Делаем материалы для сайта и соцсетей: баннеры, обложки, графику, короткие ролики и визуалы.</p><div class="service-result"><span>НА ВЫХОДЕ</span>Готовые изображения и видео для публикации.</div></div><div class="service-detail detail-content"><div class="content-frame"></div><span>FRAME / 005</span></div><span class="service-plus"><svg class="ui-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M8 6h10v10"/></svg></span></article>
+        <article class="service-item" tabindex="0"><span class="service-num mono">06</span><div class="service-main"><h3>Интерактивные решения</h3><p>Добавляем на сайт интерактивные элементы: движение, 3D-объекты и необычные реакции на действия посетителя.</p><div class="service-result"><span>НА ВЫХОДЕ</span>Интерактивные элементы, которые помогают запомнить сайт.</div></div><div class="service-detail detail-interactive"><div class="interactive-cube"></div></div><span class="service-plus"><svg class="ui-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M8 6h10v10"/></svg></span></article>
       </div>
     </section>
 
     <section class="process section-pad" id="process">
-      <div class="section-kicker mono"><span>05 / КАК МЫ РАБОТАЕМ</span><span>ЯСНОСТЬ НА КАЖДОМ ЭТАПЕ</span></div>
-      <div class="process-layout"><div><h2 class="display-heading reveal">СОЗДАЁМ<br><em>ОСОЗНАННО</em><span class="lime-dot">.</span></h2><p class="process-intro">Сильный результат начинается с правильных вопросов. Работаем вместе, вдумчиво и фокусируемся на главном.</p></div>
-        <div class="process-steps">
-          <div class="process-line"><span></span></div>
-          <button class="process-step active" data-step="0"><span class="step-num mono">01</span><span class="step-name">ПОГРУЖЕНИЕ</span><span class="step-desc">Изучаем задачу, аудиторию, цели и возможности проекта.</span><i><svg class="ui-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M8 6h10v10"/></svg></i></button>
-          <button class="process-step" data-step="1"><span class="step-num mono">02</span><span class="step-name">СТРАТЕГИЯ</span><span class="step-desc">Находим точное направление и определяем, каким должен быть результат.</span><i><svg class="ui-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M8 6h10v10"/></svg></i></button>
-          <button class="process-step" data-step="2"><span class="step-num mono">03</span><span class="step-name">ДИЗАЙН</span><span class="step-desc">Исследуем, уточняем и создаём выразительный визуальный язык.</span><i><svg class="ui-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M8 6h10v10"/></svg></i></button>
-          <button class="process-step" data-step="3"><span class="step-num mono">04</span><span class="step-name">РАЗРАБОТКА</span><span class="step-desc">Превращаем выбранную концепцию в работающий адаптивный продукт.</span><i><svg class="ui-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M8 6h10v10"/></svg></i></button>
-          <button class="process-step" data-step="4"><span class="step-num mono">05</span><span class="step-name">ЗАПУСК</span><span class="step-desc">Проверяем детали, запускаем проект и планируем следующий шаг.</span><i><svg class="ui-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M8 6h10v10"/></svg></i></button>
-        </div></div>
+      <div class="section-kicker mono"><span>05 / ПОНЯТНЫЙ ПРОЦЕСС</span><span>5 ШАГОВ — ОТ ИДЕИ ДО ГОТОВОГО САЙТА</span></div>
+      <div class="process-heading">
+        <div><h2 class="display-heading reveal">КАК МЫ<br><em>СОЗДАЁМ САЙТ</em><span class="lime-dot">.</span></h2><p class="process-intro">Вам не нужно разбираться в дизайне и технологиях. Вы рассказываете, что нужно бизнесу. Мы последовательно превращаем это в готовый сайт.</p></div>
+        <div class="process-promise"><span class="mono">ПРОСТО И ПРОЗРАЧНО</span><b>Вы всегда понимаете,<br>что происходит сейчас.</b><span>Покажем результат каждого этапа и согласуем его с вами.</span></div>
+      </div>
+      <div class="process-workflow">
+        <div class="process-tabs" role="tablist" aria-label="Этапы создания сайта">
+          <button class="process-step active" type="button" role="tab" aria-selected="true" aria-controls="process-detail" data-step="0"><span class="step-num mono">01</span><span class="step-name">БРИФ</span><span class="step-plain">Разбираемся в задаче</span></button>
+          <button class="process-step" type="button" role="tab" aria-selected="false" aria-controls="process-detail" data-step="1"><span class="step-num mono">02</span><span class="step-name">ПЛАН</span><span class="step-plain">Решаем, что нужно</span></button>
+          <button class="process-step" type="button" role="tab" aria-selected="false" aria-controls="process-detail" data-step="2"><span class="step-num mono">03</span><span class="step-name">ДИЗАЙН</span><span class="step-plain">Показываем внешний вид</span></button>
+          <button class="process-step" type="button" role="tab" aria-selected="false" aria-controls="process-detail" data-step="3"><span class="step-num mono">04</span><span class="step-name">РАЗРАБОТКА</span><span class="step-plain">Собираем работающий сайт</span></button>
+          <button class="process-step" type="button" role="tab" aria-selected="false" aria-controls="process-detail" data-step="4"><span class="step-num mono">05</span><span class="step-name">ЗАПУСК</span><span class="step-plain">Публикуем в интернете</span></button>
+        </div>
+        <article class="process-detail" id="process-detail" role="tabpanel" aria-live="polite">
+          <div class="process-detail-top"><span class="mono" id="process-count">ЭТАП 01 / 05</span><span class="process-live"><i></i> ВЫБРАННЫЙ ЭТАП</span></div>
+          <div class="process-detail-grid"><div><span class="process-overline mono" id="process-overline">СНАЧАЛА СЛУШАЕМ</span><h3 id="process-title">Расскажите, что вам нужно.</h3><p id="process-copy">Обсудим ваш бизнес, клиентов и цель сайта. Можно прийти даже с одной идеей — поможем сформулировать остальное простыми словами.</p></div><div class="process-outcome"><span class="mono">ЧТО БУДЕТ НА ВЫХОДЕ</span><b id="process-result">Понятная задача и список того, что нужно сделать.</b><span class="process-example" id="process-example">Например: сайт для студии, чтобы люди увидели услуги и оставили заявку.</span></div></div>
+          <div class="process-detail-foot"><span class="mono" id="process-foot">ВАШЕ УЧАСТИЕ: РАССКАЗАТЬ О ЗАДАЧЕ И ОТВЕТИТЬ НА ВОПРОСЫ</span><button type="button" id="process-next">СЛЕДУЮЩИЙ ЭТАП <span>↗</span></button></div>
+        </article>
+      </div>
     </section>
 
     <section class="lab section-pad" id="lab">

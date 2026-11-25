@@ -226,12 +226,103 @@
   });
   $$('[data-close-modal]').forEach(el => el.addEventListener('click', closeProjectModal));
 
-  // Process step indicator.
-  const steps = $$('.process-step'), lineFill = $('.process-line span');
-  steps.forEach(step => step.addEventListener('click', () => {
-    steps.forEach(s => s.classList.toggle('active', s === step));
-    if (lineFill) lineFill.style.top = `${Number(step.dataset.step) * 20}%`;
-  }));
+
+  // PROJECT CONSTELLATION — 3D orbit index, synchronized with the existing case modal.
+  const orbit = $('#project-orbit-scene');
+  const orbitRing = $('#project-orbit-ring');
+  const orbitNodes = $$('.project-orbit-node');
+  const orbitCurrent = $('#orbit-current');
+  let orbitIndex = 0;
+  const orbitNames = [
+    'AETHER® / IDENTITY SYSTEM','NØRD STUDIO / DIGITAL EXPERIENCE',
+    'VANTA OBJECTS / DIGITAL PRODUCT','FLUX CAMPAIGN / VISUAL CONTENT',
+    'OBJECT 05 / ART DIRECTION','SØL RETREAT / WEB EXPERIENCE'
+  ];
+  function setOrbitIndex(index, scrollToActive = false) {
+    orbitIndex = (index + orbitNodes.length) % orbitNodes.length;
+    if (!orbitRing) return;
+    orbitRing.style.setProperty('--orbit-angle', (-orbitIndex * 60) + 'deg');
+    orbitNodes.forEach((node, i) => {
+      const active = i === orbitIndex;
+      node.classList.toggle('is-current', active);
+      node.setAttribute('aria-pressed', String(active));
+    });
+    if (orbitCurrent) orbitCurrent.textContent = orbitNames[orbitIndex];
+    if (scrollToActive && window.innerWidth <= 650) {
+      orbitNodes[orbitIndex]?.scrollIntoView({ behavior:'smooth', block:'nearest', inline:'center' });
+    }
+  }
+  if (orbit && orbitRing && orbitNodes.length) {
+    setOrbitIndex(0);
+    $('#orbit-prev')?.addEventListener('click', () => setOrbitIndex(orbitIndex - 1, true));
+    $('#orbit-next')?.addEventListener('click', () => setOrbitIndex(orbitIndex + 1, true));
+    orbitNodes.forEach((node, index) => node.addEventListener('click', () => {
+      setOrbitIndex(index);
+      openProjectModal(node.dataset.project);
+    }));
+    orbit.addEventListener('keydown', event => {
+      if (!['ArrowLeft','ArrowRight','Home','End'].includes(event.key)) return;
+      if (event.target.closest('.project-orbit-node')) {
+        event.preventDefault();
+        setOrbitIndex(event.key === 'Home' ? 0 : event.key === 'End' ? orbitNodes.length - 1 : orbitIndex + (event.key === 'ArrowRight' ? 1 : -1));
+        orbitNodes[orbitIndex]?.focus();
+      }
+    });
+    if (!coarsePointer && !reduceMotion && !lowPower) {
+      let lightFrame = 0;
+      orbit.addEventListener('pointermove', event => {
+        const rect = orbit.getBoundingClientRect();
+        const x = ((event.clientX - rect.left) / rect.width) * 100;
+        const y = ((event.clientY - rect.top) / rect.height) * 100;
+        if (lightFrame) return;
+        lightFrame = requestAnimationFrame(() => {
+          orbit.style.setProperty('--orbit-light-x', x.toFixed(1) + '%');
+          orbit.style.setProperty('--orbit-light-y', y.toFixed(1) + '%');
+          lightFrame = 0;
+        });
+      }, { passive:true });
+      orbit.addEventListener('pointerleave', () => {
+        orbit.style.setProperty('--orbit-light-x','50%');
+        orbit.style.setProperty('--orbit-light-y','50%');
+      });
+    }
+  }
+
+  // Clear, single-focus process explainer: one stage and one concrete outcome at a time.
+  const processData = [
+    { overline:'СНАЧАЛА СЛУШАЕМ', title:'Расскажите, что вам нужно.', copy:'Обсудим ваш бизнес, клиентов и цель сайта. Можно прийти даже с одной идеей — поможем сформулировать остальное простыми словами.', result:'Понятная задача и список того, что нужно сделать.', example:'Например: сайт для студии, чтобы люди увидели услуги и оставили заявку.', foot:'ВАШЕ УЧАСТИЕ: РАССКАЗАТЬ О ЗАДАЧЕ И ОТВЕТИТЬ НА ВОПРОСЫ' },
+    { overline:'СОБИРАЕМ ПЛАН', title:'Решаем, каким должен быть сайт.', copy:'Определяем нужные страницы, разделы и функции. Продумываем путь посетителя: что он увидит, куда нажмёт и как свяжется с вами.', result:'Структура сайта и согласованный план работ.', example:'Например: главная, услуги, примеры работ, ответы на вопросы и кнопка заявки.', foot:'ВАШЕ УЧАСТИЕ: ПОДТВЕРДИТЬ СТРУКТУРУ И ПРИОРИТЕТЫ' },
+    { overline:'ПОКАЗЫВАЕМ ВНЕШНИЙ ВИД', title:'Вы заранее видите будущий сайт.', copy:'Подбираем цвета, шрифты, изображения и расположение блоков. Создаём макет страниц — ещё до программирования. Вы смотрите и говорите, что изменить.', result:'Согласованный дизайн-макет страниц сайта.', example:'Это как точный эскиз квартиры до ремонта: видно, где и что будет находиться.', foot:'ВАШЕ УЧАСТИЕ: ПОСМОТРЕТЬ МАКЕТ И СОГЛАСОВАТЬ ДИЗАЙН' },
+    { overline:'ПРЕВРАЩАЕМ МАКЕТ В САЙТ', title:'Делаем так, чтобы всё работало.', copy:'Собираем страницы, настраиваем кнопки, формы и переходы. Адаптируем сайт под телефон, планшет и компьютер. Проверяем скорость и удобство.', result:'Рабочий сайт, который можно открыть на любом устройстве.', example:'Кнопка отправляет заявку, меню открывается, изображения загружаются, текст не съезжает на телефоне.', foot:'ВАШЕ УЧАСТИЕ: ПРОВЕРИТЬ ГОТОВЫЙ САЙТ И ДАТЬ ЗАМЕЧАНИЯ' },
+    { overline:'ВЫПУСКАЕМ В ИНТЕРНЕТ', title:'Запускаем сайт для ваших клиентов.', copy:'Подключаем домен, размещаем сайт в интернете и проверяем его ещё раз. Передаём доступы и объясняем, как пользоваться результатом.', result:'Опубликованный сайт и доступы к нему.', example:'Вместо черновика появляется адрес, который можно отправлять клиентам и размещать в соцсетях.', foot:'ВАШЕ УЧАСТИЕ: ПРИНЯТЬ РЕЗУЛЬТАТ И ПОЛУЧИТЬ ДОСТУПЫ' }
+  ];
+  const processButtons = $$('.process-step');
+  const processFields = { count:$('#process-count'), overline:$('#process-overline'), title:$('#process-title'), copy:$('#process-copy'), result:$('#process-result'), example:$('#process-example'), foot:$('#process-foot') };
+  let currentProcessStep = 0;
+  function selectProcessStep(index) {
+    currentProcessStep = (index + processData.length) % processData.length;
+    const item = processData[currentProcessStep];
+    processButtons.forEach((button, i) => {
+      const active = i === currentProcessStep;
+      button.classList.toggle('active', active);
+      button.setAttribute('aria-selected', String(active));
+      button.tabIndex = active ? 0 : -1;
+    });
+    processFields.count.textContent = `ЭТАП ${String(currentProcessStep + 1).padStart(2,'0')} / 05`;
+    for (const key of ['overline','title','copy','result','example','foot']) processFields[key].textContent = item[key];
+  }
+  processButtons.forEach((button, i) => button.addEventListener('click', () => selectProcessStep(i)));
+  selectProcessStep(0);
+  const processNext = $('#process-next');
+  processNext?.addEventListener('click', () => selectProcessStep(currentProcessStep + 1));
+  const processTabs = $('.process-tabs');
+  processTabs?.addEventListener('keydown', event => {
+    if (!['ArrowDown','ArrowRight','ArrowUp','ArrowLeft','Home','End'].includes(event.key)) return;
+    event.preventDefault();
+    const next = event.key === 'Home' ? 0 : event.key === 'End' ? processButtons.length - 1 : currentProcessStep + (['ArrowDown','ArrowRight'].includes(event.key) ? 1 : -1);
+    selectProcessStep(next);
+    processButtons[currentProcessStep]?.focus();
+  });
 
   // Magnetic hover on larger pointers.
   if (!coarsePointer && !reduceMotion && !lowPower) {
