@@ -3110,3 +3110,14 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
   .liquid-cta>.liquid-canvas-layer{display:none!important}
   .liquid-cta,.liquid-cta:hover,.liquid-cta:focus-visible{background:#292729!important;transition:none!important;animation:none!important}
 }
+
+
+/* Keep the desktop orbital geometry intact while its surface responds to the pointer. */
+@media(min-width:1101px){
+  .project-orbit-node.liquid-cta,
+  .project-orbit-node.liquid-cta:hover,
+  .project-orbit-node.liquid-cta.is-current{
+    transform:translate(-50%,-50%) rotateY(var(--slot-angle)) translateZ(var(--orbit-depth)) rotateY(calc(0deg - var(--slot-angle))) rotateY(calc(0deg - var(--orbit-angle,0deg))) rotateX(55deg)!important;
+    border-radius:13px!important;
+  }
+}
