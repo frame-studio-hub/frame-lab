@@ -270,6 +270,9 @@
   let orbitPointerInside = false;
   let orbitFocusInside = false;
   let orbitResumeTimer = 0;
+  let orbitSettleFrame = 0;
+  let orbitRailEnabled = false;
+  let orbitRailGroupWidth = 0;
   let orbitDrag = null;
   let suppressOrbitClick = false;
   const orbitAccents = ['#c7ff42','#c5d8c7','#b8a8ff','#e1b58a','#d7ded0','#e8d8a4'];
@@ -282,6 +285,11 @@
   function syncOrbitSelection() {
     orbitNodes.forEach((node, i) => {
       const active = i === orbitIndex;
+      node.classList.toggle('is-current', active);
+      node.setAttribute('aria-pressed', String(active));
+    });
+    orbit?.querySelectorAll('.project-orbit-node.is-loop-clone').forEach(node => {
+      const active = Number(node.dataset.project) === orbitIndex + 1;
       node.classList.toggle('is-current', active);
       node.setAttribute('aria-pressed', String(active));
     });
@@ -311,6 +319,29 @@
       node.style.filter = distance < .5 ? 'none' : 'saturate(.8) brightness(.78)';
       node.style.setProperty('--deck-accent', orbitAccents[i]);
     });
+  }
+
+  function animateOrbitToIndex(index) {
+    if (!orbitDesktop.matches || !orbitNodes.length) return;
+    if (orbitSettleFrame) cancelAnimationFrame(orbitSettleFrame);
+    stopOrbitMotion();
+    const targetBase = (index % orbitNodes.length) * 60;
+    const delta = ((targetBase - orbitAngle + 540) % 360) - 180;
+    const from = orbitAngle;
+    const started = performance.now();
+    const duration = 980;
+    const ease = t => 1 - Math.pow(1 - t, 4);
+    const step = now => {
+      const t = Math.min(1, (now - started) / duration);
+      renderOrbitAngle(from + delta * ease(t));
+      if (t < 1) orbitSettleFrame = requestAnimationFrame(step);
+      else {
+        orbitSettleFrame = 0;
+        orbitAngle = ((targetBase % 360) + 360) % 360;
+        renderOrbitAngle(orbitAngle);
+      }
+    };
+    orbitSettleFrame = requestAnimationFrame(step);
   }
 
   function renderOrbitAngle(angle) {
@@ -393,7 +424,7 @@
       orbitResumeTimer = window.setTimeout(() => {
         orbitResumeTimer = 0;
         if (!hoveredOrbitCard && !orbitFocusInside) startOrbitMotion();
-      }, 220);
+      }, 1450);
     };
     orbit.addEventListener('pointerover', event => {
       const card = event.target.closest?.('.project-orbit-node');
@@ -402,7 +433,9 @@
       orbitPointerInside = true;
       if (orbitResumeTimer) window.clearTimeout(orbitResumeTimer);
       orbitResumeTimer = 0;
-      stopOrbitMotion();
+      const selectedIndex = orbitNodes.indexOf(card);
+      if (selectedIndex >= 0) animateOrbitToIndex(selectedIndex);
+      else stopOrbitMotion();
     });
     orbit.addEventListener('pointerout', event => {
       const from = event.target.closest?.('.project-orbit-node');
@@ -411,7 +444,9 @@
       if (to && orbit.contains(to)) {
         hoveredOrbitCard = to;
         orbitPointerInside = true;
-        stopOrbitMotion();
+        const selectedIndex = orbitNodes.indexOf(to);
+        if (selectedIndex >= 0) animateOrbitToIndex(selectedIndex);
+        else stopOrbitMotion();
         return;
       }
       hoveredOrbitCard = null;
@@ -493,26 +528,65 @@
     orbit.addEventListener('pointerup', finishOrbitDrag);
     orbit.addEventListener('pointercancel', finishOrbitDrag);
 
-    orbitNodes.forEach((node, index) => node.addEventListener('click', () => {
-      if (suppressOrbitClick) return;
+    // One delegated click handler supports both the original cards and their seamless rail copies.
+    orbit.addEventListener('click', event => {
+      const node = event.target.closest?.('.project-orbit-node');
+      if (!node || !orbit.contains(node) || suppressOrbitClick) return;
+      const index = Math.max(0, Number(node.dataset.project) - 1);
       setOrbitIndex(index);
       openProjectModal(node.dataset.project);
-    }));
+    });
+
+    const setupInfiniteMobileRail = () => {
+      orbit.querySelectorAll('.project-orbit-node.is-loop-clone').forEach(node => node.remove());
+      orbitRailEnabled = false;
+      orbitRailGroupWidth = 0;
+      if (orbitDesktop.matches) return;
+      const gap = parseFloat(getComputedStyle(orbitRing).columnGap || getComputedStyle(orbitRing).gap) || 12;
+      const before = orbitNodes.map(node => {
+        const clone = node.cloneNode(true);
+        clone.classList.add('is-loop-clone');
+        clone.dataset.loopClone = 'before';
+        clone.setAttribute('aria-hidden', 'true');
+        return clone;
+      });
+      const after = orbitNodes.map(node => {
+        const clone = node.cloneNode(true);
+        clone.classList.add('is-loop-clone');
+        clone.dataset.loopClone = 'after';
+        clone.setAttribute('aria-hidden', 'true');
+        return clone;
+      });
+      before.reverse().forEach(node => orbitRing.prepend(node));
+      after.forEach(node => orbitRing.append(node));
+      orbitRailGroupWidth = orbitNodes.reduce((sum, node) => sum + node.getBoundingClientRect().width, 0) + gap * orbitNodes.length;
+      orbit.scrollLeft = orbitRailGroupWidth;
+      orbitRailEnabled = true;
+    };
+    setupInfiniteMobileRail();
+
     if (!orbitDesktop.matches) {
       let mobileScrollFrame = 0;
       orbit.addEventListener('scroll', () => {
+        if (orbitRailEnabled && orbitRailGroupWidth > 0) {
+          const lower = orbitRailGroupWidth * .5;
+          const upper = orbitRailGroupWidth * 1.5;
+          if (orbit.scrollLeft < lower) orbit.scrollLeft += orbitRailGroupWidth;
+          else if (orbit.scrollLeft > upper) orbit.scrollLeft -= orbitRailGroupWidth;
+        }
         if (mobileScrollFrame) return;
         mobileScrollFrame = requestAnimationFrame(() => {
           mobileScrollFrame = 0;
           const center = orbit.getBoundingClientRect().left + orbit.clientWidth / 2;
-          let closest = 0, best = Infinity;
-          orbitNodes.forEach((node, i) => {
+          const allNodes = $$('.project-orbit-node', orbitRing);
+          let closestProject = orbitIndex, best = Infinity;
+          allNodes.forEach(node => {
             const rect = node.getBoundingClientRect();
             const distance = Math.abs(rect.left + rect.width / 2 - center);
-            if (distance < best) { best = distance; closest = i; }
+            if (distance < best) { best = distance; closestProject = Math.max(0, Number(node.dataset.project) - 1); }
           });
-          if (closest !== orbitIndex) {
-            orbitIndex = closest;
+          if (closestProject !== orbitIndex) {
+            orbitIndex = closestProject;
             syncOrbitSelection();
           }
         });
@@ -550,6 +624,7 @@
     });
     orbitDesktop.addEventListener?.('change', () => {
       stopOrbitMotion();
+      setupInfiniteMobileRail();
       layoutProjectDeck();
       startOrbitMotion();
     });
@@ -1004,3 +1079,4 @@
     }
   });
 })();
+[exit 0]
