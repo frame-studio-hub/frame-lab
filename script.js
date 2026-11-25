@@ -317,6 +317,38 @@
     });
   }
 
+
+  // Micro-detail pointer lighting for UI surfaces. Values are coalesced into one frame.
+  if (!coarsePointer && !reduceMotion && !lowPower) {
+    const bindDetailLight = (selector, strength = 1) => {
+      document.querySelectorAll(selector).forEach(element => {
+        let frame = 0, x = 50, y = 50;
+        element.addEventListener('pointermove', event => {
+          const rect = element.getBoundingClientRect();
+          x = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100));
+          y = Math.max(0, Math.min(100, ((event.clientY - rect.top) / rect.height) * 100));
+          if (frame) return;
+          frame = requestAnimationFrame(() => {
+            element.style.setProperty('--detail-x', x.toFixed(1) + '%');
+            element.style.setProperty('--detail-y', y.toFixed(1) + '%');
+            element.style.setProperty('--detail-strength', String(strength));
+            frame = 0;
+          });
+        }, { passive: true });
+        element.addEventListener('pointerleave', () => {
+          cancelAnimationFrame(frame);
+          frame = 0;
+          element.style.setProperty('--detail-x', '50%');
+          element.style.setProperty('--detail-y', '50%');
+        });
+      });
+    };
+    bindDetailLight('.object-card', 1);
+    bindDetailLight('.service-item', .7);
+    bindDetailLight('.choice-card', .65);
+    bindDetailLight('.review-card', .85);
+  }
+
   // Activate the existing glass/chrome/lime material controls in Creative Lab.
   const materialButtons = Array.from(document.querySelectorAll('[data-material-mode]'));
   materialButtons.forEach(button => {
