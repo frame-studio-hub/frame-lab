@@ -961,10 +961,8 @@
 
   // Apply the reference liquid morph to every compact interactive button and CTA.
   // Structural controls (hamburger, modal close, orbit cards and index rows) keep their native geometry.
-  document.querySelectorAll('button:not(.menu-toggle):not(.modal-close):not(.project-orbit-node):not(.project-index-row), .header-contact, .start-button, .instagram-brief').forEach(control => control.classList.add('liquid-cta'));
-
-  // One consistent liquid-glass interaction language for segmented controls and CTAs.
-  document.querySelectorAll('.filter-btn,.project-view-btn,.project-mono-toggle,.material-btn,.lab-button,.project-orbit-controls button,.planner-next,.planner-back,.process-step').forEach(control => control.classList.add('liquid-cta'));
+  // Every native button and button-like CTA uses one liquid surface system.
+  document.querySelectorAll('button, .header-contact, .start-button, #instagram-brief, .round-link').forEach(control => control.classList.add('liquid-cta'));
 
   // Activate the existing glass/chrome/lime material controls in Creative Lab.
   const materialButtons = Array.from(document.querySelectorAll('[data-material-mode]'));
@@ -1092,64 +1090,225 @@
   });
 }
 
-  // Shared canvas liquid deformation: exact influence/displacement constants from the supplied reference.
-  const liquidButtons = Array.from(document.querySelectorAll('.liquid-cta'));
-  liquidButtons.forEach(el => {
-    if (el.querySelector(':scope > .liquid-canvas-layer')) return;
-    const canvas=document.createElement('canvas'); canvas.className='liquid-canvas-layer';
-    canvas.setAttribute('aria-hidden','true'); el.prepend(canvas);
-    const ctx=canvas.getContext('2d'); if(!ctx)return;
-    const PAD=76, DPR=Math.min(window.devicePixelRatio||1,2);
-    let W=1,H=1,active=false,power=0,targetPower=0,raf=0,time=0;
-    let mouse={x:.5,y:.5},smooth={x:.5,y:.5},tail={x:.5,y:.5},velocity={x:0,y:0};
-    const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),lerp=(a,b,t)=>a+(b-a)*t;
-    const capsule=t=>{const a=t*Math.PI*2,co=Math.cos(a),si=Math.sin(a),n=4;return{x:W/2+Math.sign(co)*Math.pow(Math.abs(co),2/n)*(W/2-2),y:H/2+Math.sign(si)*Math.pow(Math.abs(si),2/n)*(H/2-2)}};
-    const resize=()=>{const r=el.getBoundingClientRect();W=Math.max(24,r.width);H=Math.max(24,r.height);canvas.width=Math.round((W+PAD*2)*DPR);canvas.height=Math.round((H+PAD*2)*DPR);canvas.style.width=(W+PAD*2)+'px';canvas.style.height=(H+PAD*2)+'px';canvas.style.left=-PAD+'px';canvas.style.top=-PAD+'px';draw()};
-    const draw=()=>{
-      time+=.016;power=lerp(power,targetPower,.065);
-      const follow=active?.12:.08,ox=smooth.x,oy=smooth.y;
-      smooth.x=lerp(smooth.x,mouse.x,follow);smooth.y=lerp(smooth.y,mouse.y,follow);
-      velocity.x=lerp(velocity.x,(smooth.x-ox)*W,.22);velocity.y=lerp(velocity.y,(smooth.y-oy)*H,.22);
-      tail.x=lerp(tail.x,smooth.x,.055);tail.y=lerp(tail.y,smooth.y,.055);
-      ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,canvas.width,canvas.height);
-      ctx.setTransform(DPR,0,0,DPR,PAD*DPR,PAD*DPR);
-      const pts=[],N=360,mx=smooth.x*W,my=smooth.y*H,tx=tail.x*W,ty=tail.y*H;
-      const speed=Math.min(1,Math.hypot(velocity.x,velocity.y)/5);
-      for(let i=0;i<N;i++){
-        const t=i/N,base=capsule(t),dx=base.x-mx,dy=base.y-my,dist=Math.hypot(dx,dy);
-        const influence=Math.exp(-Math.pow(dist/155,2));
-        const td=Math.hypot(base.x-tx,base.y-ty),trailing=Math.exp(-Math.pow(td/15.625,2));
-        const nx=dx/(dist||1),ny=dy/(dist||1);
-        const wave=Math.sin(t*21+mx*.012+time*.58)*2.5+Math.sin(t*37-my*.015-time*.42)*1.35+Math.cos(t*53+my*.011+time*.28)*.65;
-        const ripple=Math.sin(dist*.055-time*2.1)*2.2*Math.exp(-Math.pow(dist/115,2));
-        const displacement=active?power*(influence*(34+speed*5)+trailing*5+wave*influence*.48+ripple*.3):0;
-        const shear=active?power*Math.sin(t*13+time*.46)*influence*3.2:0;
-        const drag=active?power*speed*influence*5:0;
-        pts.push({x:base.x+nx*displacement-dy/(dist||1)*shear-velocity.x*drag*.22,y:base.y+ny*displacement+dx/(dist||1)*shear-velocity.y*drag*.22});
-      }
-      const shape=new Path2D();
-      for(let i=0;i<N;i++){const a=pts[i],b=pts[(i+1)%N],x=(a.x+b.x)/2,y=(a.y+b.y)/2;if(i===0)shape.moveTo(x,y);shape.quadraticCurveTo(a.x,a.y,x,y)}
-      shape.closePath();ctx.fillStyle='#292729';ctx.fill(shape);
-      if(active||power>.001){
-        ctx.save();ctx.clip(shape);const gx=lerp(mx,tx,.2),gy=lerp(my,ty,.2);
-        const grad=ctx.createRadialGradient(gx-20,gy-15,2,gx,gy,340);
-        grad.addColorStop(0,'rgba(239,183,187,1)');grad.addColorStop(.22,'rgba(220,169,190,.99)');grad.addColorStop(.46,'rgba(184,164,199,.96)');grad.addColorStop(.72,'rgba(133,157,185,.86)');grad.addColorStop(1,'rgba(41,39,41,0)');
-        ctx.fillStyle=grad;ctx.fillRect(-PAD,-PAD,W+PAD*2,H+PAD*2);
-        const sheen=ctx.createRadialGradient(gx-38,gy-27,1,gx-24,gy-18,125);
-        sheen.addColorStop(0,'rgba(255,239,237,.2)');sheen.addColorStop(.45,'rgba(255,220,229,.08)');sheen.addColorStop(1,'rgba(255,224,225,0)');
-        ctx.fillStyle=sheen;ctx.fillRect(-PAD,-PAD,W+PAD*2,H+PAD*2);ctx.restore();
-      }
-      if(active||power>.001)raf=requestAnimationFrame(draw);else raf=0;
-    };
-    const start=()=>{if(!raf)raf=requestAnimationFrame(draw)};
-    const move=e=>{const r=el.getBoundingClientRect();mouse.x=clamp((e.clientX-r.left)/r.width,0,1);mouse.y=clamp((e.clientY-r.top)/r.height,0,1);start()};
-    el.addEventListener('pointerenter',e=>{active=true;targetPower=1;move(e)});
-    el.addEventListener('pointermove',move,{passive:true});
-    el.addEventListener('pointerleave',()=>{active=false;targetPower=0;start()});
-    el.addEventListener('focus',()=>{active=true;targetPower=1;start()});
-    el.addEventListener('blur',()=>{active=false;targetPower=0;start()});
-    if('ResizeObserver'in window)new ResizeObserver(resize).observe(el);else window.addEventListener('resize',resize,{passive:true});
-    resize();
-  });
+)();
 
+(() => {
+'use strict';
+const SELECTOR='button,.header-contact,.start-button,#instagram-brief,.round-link';
+const GROUPS='.site-header,.filter-row,.project-view-controls,.project-orbit-ring,.project-index-list,.process-tabs,.lab-controls,.material-switch,.planner-actions,.result-actions';
+const PAD=52,BASE='#292729',DPR=Math.min(window.devicePixelRatio||1,1.5);
+const REDUCED=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const lerp=(a,b,t)=>a+(b-a)*t;
+const smooth=(a,b,x)=>{const t=clamp((x-a)/(b-a),0,1);return t*t*(3-2*t)};
+const groups=new Map();
+
+function add(el){
+  if(el.dataset.liquidReady==='true')return;
+  el.dataset.liquidReady='true';el.classList.add('liquid-cta');
+  const root=el.closest(GROUPS)||el;
+  let g=groups.get(root);
+  if(!g){
+    g={root,items:[],hover:false,current:null,raf:0,last:0,power:0,hasPointer:false,
+      pointer:{x:0,y:0},point:{x:0,y:0},tail:{x:0,y:0},velocity:{x:0,y:0}};
+    groups.set(root,g);bind(g);
+  }
+  const canvas=document.createElement('canvas');
+  canvas.className='liquid-canvas-layer';canvas.setAttribute('aria-hidden','true');el.prepend(canvas);
+  const ctx=canvas.getContext('2d',{alpha:true,desynchronized:true});
+  if(!ctx){el.classList.add('liquid-fallback');canvas.remove();return}
+  const item={el,canvas,ctx,g,rect:null,w:0,h:0,dpr:DPR,activity:0};
+  g.items.push(item);draw(item,g,null);
+}
+
+function pick(g,node){
+  const el=node instanceof Element?node.closest(SELECTOR):null;
+  return el&&g.items.some(item=>item.el===el)?el:null;
+}
+function distance(x,y,r){
+  return Math.hypot(Math.max(r.left-x,0,x-r.right),Math.max(r.top-y,0,y-r.bottom));
+}
+function nearest(g,x,y){
+  let result=null,d=Infinity;
+  g.items.forEach(item=>{const r=item.el.getBoundingClientRect();if(r.width<2||r.height<2)return;
+    const next=distance(x,y,r);if(next<d){d=next;result=item.el}});
+  return {el:result,d};
+}
+function size(item){
+  const r=item.el.getBoundingClientRect();item.rect=r;
+  if(r.width<2||r.height<2)return;
+  const w=Math.max(2,item.el.offsetWidth||r.width),h=Math.max(2,item.el.offsetHeight||r.height);
+  if(Math.abs(w-item.w)>.25||Math.abs(h-item.h)>.25){
+    item.w=w;item.h=h;
+    item.canvas.width=Math.round((w+PAD*2)*item.dpr);
+    item.canvas.height=Math.round((h+PAD*2)*item.dpr);
+    item.canvas.style.width=(w+PAD*2)+'px';item.canvas.style.height=(h+PAD*2)+'px';
+    item.canvas.style.left=(-PAD)+'px';item.canvas.style.top=(-PAD)+'px';
+  }
+}
+function contour(item,g){
+  const w=item.w,h=item.h,r=item.rect,min=Math.max(1,Math.min(w,h));
+  const radius=parseFloat(getComputedStyle(item.el).borderTopLeftRadius);
+  const round=clamp((Number.isFinite(radius)?radius:min*.5)/(min*.5),.08,1);
+  const exponent=2+2*round*clamp((Math.max(w,h)/min-1)/1.25,0,1);
+  const sx=w/Math.max(1,r.width),sy=h/Math.max(1,r.height);
+  const px=(g.point.x-r.left)*sx,py=(g.point.y-r.top)*sy;
+  const tx=(g.tail.x-r.left)*sx,ty=(g.tail.y-r.top)*sy;
+  const reach=clamp(min*1.72,38,92),speed=Math.min(1,Math.hypot(g.velocity.x,g.velocity.y)/15);
+  const amp=Math.min(13,min*.19),phase=g.point.x*.004+g.point.y*.003,points=[],n=112;
+  for(let i=0;i<n;i++){
+    const a=i/n*Math.PI*2,c=Math.cos(a),s=Math.sin(a);
+    const bx=w*.5+Math.sign(c)*Math.pow(Math.abs(c),2/exponent)*(w*.5-1);
+    const by=h*.5+Math.sign(s)*Math.pow(Math.abs(s),2/exponent)*(h*.5-1);
+    const dx=bx-px,dy=by-py,d=Math.hypot(dx,dy)||1;
+    const influence=Math.exp(-Math.pow(d/reach,2));
+    const tail=Math.exp(-Math.pow(Math.hypot(bx-tx,by-ty)/15,2));
+    const wave=Math.sin(a*7+phase)*.85+Math.cos(a*11-phase)*.5;
+    const force=item.activity*(influence*(amp*(.82+speed*.22))+tail*2.2+wave*influence*1.05);
+    const nx=dx/d,ny=dy/d,shear=item.activity*influence*Math.sin(a*5+phase)*1.25;
+    points.push({x:bx+nx*force-ny*shear,y:by+ny*force+nx*shear});
+  }
+  return points;
+}
+function trace(ctx,p){
+  const last=p[p.length-1],first=p[0];ctx.beginPath();
+  ctx.moveTo(PAD+(last.x+first.x)*.5,PAD+(last.y+first.y)*.5);
+  for(let i=0;i<p.length;i++){const a=p[i],b=p[(i+1)%p.length];
+    ctx.quadraticCurveTo(PAD+a.x,PAD+a.y,PAD+(a.x+b.x)*.5,PAD+(a.y+b.y)*.5)}
+  ctx.closePath();
+}
+function bridgeFor(g){
+  const active=g.items.find(item=>item.el===g.current);
+  if(!active||!active.rect||active.rect.width<2)return null;
+  // The desktop carousel is angled in 3D; its cards morph individually instead of joining.
+  if(active.el.matches('.project-orbit-node')&&innerWidth>650)return null;
+  const a=active.rect;let best=null,bestScore=Infinity;
+  for(const other of g.items){
+    if(other===active||(other.el.matches('.project-orbit-node')&&innerWidth>650))continue;
+    const b=other.rect||other.el.getBoundingClientRect();if(b.width<2||b.height<2)continue;
+    const oy=Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top);
+    const ox=Math.min(a.right,b.right)-Math.max(a.left,b.left);
+    const mh=Math.min(a.height,b.height),mw=Math.min(a.width,b.width);let pair=null;
+    const gx=Math.max(0,b.left-a.right,a.left-b.right);
+    if(gx<=42&&oy>=mh*.34&&ox<=3){
+      const l=a.left<=b.left?a:b,rr=l===a?b:a;
+      pair={axis:'x',x1:l.right-3,x2:rr.left+3,top:Math.max(a.top,b.top),
+        bottom:Math.min(a.bottom,b.bottom),gap:gx,first:active.el,second:other.el};
+    }
+    const gy=Math.max(0,b.top-a.bottom,a.top-b.bottom);
+    if(gy<=34&&ox>=mw*.34&&oy<=3){
+      const t=a.top<=b.top?a:b,bb=t===a?b:a;
+      const v={axis:'y',y1:t.bottom-3,y2:bb.top+3,left:Math.max(a.left,b.left),
+        right:Math.min(a.right,b.right),gap:gy,first:active.el,second:other.el};
+      if(!pair||v.gap<pair.gap)pair=v;
+    }
+    if(!pair)continue;
+    const cx=pair.axis==='x'?(pair.x1+pair.x2)*.5:clamp(g.point.x,pair.left,pair.right);
+    const cy=pair.axis==='y'?(pair.y1+pair.y2)*.5:clamp(g.point.y,pair.top,pair.bottom);
+    const d=Math.hypot(g.point.x-cx,g.point.y-cy);
+    const weight=(1-smooth(22,106,d))*(1-smooth(24,46,pair.gap))*g.power;
+    const score=pair.gap+d*.08;if(weight>.025&&score<bestScore){best={...pair,weight};bestScore=score}
+  }
+  return best;
+}
+function drawBridge(ctx,item,p,g){
+  const sx=item.w/Math.max(1,item.rect.width),sy=item.h/Math.max(1,item.rect.height);
+  const x=v=>(v-item.rect.left)*sx+PAD,y=v=>(v-item.rect.top)*sy+PAD;
+  const t=1.6+p.weight*3.6;ctx.beginPath();
+  if(p.axis==='x'){
+    const x1=x(p.x1),x2=x(p.x2),cy=y(clamp(g.point.y,p.top+2,p.bottom-2)),m=(x1+x2)*.5;
+    ctx.moveTo(x1,cy-t*.48);ctx.bezierCurveTo(m,cy-t*1.4,m,cy-t*1.4,x2,cy-t*.48);
+    ctx.lineTo(x2,cy+t*.48);ctx.bezierCurveTo(m,cy+t*1.4,m,cy+t*1.4,x1,cy+t*.48);
+  }else{
+    const y1=y(p.y1),y2=y(p.y2),cx=x(clamp(g.point.x,p.left+2,p.right-2)),m=(y1+y2)*.5;
+    ctx.moveTo(cx-t*.48,y1);ctx.bezierCurveTo(cx-t*1.4,m,cx-t*1.4,m,cx-t*.48,y2);
+    ctx.lineTo(cx+t*.48,y2);ctx.bezierCurveTo(cx+t*1.4,m,cx+t*1.4,m,cx+t*.48,y1);
+  }
+  ctx.closePath();ctx.fillStyle=BASE;ctx.fill();
+  ctx.strokeStyle='rgba(238,218,228,'+(p.weight*.105)+')';ctx.lineWidth=.8;ctx.stroke();
+}
+function draw(item,g,pair){
+  size(item);if(!item.rect||item.rect.width<2||item.rect.height<2)return;
+  const c=item.ctx,can=item.canvas,w=item.w,h=item.h,d=item.dpr;
+  c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,can.width,can.height);c.setTransform(d,0,0,d,0,0);
+  const points=contour(item,g);trace(c,points);c.fillStyle=BASE;c.fill();
+  const power=clamp(item.activity,0,1);
+  if(power>.001){
+    c.save();c.clip();
+    const sx=w/Math.max(1,item.rect.width),sy=h/Math.max(1,item.rect.height);
+    const mx=clamp((g.point.x-item.rect.left)*sx+PAD,PAD-8,w+PAD+8);
+    const my=clamp((g.point.y-item.rect.top)*sy+PAD,PAD-8,h+PAD+8);
+    const grad=c.createRadialGradient(mx-12,my-9,1,mx,my,Math.max(110,Math.min(190,Math.max(w,h)*.72)));
+    grad.addColorStop(0,'rgba(239,183,187,1)');grad.addColorStop(.2,'rgba(220,169,190,.93)');
+    grad.addColorStop(.43,'rgba(184,164,199,.8)');grad.addColorStop(.7,'rgba(133,157,185,.58)');
+    grad.addColorStop(1,'rgba(41,39,41,0)');
+    c.globalAlpha=power*.48;c.fillStyle=grad;c.fillRect(0,0,w+PAD*2,h+PAD*2);
+    const shine=c.createRadialGradient(mx-26,my-20,1,mx-18,my-12,82);
+    shine.addColorStop(0,'rgba(255,239,237,.2)');shine.addColorStop(.5,'rgba(255,220,229,.07)');
+    shine.addColorStop(1,'rgba(255,224,225,0)');
+    c.globalAlpha=power*.3;c.fillStyle=shine;c.fillRect(0,0,w+PAD*2,h+PAD*2);c.restore();
+  }
+  if(pair&&(item.el===pair.first||item.el===pair.second))drawBridge(c,item,pair,g);
+  c.save();trace(c,points);c.strokeStyle='rgba(245,239,241,'+(.07+power*.13)+')';c.lineWidth=.8;c.stroke();c.restore();
+}
+function render(g,time){
+  g.raf=0;const dt=clamp((g.last?Math.min(40,time-g.last):16.67)/16.67,.45,2.4);g.last=time;
+  const ox=g.point.x,oy=g.point.y;
+  if(g.hasPointer){
+    const follow=g.hover?.2:.13;
+    g.point.x=lerp(g.point.x,g.pointer.x,follow*dt);g.point.y=lerp(g.point.y,g.pointer.y,follow*dt);
+    g.velocity.x=lerp(g.velocity.x,(g.point.x-ox)/Math.max(.45,dt),.24);
+    g.velocity.y=lerp(g.velocity.y,(g.point.y-oy)/Math.max(.45,dt),.24);
+    g.tail.x=lerp(g.tail.x,g.point.x,.075*dt);g.tail.y=lerp(g.tail.y,g.point.y,.075*dt);
+  }
+  g.power=lerp(g.power,g.hover?1:0,(g.hover?.24:.105)*dt);
+  g.items.forEach(item=>{
+    const target=g.hover&&g.current===item.el?1:0;
+    item.activity=lerp(item.activity,target,(target>item.activity?.24:.12)*dt);size(item);
+  });
+  const bridge=g.current&&g.power>.002?bridgeFor(g):null;
+  g.items.forEach(item=>draw(item,g,bridge));
+  const active=g.hover||g.power>.002||g.items.some(item=>item.activity>.002);
+  if(active&&!document.hidden)g.raf=requestAnimationFrame(t=>render(g,t));
+  else{g.power=0;g.current=null;g.items.forEach(item=>{item.activity=0;draw(item,g,null)});g.last=0}
+}
+function start(g){if(!REDUCED&&!g.raf)g.raf=requestAnimationFrame(t=>render(g,t))}
+function bind(g){
+  g.root.addEventListener('pointerenter',e=>{
+    const hit=pick(g,e.target);if(!hit)return;
+    g.current=hit;g.hover=true;g.hasPointer=true;
+    g.pointer.x=g.point.x=g.tail.x=e.clientX;g.pointer.y=g.point.y=g.tail.y=e.clientY;start(g);
+  },{passive:true});
+  g.root.addEventListener('pointermove',e=>{
+    g.pointer.x=e.clientX;g.pointer.y=e.clientY;g.hasPointer=true;
+    const hit=pick(g,e.target);
+    if(hit){g.current=hit;g.hover=true}
+    else{const near=nearest(g,e.clientX,e.clientY);if(near.el&&near.d<=46){g.current=near.el;g.hover=true}else{g.current=null;g.hover=false}}
+    start(g);
+  },{passive:true});
+  g.root.addEventListener('pointerleave',()=>{g.hover=false;start(g)},{passive:true});
+  g.root.addEventListener('focusin',e=>{
+    const hit=pick(g,e.target);if(!hit)return;const r=hit.getBoundingClientRect();
+    g.current=hit;g.hover=true;g.hasPointer=true;
+    g.pointer.x=g.point.x=g.tail.x=r.left+r.width*.5;g.pointer.y=g.point.y=g.tail.y=r.top+r.height*.5;start(g);
+  });
+  g.root.addEventListener('focusout',e=>{
+    const next=e.relatedTarget?pick(g,e.relatedTarget):null;
+    if(next){g.current=next;g.hover=true}else g.hover=false;start(g);
+  });
+  if('ResizeObserver'in window){
+    const ro=new ResizeObserver(()=>g.items.forEach(item=>draw(item,g,null)));
+    ro.observe(g.root);g.items.forEach(item=>ro.observe(item.el));
+  }else window.addEventListener('resize',()=>g.items.forEach(item=>draw(item,g,null)),{passive:true});
+}
+document.querySelectorAll(SELECTOR).forEach(add);
+const observer=new MutationObserver(records=>records.forEach(record=>record.addedNodes.forEach(node=>{
+  if(!(node instanceof Element))return;if(node.matches(SELECTOR))add(node);node.querySelectorAll(SELECTOR).forEach(add);
+})));
+observer.observe(document.body,{childList:true,subtree:true});
+document.addEventListener('visibilitychange',()=>{
+  if(!document.hidden)return;
+  groups.forEach(g=>{if(g.raf)cancelAnimationFrame(g.raf);g.raf=0;g.hover=false;g.current=null;g.power=0;
+    g.items.forEach(item=>{item.activity=0;draw(item,g,null)})});
+});
 })();
