@@ -256,6 +256,49 @@
     });
   }
 
+  // Editorial interaction layer: header state, tilt cards and material switch.
+  const header = $('.site-header');
+  const updateHeaderState = () => header?.classList.toggle('is-scrolled', window.scrollY > 28);
+  window.addEventListener('scroll', updateHeaderState, { passive: true });
+  updateHeaderState();
+
+  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches && !reduceMotion) {
+    projectCards.forEach(card => {
+      card.addEventListener('pointermove', event => {
+        const rect = card.getBoundingClientRect();
+        const px = (event.clientX - rect.left) / rect.width;
+        const py = (event.clientY - rect.top) / rect.height;
+        card.style.setProperty('--tilt-x', (((px - .5) * 7).toFixed(2)) + 'deg');
+        card.style.setProperty('--tilt-y', (((.5 - py) * 6).toFixed(2)) + 'deg');
+        const art = $('.project-art', card);
+        if (art) {
+          art.style.setProperty('--spot-x', (px * 100).toFixed(1) + '%');
+          art.style.setProperty('--spot-y', (py * 100).toFixed(1) + '%');
+        }
+      });
+      card.addEventListener('pointerleave', () => {
+        card.style.setProperty('--tilt-x', '0deg');
+        card.style.setProperty('--tilt-y', '0deg');
+        const art = $('.project-art', card);
+        if (art) { art.style.setProperty('--spot-x', '50%'); art.style.setProperty('--spot-y', '50%'); }
+      });
+    });
+  }
+
+  // Activate the existing glass/chrome/lime material controls in Creative Lab.
+  const materialButtons = $('[data-material-mode]');
+  materialButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const material = button.dataset.materialMode;
+      materialButtons.forEach(item => {
+        const active = item === button;
+        item.classList.toggle('active', active);
+        item.setAttribute('aria-pressed', String(active));
+      });
+      if (labVisual) labVisual.dataset.material = material;
+    });
+  });
+
   $('#year').textContent = new Date().getFullYear();
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) { cancelAnimationFrame(ambientFrame); cancelAnimationFrame(labRaf); }
