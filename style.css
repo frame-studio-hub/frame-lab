@@ -525,3 +525,17 @@ body{
   .project-card:hover{transform:none!important}
   .hero-object,.ticker-track{animation:none!important}
 }
+
+
+
+/* QA fix: contain horizontal overflow while keeping the filter row swipeable. */
+@media(max-width:700px){
+  html,body{max-width:100%;overflow-x:clip}
+  .filter-row{
+    width:100%;max-width:100%;min-width:0;
+    overflow-x:auto;overflow-y:hidden;
+    overscroll-behavior-x:contain;
+    scrollbar-width:none;
+  }
+  .filter-row::-webkit-scrollbar{display:none}
+}
