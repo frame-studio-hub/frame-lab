@@ -2410,3 +2410,19 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 }
 .lite-device .visual-print{will-change:auto}
 .lite-device .visual-print:after{display:none}
+
+/* Autonomous orbit: transform stays on the compositor, no click controls required. */
+.project-orbit-ring.orbit-auto-running{
+  transition:none!important;
+  will-change:transform
+}
+.project-orbit-caption span:first-child{
+  color:var(--lime);
+  letter-spacing:.1em
+}
+@media(prefers-reduced-motion:reduce){
+  .project-orbit-ring.orbit-auto-running{will-change:auto}
+}
+@media(max-width:900px){
+  .project-orbit-caption span:first-child{display:none}
+}

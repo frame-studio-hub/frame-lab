@@ -254,35 +254,130 @@
   $$('[data-close-modal]').forEach(el => el.addEventListener('click', closeProjectModal));
 
 
-  // PROJECT CONSTELLATION — 3D orbit index, synchronized with the existing case modal.
+  // PROJECT CONSTELLATION — autonomous 3D rotation, paused only while the visitor interacts.
   const orbit = $('#project-orbit-scene');
   const orbitRing = $('#project-orbit-ring');
   const orbitNodes = $$('.project-orbit-node');
   const orbitCurrent = $('#orbit-current');
+  const orbitDesktop = window.matchMedia('(min-width: 901px)');
   let orbitIndex = 0;
+  let orbitAngle = 0;
+  let orbitFrame = 0;
+  let orbitLastTime = 0;
+  let orbitInView = false;
+  let orbitPointerInside = false;
+  let orbitFocusInside = false;
+  let orbitResumeTimer = 0;
   const orbitNames = [
     'AETHER® / IDENTITY SYSTEM','NØRD STUDIO / DIGITAL EXPERIENCE',
     'VANTA OBJECTS / DIGITAL PRODUCT','FLUX CAMPAIGN / VISUAL CONTENT',
     'OBJECT 05 / ART DIRECTION','SØL RETREAT / WEB EXPERIENCE'
   ];
-  function setOrbitIndex(index, scrollToActive = false) {
-    orbitIndex = (index + orbitNodes.length) % orbitNodes.length;
-    if (!orbitRing) return;
-    orbitRing.style.setProperty('--orbit-angle', (-orbitIndex * 60) + 'deg');
+
+  function syncOrbitSelection() {
     orbitNodes.forEach((node, i) => {
       const active = i === orbitIndex;
       node.classList.toggle('is-current', active);
       node.setAttribute('aria-pressed', String(active));
     });
     if (orbitCurrent) orbitCurrent.textContent = orbitNames[orbitIndex];
-    if (scrollToActive && window.innerWidth <= 650) {
-      orbitNodes[orbitIndex]?.scrollIntoView({ behavior:'smooth', block:'nearest', inline:'center' });
+  }
+
+  function renderOrbitAngle(angle) {
+    orbitAngle = ((angle % 360) + 360) % 360;
+    if (!orbitRing) return;
+    orbitRing.style.setProperty('--orbit-angle', (-orbitAngle).toFixed(2) + 'deg');
+    const nextIndex = Math.round(orbitAngle / 60) % orbitNodes.length;
+    if (nextIndex !== orbitIndex) {
+      orbitIndex = nextIndex;
+      syncOrbitSelection();
     }
   }
+
+  function canOrbitRun() {
+    return orbitDesktop.matches && orbitInView && !reduceMotion &&
+      !document.hidden && !orbitPointerInside && !orbitFocusInside &&
+      !modal?.classList.contains('open');
+  }
+
+  function stopOrbitMotion() {
+    if (orbitFrame) cancelAnimationFrame(orbitFrame);
+    orbitFrame = 0;
+    orbitLastTime = 0;
+    orbitRing?.classList.remove('orbit-auto-running');
+  }
+
+  function drawOrbit(timestamp) {
+    orbitFrame = 0;
+    if (!canOrbitRun()) return;
+    if (!orbitLastTime) orbitLastTime = timestamp;
+    const delta = Math.min(timestamp - orbitLastTime, 80);
+    orbitLastTime = timestamp;
+    // One complete revolution in 48 seconds: slow enough to read each project.
+    renderOrbitAngle(orbitAngle + delta * (360 / 48000));
+    orbitFrame = requestAnimationFrame(drawOrbit);
+  }
+
+  function startOrbitMotion() {
+    if (!canOrbitRun() || orbitFrame) return;
+    orbitRing?.classList.add('orbit-auto-running');
+    orbitLastTime = 0;
+    orbitFrame = requestAnimationFrame(drawOrbit);
+  }
+
+  function setOrbitIndex(index, scrollToActive = false) {
+    if (!orbitNodes.length) return;
+    orbitIndex = (index + orbitNodes.length) % orbitNodes.length;
+    stopOrbitMotion();
+    if (orbitResumeTimer) window.clearTimeout(orbitResumeTimer);
+    orbitRing?.classList.remove('orbit-auto-running');
+    orbitAngle = orbitIndex * 60;
+    orbitRing?.style.setProperty('--orbit-angle', (-orbitAngle) + 'deg');
+    syncOrbitSelection();
+    if (scrollToActive && window.innerWidth <= 900) {
+      orbitNodes[orbitIndex]?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block:'nearest', inline:'center' });
+    }
+    orbitResumeTimer = window.setTimeout(() => {
+      orbitResumeTimer = 0;
+      startOrbitMotion();
+    }, 950);
+  }
+
   if (orbit && orbitRing && orbitNodes.length) {
-    setOrbitIndex(0);
-    $('#orbit-prev')?.addEventListener('click', () => setOrbitIndex(orbitIndex - 1, true));
-    $('#orbit-next')?.addEventListener('click', () => setOrbitIndex(orbitIndex + 1, true));
+    renderOrbitAngle(0);
+    if ('IntersectionObserver' in window) {
+      const orbitObserver = new IntersectionObserver(entries => {
+        orbitInView = entries.some(entry => entry.isIntersecting);
+        if (orbitInView) startOrbitMotion();
+        else stopOrbitMotion();
+      }, { threshold: 0.08 });
+      orbitObserver.observe(orbit);
+    } else {
+      orbitInView = true;
+      startOrbitMotion();
+    }
+
+    orbit.addEventListener('pointerenter', () => {
+      orbitPointerInside = true;
+      stopOrbitMotion();
+    });
+    orbit.addEventListener('pointerleave', () => {
+      orbitPointerInside = false;
+      orbit.style.setProperty('--orbit-light-x','50%');
+      orbit.style.setProperty('--orbit-light-y','50%');
+      startOrbitMotion();
+    });
+    orbit.addEventListener('focusin', () => {
+      orbitFocusInside = true;
+      stopOrbitMotion();
+    });
+    orbit.addEventListener('focusout', event => {
+      if (!orbit.contains(event.relatedTarget)) {
+        orbitFocusInside = false;
+        startOrbitMotion();
+      }
+    });
+
     orbitNodes.forEach((node, index) => node.addEventListener('click', () => {
       setOrbitIndex(index);
       openProjectModal(node.dataset.project);
@@ -295,6 +390,7 @@
         orbitNodes[orbitIndex]?.focus();
       }
     });
+
     if (!coarsePointer && !reduceMotion && !lowPower) {
       let lightFrame = 0;
       orbit.addEventListener('pointermove', event => {
@@ -308,11 +404,16 @@
           lightFrame = 0;
         });
       }, { passive:true });
-      orbit.addEventListener('pointerleave', () => {
-        orbit.style.setProperty('--orbit-light-x','50%');
-        orbit.style.setProperty('--orbit-light-y','50%');
-      });
     }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) stopOrbitMotion();
+      else startOrbitMotion();
+    });
+    orbitDesktop.addEventListener?.('change', () => {
+      stopOrbitMotion();
+      startOrbitMotion();
+    });
   }
 
   // Clear, single-focus process explainer: one stage and one concrete outcome at a time.
