@@ -4,14 +4,17 @@
   const $$ = (s, root = document) => [...root.querySelectorAll(s)];
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const coarsePointer = window.matchMedia('(pointer: coarse)').matches;
+  const lowPower = (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4)
+    || (navigator.deviceMemory && navigator.deviceMemory <= 2)
+    || navigator.connection?.saveData === true;
+  if (lowPower) document.documentElement.classList.add('lite-device');
 
   // Scroll progress and soft cursor light.
   const progress = $('.scroll-progress span');
   const glow = $('.cursor-glow');
   if (!coarsePointer && !reduceMotion && glow) {
     window.addEventListener('pointermove', e => {
-      glow.style.left = e.clientX + 'px';
-      glow.style.top = e.clientY + 'px';
+      glow.style.transform = 'translate3d(' + e.clientX + 'px,' + e.clientY + 'px,0) translate(-50%,-50%)';
     }, { passive: true });
   }
   const updateScroll = () => {
@@ -89,8 +92,8 @@
   }));
 
   // Magnetic hover on larger pointers.
-  if (!coarsePointer && !reduceMotion) {
-    $$('.magnetic').forEach(el => {
+  if (!coarsePointer && !reduceMotion && !lowPower) {
+    document.querySelectorAll('.magnetic').forEach(el => {
       el.addEventListener('pointermove', e => {
         const r = el.getBoundingClientRect(), dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
         el.style.transform = `translate(${dx * .08}px, ${dy * .12}px)`;
@@ -99,44 +102,28 @@
     });
   }
 
-  // Ambient canvas: subtle depth particles, low-cost and DPR-capped.
-  const ambient = $('#ambient-canvas'), aCtx = ambient?.getContext('2d');
-  let ambientW = 0, ambientH = 0, particles = [], ambientFrame = 0;
-  function resizeAmbient() {
-    if (!ambient || !aCtx) return;
-    const dpr = Math.min(devicePixelRatio || 1, 1.5); ambientW = innerWidth; ambientH = innerHeight;
-    ambient.width = Math.round(ambientW * dpr); ambient.height = Math.round(ambientH * dpr); aCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const count = Math.min(65, Math.max(24, Math.floor(ambientW / 20)));
-    particles = Array.from({ length: count }, () => ({ x: Math.random() * ambientW, y: Math.random() * ambientH, r: Math.random() * 1.3 + .25, vx: (Math.random() - .5) * .12, vy: (Math.random() - .5) * .1, alpha: Math.random() * .25 + .05 }));
-  }
-  function drawAmbient() {
-    if (!aCtx) return;
-    aCtx.clearRect(0, 0, ambientW, ambientH);
-    particles.forEach(p => {
-      p.x += p.vx; p.y += p.vy;
-      if (p.x < 0) p.x = ambientW; if (p.x > ambientW) p.x = 0;
-      if (p.y < 0) p.y = ambientH; if (p.y > ambientH) p.y = 0;
-      aCtx.beginPath(); aCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2); aCtx.fillStyle = `rgba(199,255,66,${p.alpha})`; aCtx.fill();
-    });
-    // A single subtle particle frame is enough; avoid a permanent animation loop.
-  }
-  resizeAmbient(); drawAmbient();
-  window.addEventListener('resize', () => { resizeAmbient(); drawAmbient(); }, { passive: true });
-
   // Creative Lab interactive field.
   const labCanvas = $('#lab-canvas'), labCtx = labCanvas?.getContext('2d'), labVisual = $('#lab-visual');
   const modeButton = $('#lab-mode'), resetButton = $('#lab-reset'), labState = $('#lab-state');
-  let labW = 0, labH = 0, labPoints = [], labMode = 0, labPointer = { x: .5, y: .5, active: false }, labRaf = 0;
+  let labW = 0, labH = 0, labPoints = [], labMode = 0, labPointer = { x: .5, y: .5, active: false }, labRaf = 0, labTimer = 0, labInView = false;
   const modes = ['ORBITAL', 'FIELD', 'WAVE'];
   function resizeLab() {
     if (!labCanvas || !labCtx || !labVisual) return;
     const r = labVisual.getBoundingClientRect(), dpr = Math.min(devicePixelRatio || 1, 1.5);
     labW = r.width; labH = r.height; labCanvas.width = Math.round(labW * dpr); labCanvas.height = Math.round(labH * dpr); labCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const n = Math.min(180, Math.max(90, Math.floor(labW * labH / 1500)));
+    const n = Math.min(lowPower ? 48 : 105, Math.max(lowPower ? 36 : 58, Math.floor(labW * labH / (lowPower ? 5200 : 2900))));
     labPoints = Array.from({ length: n }, (_, i) => ({ a: Math.random() * Math.PI * 2, radius: .12 + Math.random() * .38, speed: (Math.random() * .002 + .0004) * (i % 2 ? 1 : -1), size: Math.random() * 1.6 + .4, phase: Math.random() * 8 }));
+  }
+  function scheduleLab() {
+    if (!labInView || reduceMotion || coarsePointer || lowPower || document.hidden || labRaf || labTimer) return;
+    labTimer = window.setTimeout(() => {
+      labTimer = 0;
+      if (labInView && !document.hidden) labRaf = requestAnimationFrame(drawLab);
+    }, 42);
   }
   function drawLab(time = 0) {
     if (!labCtx) return;
+    labRaf = 0;
     labCtx.clearRect(0, 0, labW, labH);
     const cx = labW * (.5 + (labPointer.x - .5) * .09), cy = labH * (.5 + (labPointer.y - .5) * .09);
     const pulse = Math.sin(time * .0005) * 4;
@@ -153,15 +140,60 @@
       if (i % 9 === 0) { labCtx.beginPath(); labCtx.moveTo(x, y); labCtx.lineTo(x * .72, y * .72); labCtx.strokeStyle = 'rgba(199,255,66,.09)'; labCtx.lineWidth = .6; labCtx.stroke(); }
     });
     labCtx.restore();
-    if (!reduceMotion && !coarsePointer) labRaf = requestAnimationFrame(drawLab);
+    scheduleLab();
   }
   if (labVisual) {
-    labVisual.addEventListener('pointermove', e => { const r = labVisual.getBoundingClientRect(); labPointer = { x: (e.clientX - r.left) / r.width, y: (e.clientY - r.top) / r.height, active: true }; });
+    labVisual.addEventListener('pointermove', e => {
+      const r = labVisual.getBoundingClientRect();
+      labPointer = { x: (e.clientX - r.left) / r.width, y: (e.clientY - r.top) / r.height, active: true };
+    }, { passive: true });
     labVisual.addEventListener('pointerleave', () => { labPointer.active = false; });
-    modeButton?.addEventListener('click', () => { labMode = (labMode + 1) % modes.length; if (labState) labState.textContent = `FIELD: ${modes[labMode]}`; if (reduceMotion) drawLab(0); });
-    resetButton?.addEventListener('click', () => { labMode = 0; labPointer = { x: .5, y: .5, active: false }; if (labState) labState.textContent = 'FIELD: ORBITAL'; resizeLab(); if (reduceMotion) drawLab(0); });
-    resizeLab(); if (reduceMotion || coarsePointer) drawLab(0); else drawLab();
-    if ('ResizeObserver' in window) new ResizeObserver(resizeLab).observe(labVisual); else window.addEventListener('resize', resizeLab, { passive: true });
+    modeButton?.addEventListener('click', () => {
+      labMode = (labMode + 1) % modes.length;
+      if (labState) labState.textContent = 'FIELD: ' + modes[labMode];
+      if (reduceMotion || coarsePointer || lowPower || !labInView) drawLab(0);
+    });
+    resetButton?.addEventListener('click', () => {
+      labMode = 0;
+      labPointer = { x: .5, y: .5, active: false };
+      if (labState) labState.textContent = 'FIELD: ORBITAL';
+      resizeLab();
+      drawLab(0);
+    });
+
+    resizeLab();
+    // Paint one still frame immediately. Continuous frames only run while the scene is visible.
+    drawLab(0);
+    if ('IntersectionObserver' in window) {
+      const labObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          labInView = entry.isIntersecting;
+          if (labInView && !reduceMotion && !coarsePointer && !lowPower && !document.hidden) {
+            if (!labRaf) labRaf = requestAnimationFrame(drawLab);
+          } else {
+            if (labTimer) window.clearTimeout(labTimer);
+            labTimer = 0;
+            cancelAnimationFrame(labRaf);
+            labRaf = 0;
+          }
+        });
+      }, { threshold: .08, rootMargin: '80px 0px' });
+      labObserver.observe(labVisual);
+    } else {
+      labInView = true;
+      if (!reduceMotion && !coarsePointer && !lowPower) labRaf = requestAnimationFrame(drawLab);
+    }
+    if ('ResizeObserver' in window) {
+      new ResizeObserver(() => {
+        resizeLab();
+        if (!labRaf) drawLab(0);
+      }).observe(labVisual);
+    } else {
+      window.addEventListener('resize', () => {
+        resizeLab();
+        if (!labRaf) drawLab(0);
+      }, { passive: true });
+    }
   }
   // Guided project planner: creates a client-controlled brief (no backend or auto-send).
   const planner = $('#project-planner');
@@ -303,35 +335,9 @@
   // Motion direction: cursor ring, pointer-led hero light, section tracking and tactile feedback.
   document.documentElement.classList.add('motion-ready');
 
-  // A small cursor instrument replaces the static glow with a responsive, restrained ring.
-  let cursorRing = null;
-  if (!coarsePointer && !reduceMotion) {
-    cursorRing = document.createElement('div');
-    cursorRing.className = 'cursor-ring';
-    cursorRing.setAttribute('aria-hidden', 'true');
-    document.body.appendChild(cursorRing);
-    let cursorX = innerWidth * .5, cursorY = innerHeight * .5, cursorFrame = 0;
-    const moveCursor = event => {
-      cursorX = event.clientX; cursorY = event.clientY;
-      if (!cursorFrame) cursorFrame = requestAnimationFrame(() => {
-        cursorRing.style.transform = 'translate3d(' + cursorX + 'px,' + cursorY + 'px,0) translate(-50%,-50%)';
-        cursorRing.classList.add('is-visible');
-        cursorFrame = 0;
-      });
-    };
-    window.addEventListener('pointermove', moveCursor, { passive: true });
-    window.addEventListener('pointerdown', () => cursorRing.classList.add('is-down'));
-    window.addEventListener('pointerup', () => cursorRing.classList.remove('is-down'));
-    window.addEventListener('pointerleave', () => cursorRing.classList.remove('is-visible'));
-    $$('a,button,.project-card,[role="button"],input,select,textarea,summary').forEach(el => {
-      el.addEventListener('pointerenter', () => cursorRing.classList.add('is-hover'));
-      el.addEventListener('pointerleave', () => cursorRing.classList.remove('is-hover'));
-    });
-  }
-
   // Subtle pointer parallax is restricted to the hero object and never runs on touch screens.
   const hero = $('.hero'), heroObject = $('.hero-object');
-  if (hero && heroObject && !coarsePointer && !reduceMotion) {
+  if (hero && heroObject && !coarsePointer && !reduceMotion && !lowPower) {
     let heroFrame = 0, heroX = 0, heroY = 0;
     hero.addEventListener('pointermove', event => {
       const rect = hero.getBoundingClientRect();
@@ -350,7 +356,7 @@
   }
 
   // Stagger cards as they enter the viewport; reduced-motion and no-JS states remain visible.
-  const motionItems = $$('.project-card,.service-item,.process-step,.lab-visual,.planner-shell,.review-form-shell,.faq-list details');
+  const motionItems = Array.from(document.querySelectorAll('.project-card,.service-item,.object-card,.process-step,.lab-visual,.planner-shell,.review-form-shell,.faq-list details'));
   motionItems.forEach((el, index) => {
     el.style.setProperty('--motion-order', String(index % 6));
     el.classList.add('motion-item');
@@ -393,24 +399,15 @@
     });
   }
 
-  // The ambient field gently drifts at a capped frame rate and pauses in background tabs.
-  let ambientLastFrame = 0;
-  function animateAmbient(now = 0) {
-    if (document.hidden || reduceMotion || !aCtx) return;
-    if (now - ambientLastFrame > 42) {
-      drawAmbient();
-      ambientLastFrame = now;
-    }
-    ambientFrame = requestAnimationFrame(animateAmbient);
-  }
-  if (!reduceMotion && !document.hidden && aCtx) ambientFrame = requestAnimationFrame(animateAmbient);
-
   $('#year').textContent = new Date().getFullYear();
   document.addEventListener('visibilitychange', () => {
-    if (document.hidden) { cancelAnimationFrame(ambientFrame); cancelAnimationFrame(labRaf); }
-    else {
-      if (!reduceMotion && aCtx) ambientFrame = requestAnimationFrame(animateAmbient);
-      if (!reduceMotion && !coarsePointer && labCtx) drawLab();
+    if (document.hidden) {
+      if (labTimer) window.clearTimeout(labTimer);
+      labTimer = 0;
+      cancelAnimationFrame(labRaf);
+      labRaf = 0;
+    } else if (labInView && !reduceMotion && !coarsePointer && !lowPower && labCtx && !labRaf && !labTimer) {
+      labRaf = requestAnimationFrame(drawLab);
     }
   });
 })();
