@@ -32,12 +32,12 @@
   // Header menu.
   const menuButton = $('.menu-toggle'), mobileMenu = $('.mobile-menu');
   const closeMenu = () => {
-    menuButton?.setAttribute('aria-expanded', 'false'); menuButton?.setAttribute('aria-label', 'Open navigation');
+    menuButton?.setAttribute('aria-expanded', 'false'); menuButton?.setAttribute('aria-label', 'Открыть меню');
     mobileMenu?.classList.remove('open'); mobileMenu?.setAttribute('aria-hidden', 'true'); document.body.classList.remove('menu-open');
   };
   menuButton?.addEventListener('click', () => {
     const open = menuButton.getAttribute('aria-expanded') !== 'true';
-    menuButton.setAttribute('aria-expanded', String(open)); menuButton.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation');
+    menuButton.setAttribute('aria-expanded', String(open)); menuButton.setAttribute('aria-label', open ? 'Закрыть меню' : 'Открыть меню');
     mobileMenu.classList.toggle('open', open); mobileMenu.setAttribute('aria-hidden', String(!open)); document.body.classList.toggle('menu-open', open);
   });
   $$('.mobile-menu a').forEach(a => a.addEventListener('click', closeMenu));
@@ -299,9 +299,118 @@
     });
   });
 
+
+  // Motion direction: cursor ring, pointer-led hero light, section tracking and tactile feedback.
+  document.documentElement.classList.add('motion-ready');
+
+  // A small cursor instrument replaces the static glow with a responsive, restrained ring.
+  let cursorRing = null;
+  if (!coarsePointer && !reduceMotion) {
+    cursorRing = document.createElement('div');
+    cursorRing.className = 'cursor-ring';
+    cursorRing.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(cursorRing);
+    let cursorX = innerWidth * .5, cursorY = innerHeight * .5, cursorFrame = 0;
+    const moveCursor = event => {
+      cursorX = event.clientX; cursorY = event.clientY;
+      if (!cursorFrame) cursorFrame = requestAnimationFrame(() => {
+        cursorRing.style.transform = 'translate3d(' + cursorX + 'px,' + cursorY + 'px,0) translate(-50%,-50%)';
+        cursorRing.classList.add('is-visible');
+        cursorFrame = 0;
+      });
+    };
+    window.addEventListener('pointermove', moveCursor, { passive: true });
+    window.addEventListener('pointerdown', () => cursorRing.classList.add('is-down'));
+    window.addEventListener('pointerup', () => cursorRing.classList.remove('is-down'));
+    window.addEventListener('pointerleave', () => cursorRing.classList.remove('is-visible'));
+    $$('a,button,.project-card,[role="button"],input,select,textarea,summary').forEach(el => {
+      el.addEventListener('pointerenter', () => cursorRing.classList.add('is-hover'));
+      el.addEventListener('pointerleave', () => cursorRing.classList.remove('is-hover'));
+    });
+  }
+
+  // Subtle pointer parallax is restricted to the hero object and never runs on touch screens.
+  const hero = $('.hero'), heroObject = $('.hero-object');
+  if (hero && heroObject && !coarsePointer && !reduceMotion) {
+    let heroFrame = 0, heroX = 0, heroY = 0;
+    hero.addEventListener('pointermove', event => {
+      const rect = hero.getBoundingClientRect();
+      heroX = ((event.clientX - rect.left) / rect.width - .5) * 16;
+      heroY = ((event.clientY - rect.top) / rect.height - .5) * 13;
+      if (!heroFrame) heroFrame = requestAnimationFrame(() => {
+        heroObject.style.setProperty('--hero-x', heroX.toFixed(1) + 'px');
+        heroObject.style.setProperty('--hero-y', heroY.toFixed(1) + 'px');
+        heroFrame = 0;
+      });
+    }, { passive: true });
+    hero.addEventListener('pointerleave', () => {
+      heroObject.style.setProperty('--hero-x', '0px');
+      heroObject.style.setProperty('--hero-y', '0px');
+    });
+  }
+
+  // Stagger cards as they enter the viewport; reduced-motion and no-JS states remain visible.
+  const motionItems = $$('.project-card,.service-item,.process-step,.lab-visual,.planner-shell,.review-form-shell,.faq-list details');
+  motionItems.forEach((el, index) => {
+    el.style.setProperty('--motion-order', String(index % 6));
+    el.classList.add('motion-item');
+  });
+  if ('IntersectionObserver' in window && !reduceMotion) {
+    const motionObserver = new IntersectionObserver(entries => entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('motion-visible');
+        motionObserver.unobserve(entry.target);
+      }
+    }), { threshold: .1, rootMargin: '0px 0px -5% 0px' });
+    motionItems.forEach(el => motionObserver.observe(el));
+  } else motionItems.forEach(el => el.classList.add('motion-visible'));
+
+  // Keep the current section visible in the desktop navigation.
+  const sectionLinks = $$('.desktop-nav a');
+  const observedSections = sectionLinks.map(link => $(link.getAttribute('href'))).filter(Boolean);
+  if ('IntersectionObserver' in window && observedSections.length) {
+    const sectionObserver = new IntersectionObserver(entries => entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      sectionLinks.forEach(link => {
+        const active = link.getAttribute('href') === '#' + entry.target.id;
+        link.classList.toggle('current', active);
+        if (active) link.setAttribute('aria-current', 'location');
+        else link.removeAttribute('aria-current');
+      });
+    }), { rootMargin: '-30% 0px -55% 0px', threshold: 0 });
+    observedSections.forEach(section => sectionObserver.observe(section));
+  }
+
+  // Tactile feedback for controls, without changing their native click behavior.
+  if (!coarsePointer && !reduceMotion) {
+    $$('.planner-next,.planner-back,.filter-btn,.material-btn,.lab-button,.start-button,.round-link').forEach(control => {
+      control.addEventListener('pointerdown', () => {
+        control.classList.remove('is-pressed');
+        void control.offsetWidth;
+        control.classList.add('is-pressed');
+      });
+      control.addEventListener('animationend', () => control.classList.remove('is-pressed'));
+    });
+  }
+
+  // The ambient field gently drifts at a capped frame rate and pauses in background tabs.
+  let ambientLastFrame = 0;
+  function animateAmbient(now = 0) {
+    if (document.hidden || reduceMotion || !aCtx) return;
+    if (now - ambientLastFrame > 42) {
+      drawAmbient();
+      ambientLastFrame = now;
+    }
+    ambientFrame = requestAnimationFrame(animateAmbient);
+  }
+  if (!reduceMotion && !document.hidden && aCtx) ambientFrame = requestAnimationFrame(animateAmbient);
+
   $('#year').textContent = new Date().getFullYear();
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) { cancelAnimationFrame(ambientFrame); cancelAnimationFrame(labRaf); }
-    else if (!reduceMotion && !coarsePointer && labCtx) drawLab();
+    else {
+      if (!reduceMotion && aCtx) ambientFrame = requestAnimationFrame(animateAmbient);
+      if (!reduceMotion && !coarsePointer && labCtx) drawLab();
+    }
   });
 })();
