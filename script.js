@@ -1086,4 +1086,91 @@
       }
     }
   });
+}
+  // Canvas-based liquid CTA deformation, ported from the supplied standalone demo.
+  const liquidButtons = Array.from(document.querySelectorAll('.header-contact.liquid-cta,.start-button.liquid-cta'));
+  liquidButtons.forEach(el => {
+    if (el.querySelector('.liquid-canvas-layer')) return;
+    const canvas = document.createElement('canvas');
+    canvas.className = 'liquid-canvas-layer';
+    canvas.setAttribute('aria-hidden', 'true');
+    el.prepend(canvas);
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    let active = false, raf = 0, power = 0, targetPower = 0, time = 0;
+    let W = 1, H = 1, PAD = 38, DPR = Math.min(window.devicePixelRatio || 1, 2);
+    let mouse = {x:.5,y:.5}, smooth = {x:.5,y:.5}, tail = {x:.5,y:.5}, velocity = {x:0,y:0};
+    const clamp = (v,a,b) => Math.max(a,Math.min(b,v));
+    const lerp = (a,b,t) => a+(b-a)*t;
+    const resize = () => {
+      const r = el.getBoundingClientRect();
+      W = Math.max(1,r.width); H = Math.max(1,r.height);
+      PAD = Math.max(26,H*.64);
+      canvas.width = Math.round((W+PAD*2)*DPR);
+      canvas.height = Math.round((H+PAD*2)*DPR);
+      canvas.style.left = -PAD+'px'; canvas.style.top = -PAD+'px';
+      canvas.style.width = (W+PAD*2)+'px'; canvas.style.height = (H+PAD*2)+'px';
+      drawStatic();
+    };
+    const capsule = t => {
+      const a=t*Math.PI*2, co=Math.cos(a), si=Math.sin(a), n=4;
+      return {x:W/2+Math.sign(co)*Math.pow(Math.abs(co),2/n)*(W/2-1.5),
+              y:H/2+Math.sign(si)*Math.pow(Math.abs(si),2/n)*(H/2-1.5)};
+    };
+    const paint = () => {
+      time += .016; power = lerp(power,targetPower,.065);
+      const follow = active ? .12 : .08;
+      const ox=smooth.x, oy=smooth.y;
+      smooth.x=lerp(smooth.x,mouse.x,follow); smooth.y=lerp(smooth.y,mouse.y,follow);
+      velocity.x=lerp(velocity.x,(smooth.x-ox)*W,.22);
+      velocity.y=lerp(velocity.y,(smooth.y-oy)*H,.22);
+      tail.x=lerp(tail.x,smooth.x,.055); tail.y=lerp(tail.y,smooth.y,.055);
+      ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,canvas.width,canvas.height);
+      ctx.setTransform(DPR,0,0,DPR,PAD*DPR,PAD*DPR);
+      const pts=[], N=240, mx=smooth.x*W, my=smooth.y*H, tx=tail.x*W, ty=tail.y*H;
+      const speed=Math.min(1,Math.hypot(velocity.x,velocity.y)/Math.max(1,Math.min(W,H)*.07));
+      for(let i=0;i<N;i++){
+        const t=i/N, b=capsule(t), dx=b.x-mx, dy=b.y-my, dist=Math.hypot(dx,dy);
+        const influence=Math.exp(-Math.pow(dist/(Math.max(W,H)*.43),2));
+        const td=Math.hypot(b.x-tx,b.y-ty), trailing=Math.exp(-Math.pow(td/Math.max(8,H*.13),2));
+        const nx=dx/(dist||1), ny=dy/(dist||1);
+        const wave=Math.sin(t*21+mx*.012+time*.58)*2.5+Math.sin(t*37-my*.015-time*.42)*1.35+Math.cos(t*53+my*.011+time*.28)*.65;
+        const ripple=Math.sin(dist*.055-time*2.1)*2.2*Math.exp(-Math.pow(dist/(Math.max(W,H)*.32),2));
+        const displacement=active?power*(influence*(H*.28+speed*H*.07)+trailing*H*.045+wave*influence*.48+ripple*.3):0;
+        const shear=active?power*Math.sin(t*13+time*.46)*influence*H*.027:0;
+        const drag=active?power*speed*influence*H*.045:0;
+        pts.push({x:b.x+nx*displacement-dy/(dist||1)*shear-velocity.x*drag*.002,
+                  y:b.y+ny*displacement+dx/(dist||1)*shear-velocity.y*drag*.002});
+      }
+      const shape=new Path2D();
+      for(let i=0;i<N;i++){const a=pts[i],b=pts[(i+1)%N],x=(a.x+b.x)/2,y=(a.y+b.y)/2;if(i===0)shape.moveTo(x,y);shape.quadraticCurveTo(a.x,a.y,x,y);}
+      shape.closePath(); ctx.fillStyle='#292729'; ctx.fill(shape);
+      if(active||power>.001){
+        ctx.save();ctx.clip(shape);
+        const gx=lerp(mx,tx,.2),gy=lerp(my,ty,.2);
+        const grad=ctx.createRadialGradient(gx-20,gy-15,2,gx,gy,Math.max(W,H)*.95);
+        grad.addColorStop(0,'rgba(239,183,187,1)');grad.addColorStop(.22,'rgba(220,169,190,.99)');
+        grad.addColorStop(.46,'rgba(184,164,199,.96)');grad.addColorStop(.72,'rgba(133,157,185,.86)');
+        grad.addColorStop(1,'rgba(41,39,41,0)');
+        ctx.fillStyle=grad;ctx.fillRect(-PAD,-PAD,W+PAD*2,H+PAD*2);
+        const sheen=ctx.createRadialGradient(gx-38,gy-27,1,gx-24,gy-18,Math.max(60,H*1.05));
+        sheen.addColorStop(0,'rgba(255,239,237,.2)');sheen.addColorStop(.45,'rgba(255,220,229,.08)');sheen.addColorStop(1,'rgba(255,224,225,0)');
+        ctx.fillStyle=sheen;ctx.fillRect(-PAD,-PAD,W+PAD*2,H+PAD*2);ctx.restore();
+      }
+      if(active||power>.002) raf=requestAnimationFrame(paint); else raf=0;
+    };
+    const start=()=>{if(!raf)raf=requestAnimationFrame(paint)};
+    const move=e=>{const r=el.getBoundingClientRect();mouse.x=clamp((e.clientX-r.left)/r.width,0,1);mouse.y=clamp((e.clientY-r.top)/r.height,0,1);start()};
+    const enter=e=>{active=true;targetPower=1;if(e)move(e);else start()};
+    const leave=()=>{active=false;targetPower=0;start()};
+    el.addEventListener('pointerenter',enter);
+    el.addEventListener('pointermove',move,{passive:true});
+    el.addEventListener('pointerleave',leave);
+    el.addEventListener('focus',()=>enter());
+    el.addEventListener('blur',leave);
+    if('ResizeObserver' in window)new ResizeObserver(resize).observe(el);else window.addEventListener('resize',resize,{passive:true});
+    function drawStatic(){if(!raf){const was=active;active=false;targetPower=0;paint();active=was;}}
+    resize();
+  });
+
 })();
