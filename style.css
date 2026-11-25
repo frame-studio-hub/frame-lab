@@ -3077,3 +3077,36 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .liquid-cta:active{transform:none!important}
 .liquid-cta.active,.liquid-cta[aria-pressed="true"]{background:transparent!important;box-shadow:none!important}
 @media(prefers-reduced-motion:reduce){.liquid-cta>.liquid-canvas-layer{display:none!important}.liquid-cta{background:#292729!important;border-radius:999px!important}}
+
+
+/* FRAME LAB / LIQUID MERGE V25 — every button, native geometry, clean dark reset. */
+.liquid-cta{
+  position:relative!important;isolation:isolate!important;overflow:visible!important;
+  background:transparent!important;border-color:transparent!important;box-shadow:none!important;
+  transform:none;-webkit-tap-highlight-color:transparent;
+}
+.liquid-cta::before,.liquid-cta::after{display:none!important;content:none!important}
+.liquid-cta>.liquid-canvas-layer{
+  position:absolute!important;z-index:0!important;display:block!important;
+  max-width:none!important;max-height:none!important;pointer-events:none!important;overflow:visible!important;
+}
+.liquid-cta>*:not(.liquid-canvas-layer){position:relative;z-index:2}
+.project-orbit-node.liquid-cta{border-radius:13px!important;border-color:rgba(237,244,228,.17)!important}
+.project-orbit-node.liquid-cta:hover,.project-orbit-node.liquid-cta.is-current{border-color:rgba(199,255,66,.52)!important}
+.project-index-row.liquid-cta{border:0!important;border-bottom:1px solid rgba(238,242,228,.13)!important;border-radius:0!important}
+.process-step.liquid-cta{border:0!important;border-bottom:1px solid var(--line)!important;border-radius:14px!important}
+.menu-toggle.liquid-cta,.modal-close.liquid-cta{border-radius:50%!important}
+.liquid-cta:hover,.liquid-cta:focus-visible,.liquid-cta:active{
+  background:transparent!important;box-shadow:none!important;transform:none!important;
+}
+.liquid-cta:focus-visible{outline:1px solid rgba(224,202,216,.72)!important;outline-offset:4px}
+.liquid-cta.active,.liquid-cta[aria-pressed="true"]{background:transparent!important;box-shadow:none!important}
+.filter-btn.liquid-cta.active,.project-view-btn.liquid-cta.active,
+.project-mono-toggle.liquid-cta.active,.material-btn.liquid-cta.active{color:var(--lime)!important}
+.liquid-cta.liquid-fallback{background:#292729!important;border-color:rgba(245,239,241,.09)!important}
+.liquid-cta:disabled{cursor:not-allowed;opacity:.58}
+@media(max-width:650px){.project-orbit-node.liquid-cta{border-radius:10px!important}}
+@media(prefers-reduced-motion:reduce){
+  .liquid-cta>.liquid-canvas-layer{display:none!important}
+  .liquid-cta,.liquid-cta:hover,.liquid-cta:focus-visible{background:#292729!important;transition:none!important;animation:none!important}
+}
