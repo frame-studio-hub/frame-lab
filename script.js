@@ -442,7 +442,7 @@
     // Drag the deck like a physical carousel; a drag never accidentally opens a card.
     orbit.addEventListener('pointerdown', event => {
       if (!orbitDesktop.matches || event.button !== 0 || event.target.closest('a')) return;
-      orbitDrag = { pointerId:event.pointerId, startX:event.clientX, startAngle:orbitAngle, moved:false };
+      orbitDrag = { pointerId:event.pointerId, startX:event.clientX, startAngle:orbitAngle, targetAngle:orbitAngle, moved:false, frame:0 };
       // Do not capture a click: capture begins only after a real drag threshold.
       stopOrbitMotion();
     });
@@ -457,8 +457,22 @@
         }
         if (orbitDrag.moved) {
           const width = orbit.clientWidth || window.innerWidth;
-          const spread = Math.max(0, Math.min(540, width * .43, width / 2 - 120));
-          renderOrbitAngle(orbitDrag.startAngle - (dx / spread) * 60);
+          const spread = Math.max(260, Math.min(540, width * .43, width / 2 - 120));
+          orbitDrag.targetAngle = orbitDrag.startAngle - (dx / spread) * 60;
+          if (!orbitDrag.frame) {
+            const paintDrag = () => {
+              if (!orbitDrag) return;
+              const difference = orbitDrag.targetAngle - orbitAngle;
+              if (Math.abs(difference) < .08) {
+                renderOrbitAngle(orbitDrag.targetAngle);
+                orbitDrag.frame = 0;
+                return;
+              }
+              renderOrbitAngle(orbitAngle + difference * .34);
+              orbitDrag.frame = requestAnimationFrame(paintDrag);
+            };
+            orbitDrag.frame = requestAnimationFrame(paintDrag);
+          }
         }
       }
     }, { passive:true });
@@ -468,6 +482,8 @@
         suppressOrbitClick = true;
         window.setTimeout(() => { suppressOrbitClick = false; }, 350);
       }
+      if (orbitDrag.frame) cancelAnimationFrame(orbitDrag.frame);
+      if (orbitDrag.moved) renderOrbitAngle(orbitDrag.targetAngle);
       orbit.classList.remove('is-dragging');
       if (orbitCaption) orbitCaption.textContent = 'AUTO DECK / DRAG TO EXPLORE';
       orbitDrag = null;
@@ -482,6 +498,27 @@
       setOrbitIndex(index);
       openProjectModal(node.dataset.project);
     }));
+    if (!orbitDesktop.matches) {
+      let mobileScrollFrame = 0;
+      orbit.addEventListener('scroll', () => {
+        if (mobileScrollFrame) return;
+        mobileScrollFrame = requestAnimationFrame(() => {
+          mobileScrollFrame = 0;
+          const center = orbit.getBoundingClientRect().left + orbit.clientWidth / 2;
+          let closest = 0, best = Infinity;
+          orbitNodes.forEach((node, i) => {
+            const rect = node.getBoundingClientRect();
+            const distance = Math.abs(rect.left + rect.width / 2 - center);
+            if (distance < best) { best = distance; closest = i; }
+          });
+          if (closest !== orbitIndex) {
+            orbitIndex = closest;
+            syncOrbitSelection();
+          }
+        });
+      }, { passive:true });
+    }
+
     orbit.addEventListener('keydown', event => {
       if (!['ArrowLeft','ArrowRight','Home','End'].includes(event.key)) return;
       if (event.target.closest('.project-orbit-node')) {
@@ -838,6 +875,9 @@
     bindDetailLight('.choice-card', .65);
     bindDetailLight('.review-card', .85);
   }
+
+  // One consistent liquid-glass interaction language for segmented controls and CTAs.
+  document.querySelectorAll('.filter-btn,.project-view-btn,.project-mono-toggle,.material-btn,.lab-button,.project-orbit-controls button,.planner-next,.planner-back,.process-step').forEach(control => control.classList.add('liquid-cta'));
 
   // Activate the existing glass/chrome/lime material controls in Creative Lab.
   const materialButtons = Array.from(document.querySelectorAll('[data-material-mode]'));
