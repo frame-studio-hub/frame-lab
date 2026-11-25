@@ -417,46 +417,54 @@
       startOrbitMotion();
     }
 
-    // Empty space never pauses playback: use delegated hit-testing on actual project cards only.
+    // Keep a hover lock while the card glides; its transform must not simulate pointerout.
     let hoveredOrbitCard = null;
+    let orbitHoverLock = false;
     const resumeAfterCardLeave = () => {
       if (orbitResumeTimer) window.clearTimeout(orbitResumeTimer);
       orbitResumeTimer = window.setTimeout(() => {
         orbitResumeTimer = 0;
-        if (!hoveredOrbitCard && !orbitFocusInside) startOrbitMotion();
-      }, 1450);
+        if (!orbitHoverLock && !hoveredOrbitCard && !orbitFocusInside) startOrbitMotion();
+      }, 520);
     };
-    orbit.addEventListener('pointerover', event => {
-      const card = event.target.closest?.('.project-orbit-node');
-      if (!card || !orbit.contains(card) || card === hoveredOrbitCard) return;
+    const focusOrbitCard = card => {
+      const selectedIndex = orbitNodes.indexOf(card);
+      if (selectedIndex < 0) return;
       hoveredOrbitCard = card;
+      orbitHoverLock = true;
       orbitPointerInside = true;
       if (orbitResumeTimer) window.clearTimeout(orbitResumeTimer);
       orbitResumeTimer = 0;
-      const selectedIndex = orbitNodes.indexOf(card);
-      if (selectedIndex >= 0) animateOrbitToIndex(selectedIndex);
+      if (selectedIndex !== orbitIndex || orbitSettleFrame) animateOrbitToIndex(selectedIndex);
       else stopOrbitMotion();
+    };
+    orbit.addEventListener('pointerover', event => {
+      if (!orbitDesktop.matches || orbitHoverLock) return;
+      const card = event.target.closest?.('.project-orbit-node');
+      if (!card || !orbit.contains(card) || card.classList.contains('is-loop-clone')) return;
+      if (card === hoveredOrbitCard) return;
+      focusOrbitCard(card);
     });
-    orbit.addEventListener('pointerout', event => {
-      const from = event.target.closest?.('.project-orbit-node');
-      const to = event.relatedTarget?.closest?.('.project-orbit-node');
-      if (!from || from === to) return;
-      if (to && orbit.contains(to)) {
-        hoveredOrbitCard = to;
-        orbitPointerInside = true;
-        const selectedIndex = orbitNodes.indexOf(to);
-        if (selectedIndex >= 0) animateOrbitToIndex(selectedIndex);
-        else stopOrbitMotion();
-        return;
+    orbit.addEventListener('pointermove', event => {
+      if (!orbitDesktop.matches || !orbitHoverLock || orbitSettleFrame) return;
+      const hit = document.elementFromPoint(event.clientX, event.clientY);
+      const card = hit?.closest?.('.project-orbit-node');
+      const nextCard = card && orbit.contains(card) && !card.classList.contains('is-loop-clone') ? card : null;
+      if (nextCard === hoveredOrbitCard) return;
+      if (nextCard) focusOrbitCard(nextCard);
+      else {
+        hoveredOrbitCard = null;
+        orbitHoverLock = false;
+        orbitPointerInside = false;
+        resumeAfterCardLeave();
       }
-      hoveredOrbitCard = null;
-      orbitPointerInside = false;
-      resumeAfterCardLeave();
-    });
+    }, { passive:true });
+    // Ignore pointerout: the selected card intentionally moves away from the pointer.
     orbit.addEventListener('pointerleave', () => {
       orbit.style.setProperty('--orbit-light-x','50%');
       orbit.style.setProperty('--orbit-light-y','50%');
       hoveredOrbitCard = null;
+      orbitHoverLock = false;
       orbitPointerInside = false;
       resumeAfterCardLeave();
     });
