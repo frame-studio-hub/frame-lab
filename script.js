@@ -286,7 +286,7 @@
   }
 
   // Activate the existing glass/chrome/lime material controls in Creative Lab.
-  const materialButtons = $('[data-material-mode]');
+  const materialButtons = Array.from(document.querySelectorAll('[data-material-mode]'));
   materialButtons.forEach(button => {
     button.addEventListener('click', () => {
       const material = button.dataset.materialMode;
