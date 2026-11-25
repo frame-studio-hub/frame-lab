@@ -13,8 +13,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=frame-motion-20261125-v7">
-  <link rel="stylesheet" href="reviews.css?v=frame-motion-20261125-v7">
+  <link rel="stylesheet" href="style.css?v=frame-motion-20261125-v8">
+  <link rel="stylesheet" href="reviews.css?v=frame-motion-20261125-v8">
   <style>
     /* Mobile fallback: keep content readable without disabling the designed motion. */
     @media (max-width:700px) {
@@ -118,6 +118,16 @@
         <button class="filter-btn" data-filter="visual" aria-pressed="false">ВИЗУАЛЬНЫЙ КОНТЕНТ</button>
       </div>
 
+
+      <div class="project-view-controls">
+        <span class="mono">VIEW MODE / 02</span>
+        <div class="project-view-segment" role="group" aria-label="Режим портфолио">
+          <button type="button" class="project-view-btn active" data-work-view="visual" aria-pressed="true">VISUAL</button>
+          <button type="button" class="project-view-btn" data-work-view="index" aria-pressed="false">INDEX</button>
+        </div>
+        <button type="button" class="project-mono-toggle" id="project-mono-toggle" aria-pressed="false"><span class="mono-toggle-dot"></span> MONOCHROME</button>
+      </div>
+
       <div class="project-orbit-module" id="project-constellation">
         <div class="project-orbit-heading">
           <div class="mono"><span class="orbit-live-dot"></span> 02.1 / PROJECT CONSTELLATION</div>
@@ -200,6 +210,16 @@
         </div>
       </div>
 
+
+      <div class="project-index-list" id="project-index-list" aria-label="Текстовый индекс проектов">
+        <button class="project-index-row" type="button" data-project="01" data-category="branding"><span class="project-index-no mono">01</span><span class="project-index-name">AETHER®</span><span class="project-index-type mono">IDENTITY / BRAND SYSTEM</span><span class="project-index-arrow">↗</span></button>
+        <button class="project-index-row" type="button" data-project="02" data-category="web"><span class="project-index-no mono">02</span><span class="project-index-name">NØRD STUDIO</span><span class="project-index-type mono">WEB DESIGN / DIGITAL</span><span class="project-index-arrow">↗</span></button>
+        <button class="project-index-row" type="button" data-project="03" data-category="digital"><span class="project-index-no mono">03</span><span class="project-index-name">VANTA OBJECTS</span><span class="project-index-type mono">DIGITAL PRODUCT / ART DIRECTION</span><span class="project-index-arrow">↗</span></button>
+        <button class="project-index-row" type="button" data-project="04" data-category="visual"><span class="project-index-no mono">04</span><span class="project-index-name">FLUX CAMPAIGN</span><span class="project-index-type mono">VISUAL CONTENT / CAMPAIGN</span><span class="project-index-arrow">↗</span></button>
+        <button class="project-index-row" type="button" data-project="05" data-category="branding"><span class="project-index-no mono">05</span><span class="project-index-name">OBJECT / 05</span><span class="project-index-type mono">ART DIRECTION / IDENTITY</span><span class="project-index-arrow">↗</span></button>
+        <button class="project-index-row" type="button" data-project="06" data-category="web"><span class="project-index-no mono">06</span><span class="project-index-name">SØL RETREAT</span><span class="project-index-type mono">WEB EXPERIENCE / DIGITAL</span><span class="project-index-arrow">↗</span></button>
+      </div>
+
       <p class="work-note mono">* ВСЕ ПРОЕКТЫ — АВТОРСКИЕ КОНЦЕПТУАЛЬНЫЕ ИССЛЕДОВАНИЯ.</p>
     </section>
 
@@ -252,6 +272,46 @@
           <div class="object-card-caption"><div><span class="mono">STRUCTURE / 003</span><h3>Chromatic</h3></div><span class="object-index">03</span></div>
         </article>
       </div>
+
+      <div class="visual-study-wall">
+        <div class="visual-study-heading">
+          <span class="mono">03.1 / PRINT STUDIES — FLOATING ARCHIVE</span>
+          <p>Фрагменты визуального языка FRAME LAB. Три направления, одна система координат.</p>
+        </div>
+        <div class="visual-study-deck" id="visual-study-deck">
+          <article class="visual-print visual-print-type" data-print-card>
+            <div class="visual-print-meta mono"><span>FRAME® / STUDY 001</span><span>TYPE / 26</span></div>
+            <div class="visual-print-art print-type-art">
+              <span class="print-type-index">01</span>
+              <span class="print-type-main">TYPE<br><em>IS</em><br>FORM.</span>
+              <span class="print-type-line"></span>
+              <span class="print-type-side mono">A STUDY IN<br>CONTRAST</span>
+            </div>
+            <div class="visual-print-foot mono"><span>TYPOGRAPHIC SYSTEM</span><span>01 — 03</span></div>
+          </article>
+          <article class="visual-print visual-print-matter" data-print-card>
+            <div class="visual-print-meta mono"><span>FRAME® / STUDY 002</span><span>MATTER / 26</span></div>
+            <div class="visual-print-art print-matter-art">
+              <span class="matter-orbit matter-orbit-a"></span><span class="matter-orbit matter-orbit-b"></span>
+              <span class="matter-object"></span><span class="matter-shard"></span>
+              <span class="matter-caption">MATERIAL<br>BEHAVIOUR<span>®</span></span>
+              <span class="matter-coordinate mono">REFRACTION / 002</span>
+            </div>
+            <div class="visual-print-foot mono"><span>CHROME / GLASS / LIGHT</span><span>02 — 03</span></div>
+          </article>
+          <article class="visual-print visual-print-signal" data-print-card>
+            <div class="visual-print-meta mono"><span>FRAME® / STUDY 003</span><span>SIGNAL / 26</span></div>
+            <div class="visual-print-art print-signal-art">
+              <span class="signal-sun"></span><span class="signal-wave signal-wave-a"></span><span class="signal-wave signal-wave-b"></span>
+              <span class="signal-word">FUTURE<br><em>IN</em><br>FRAME.</span>
+              <span class="signal-coordinate mono">SIGNAL / 003 — 026</span>
+            </div>
+            <div class="visual-print-foot mono"><span>GENERATIVE COMPOSITION</span><span>03 — 03</span></div>
+          </article>
+        </div>
+        <div class="visual-study-bottom mono"><span>ART DIRECTION / EXPERIMENTAL SERIES</span><span>MOVE THROUGH THE FRAME ↗</span></div>
+      </div>
+
       <div class="object-gallery-foot mono"><span>CSS 3D / REAL-TIME LIGHT STUDIES</span><span>NO HEAVY WEBGL REQUIRED</span></div>
     </section>
 
@@ -379,7 +439,7 @@
   <div class="project-modal" id="project-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modal-title">
     <div class="modal-backdrop" data-close-modal></div><div class="modal-panel"><button class="modal-close" aria-label="Закрыть описание проекта" data-close-modal>×</button><span class="mono modal-kicker" id="modal-kicker">КОНЦЕПТ / 01</span><h2 id="modal-title">AETHER®</h2><p id="modal-description">Исследование фирменной идентичности.</p><div class="modal-meta mono"><span id="modal-category">АЙДЕНТИКА</span><span>АВТОРСКИЙ КОНЦЕПТ</span></div><p class="modal-disclaimer">Это авторское концептуальное исследование для портфолио FRAME LAB. Проект не является заказной клиентской работой.</p><a class="text-link" id="modal-project-link" href="https://www.instagram.com/frame.lab.co/" target="_blank" rel="noopener noreferrer">ОБСУДИТЬ ПРОЕКТ <span><svg class="ui-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M8 6h10v10"/></svg></span></a></div>
   </div>
-  <script src="script.js" defer></script>
+  <script src="script.js?v=frame-motion-20261125-v8" defer></script>
   <script src="analytics.js" defer></script>
   <script src="site-backend.js" defer></script>
   </body>

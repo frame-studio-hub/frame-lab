@@ -190,11 +190,37 @@
 
   // Project category filters.
   const filterButtons = $$('.filter-btn'), projectCards = $$('.project-card');
+  const projectIndexRows = $$('.project-index-row');
+  const workSection = $('#work');
   filterButtons.forEach(button => button.addEventListener('click', () => {
     const filter = button.dataset.filter;
     filterButtons.forEach(b => { const active = b === button; b.classList.toggle('active', active); b.setAttribute('aria-pressed', String(active)); });
     projectCards.forEach(card => card.classList.toggle('hidden', filter !== 'all' && card.dataset.category !== filter));
+    projectIndexRows.forEach(row => row.classList.toggle('hidden', filter !== 'all' && row.dataset.category !== filter));
   }));
+
+  // Portfolio presentation: switch between the immersive art direction and a clean type index.
+  const workViewButtons = $$('[data-work-view]');
+  workViewButtons.forEach(button => button.addEventListener('click', () => {
+    const indexMode = button.dataset.workView === 'index';
+    workSection?.classList.toggle('work-index-mode', indexMode);
+    workViewButtons.forEach(item => {
+      const active = item === button;
+      item.classList.toggle('active', active);
+      item.setAttribute('aria-pressed', String(active));
+    });
+  }));
+
+  // A restrained monochrome proofing mode for the portfolio and the 3D object gallery.
+  const monoToggle = $('#project-mono-toggle');
+  monoToggle?.addEventListener('click', () => {
+    const active = monoToggle.getAttribute('aria-pressed') !== 'true';
+    workSection?.classList.toggle('is-monochrome', active);
+    $('#objects')?.classList.toggle('is-monochrome', active);
+    monoToggle.setAttribute('aria-pressed', String(active));
+    monoToggle.classList.toggle('active', active);
+    monoToggle.lastChild && (monoToggle.lastChild.textContent = active ? ' MONOCHROME ON' : ' MONOCHROME');
+  });
 
   // Project detail modal.
   const projectData = {
@@ -224,6 +250,7 @@
     card.addEventListener('click', () => openProjectModal(card.dataset.project));
     card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openProjectModal(card.dataset.project); } });
   });
+  projectIndexRows.forEach(row => row.addEventListener('click', () => openProjectModal(row.dataset.project)));
   $$('[data-close-modal]').forEach(el => el.addEventListener('click', closeProjectModal));
 
 
@@ -546,6 +573,33 @@
         card.style.setProperty('--tilt-y', '0deg');
         const art = $('.project-art', card);
         if (art) { art.style.setProperty('--spot-x', '50%'); art.style.setProperty('--spot-y', '50%'); }
+      });
+    });
+  }
+
+  // Print archive: pointer-led paper cards, coalesced to one animation frame.
+  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches && !reduceMotion && !lowPower) {
+    $$('[data-print-card]').forEach(card => {
+      let frame = 0, px = 0, py = 0;
+      card.addEventListener('pointermove', event => {
+        const rect = card.getBoundingClientRect();
+        px = (event.clientX - rect.left) / rect.width - .5;
+        py = (event.clientY - rect.top) / rect.height - .5;
+        if (frame) return;
+        frame = requestAnimationFrame(() => {
+          card.style.setProperty('--print-rotate-x', (py * -3.5).toFixed(2) + 'deg');
+          card.style.setProperty('--print-rotate-y', (px * 4.5).toFixed(2) + 'deg');
+          card.style.setProperty('--print-shine-x', ((px + .5) * 100).toFixed(1) + '%');
+          card.style.setProperty('--print-shine-y', ((py + .5) * 100).toFixed(1) + '%');
+          frame = 0;
+        });
+      }, { passive:true });
+      card.addEventListener('pointerleave', () => {
+        cancelAnimationFrame(frame); frame = 0;
+        card.style.setProperty('--print-rotate-x','0deg');
+        card.style.setProperty('--print-rotate-y','0deg');
+        card.style.setProperty('--print-shine-x','50%');
+        card.style.setProperty('--print-shine-y','50%');
       });
     });
   }
