@@ -928,37 +928,6 @@
   }
 
 
-  // Shared high-fidelity tilt: every portfolio and print card reacts, not only the first item.
-  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches && !reduceMotion) {
-    const interactiveCards = $('.project-card, [data-print-card]');
-    interactiveCards.forEach(card => {
-      let raf = 0, x = 0, y = 0;
-      const reset = () => {
-        cancelAnimationFrame(raf); raf = 0;
-        card.style.setProperty('--card-rx','0deg');
-        card.style.setProperty('--card-ry','0deg');
-        card.style.setProperty('--card-px','50%');
-        card.style.setProperty('--card-py','50%');
-      };
-      card.addEventListener('pointermove', event => {
-        const rect = card.getBoundingClientRect();
-        x = Math.max(0,Math.min(1,(event.clientX-rect.left)/rect.width));
-        y = Math.max(0,Math.min(1,(event.clientY-rect.top)/rect.height));
-        if (raf) return;
-        raf = requestAnimationFrame(() => {
-          const strength = card.matches('[data-print-card]') ? 8 : 10;
-          card.style.setProperty('--card-ry',((x-.5)*strength*2).toFixed(2)+'deg');
-          card.style.setProperty('--card-rx',((.5-y)*strength*1.5).toFixed(2)+'deg');
-          card.style.setProperty('--card-px',(x*100).toFixed(1)+'%');
-          card.style.setProperty('--card-py',(y*100).toFixed(1)+'%');
-          raf = 0;
-        });
-      },{passive:true});
-      card.addEventListener('pointerleave',reset,{passive:true});
-      card.addEventListener('pointercancel',reset,{passive:true});
-    });
-  }
-
   // Micro-detail pointer lighting for UI surfaces. Values are coalesced into one frame.
   if (!coarsePointer && !reduceMotion && !lowPower) {
     const bindDetailLight = (selector, strength = 1) => {
