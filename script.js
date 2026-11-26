@@ -1096,7 +1096,7 @@
 'use strict';
 const SELECTOR='button,.header-contact,.start-button,#instagram-brief,.round-link';
 const GROUPS='.site-header,.filter-row,.project-view-controls,.project-orbit-ring,.project-index-list,.process-tabs,.lab-controls,.material-switch,.planner-actions,.result-actions';
-const PAD=52,BASE='#292729',DPR=Math.min(window.devicePixelRatio||1,1.5);
+const PAD=28,BASE='#292729',DPR=Math.min(window.devicePixelRatio||1,1.5);
 const REDUCED=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const lerp=(a,b,t)=>a+(b-a)*t;
@@ -1154,18 +1154,18 @@ function contour(item,g){
   const sx=w/Math.max(1,r.width),sy=h/Math.max(1,r.height);
   const px=(g.point.x-r.left)*sx,py=(g.point.y-r.top)*sy;
   const tx=(g.tail.x-r.left)*sx,ty=(g.tail.y-r.top)*sy;
-  const reach=clamp(min*1.72,38,92),speed=Math.min(1,Math.hypot(g.velocity.x,g.velocity.y)/15);
-  const amp=Math.min(13,min*.19),phase=g.point.x*.004+g.point.y*.003,points=[],n=112;
+  const reach=clamp(min*1.25,30,64),speed=Math.min(1,Math.hypot(g.velocity.x,g.velocity.y)/15);
+  const amp=Math.min(6,min*.09),phase=g.point.x*.004+g.point.y*.003,points=[],n=112;
   for(let i=0;i<n;i++){
     const a=i/n*Math.PI*2,c=Math.cos(a),s=Math.sin(a);
     const bx=w*.5+Math.sign(c)*Math.pow(Math.abs(c),2/exponent)*(w*.5-1);
     const by=h*.5+Math.sign(s)*Math.pow(Math.abs(s),2/exponent)*(h*.5-1);
     const dx=bx-px,dy=by-py,d=Math.hypot(dx,dy)||1;
     const influence=Math.exp(-Math.pow(d/reach,2));
-    const tail=Math.exp(-Math.pow(Math.hypot(bx-tx,by-ty)/15,2));
-    const wave=Math.sin(a*7+phase)*.85+Math.cos(a*11-phase)*.5;
-    const force=item.activity*(influence*(amp*(.82+speed*.22))+tail*2.2+wave*influence*1.05);
-    const nx=dx/d,ny=dy/d,shear=item.activity*influence*Math.sin(a*5+phase)*1.25;
+    const tail=Math.exp(-Math.pow(Math.hypot(bx-tx,by-ty)/12,2));
+    const wave=Math.sin(a*7+phase)*.42+Math.cos(a*11-phase)*.22;
+    const force=item.activity*(influence*(amp*(.82+speed*.22))+tail*1.2+wave*influence*.45);
+    const nx=dx/d,ny=dy/d,shear=item.activity*influence*Math.sin(a*5+phase)*.65;
     points.push({x:bx+nx*force-ny*shear,y:by+ny*force+nx*shear});
   }
   return points;
@@ -1190,13 +1190,13 @@ function bridgeFor(g){
     const ox=Math.min(a.right,b.right)-Math.max(a.left,b.left);
     const mh=Math.min(a.height,b.height),mw=Math.min(a.width,b.width);let pair=null;
     const gx=Math.max(0,b.left-a.right,a.left-b.right);
-    if(gx<=42&&oy>=mh*.34&&ox<=3){
+    if(gx<=24&&oy>=mh*.34&&ox<=3){
       const l=a.left<=b.left?a:b,rr=l===a?b:a;
       pair={axis:'x',x1:l.right-3,x2:rr.left+3,top:Math.max(a.top,b.top),
         bottom:Math.min(a.bottom,b.bottom),gap:gx,first:active.el,second:other.el};
     }
     const gy=Math.max(0,b.top-a.bottom,a.top-b.bottom);
-    if(gy<=34&&ox>=mw*.34&&oy<=3){
+    if(gy<=22&&ox>=mw*.34&&oy<=3){
       const t=a.top<=b.top?a:b,bb=t===a?b:a;
       const v={axis:'y',y1:t.bottom-3,y2:bb.top+3,left:Math.max(a.left,b.left),
         right:Math.min(a.right,b.right),gap:gy,first:active.el,second:other.el};
@@ -1206,7 +1206,7 @@ function bridgeFor(g){
     const cx=pair.axis==='x'?(pair.x1+pair.x2)*.5:clamp(g.point.x,pair.left,pair.right);
     const cy=pair.axis==='y'?(pair.y1+pair.y2)*.5:clamp(g.point.y,pair.top,pair.bottom);
     const d=Math.hypot(g.point.x-cx,g.point.y-cy);
-    const weight=(1-smooth(22,106,d))*(1-smooth(24,46,pair.gap))*g.power;
+    const weight=(1-smooth(18,68,d))*(1-smooth(8,28,pair.gap))*g.power;
     const score=pair.gap+d*.08;if(weight>.025&&score<bestScore){best={...pair,weight};bestScore=score}
   }
   return best;
@@ -1214,7 +1214,7 @@ function bridgeFor(g){
 function drawBridge(ctx,item,p,g){
   const sx=item.w/Math.max(1,item.rect.width),sy=item.h/Math.max(1,item.rect.height);
   const x=v=>(v-item.rect.left)*sx+PAD,y=v=>(v-item.rect.top)*sy+PAD;
-  const t=1.6+p.weight*3.6;ctx.beginPath();
+  const t=1.0+p.weight*2.2;ctx.beginPath();
   if(p.axis==='x'){
     const x1=x(p.x1),x2=x(p.x2),cy=y(clamp(g.point.y,p.top+2,p.bottom-2)),m=(x1+x2)*.5;
     ctx.moveTo(x1,cy-t*.48);ctx.bezierCurveTo(m,cy-t*1.4,m,cy-t*1.4,x2,cy-t*.48);
@@ -1238,15 +1238,15 @@ function draw(item,g,pair){
     const sx=w/Math.max(1,item.rect.width),sy=h/Math.max(1,item.rect.height);
     const mx=clamp((g.point.x-item.rect.left)*sx+PAD,PAD-8,w+PAD+8);
     const my=clamp((g.point.y-item.rect.top)*sy+PAD,PAD-8,h+PAD+8);
-    const grad=c.createRadialGradient(mx-12,my-9,1,mx,my,Math.max(110,Math.min(190,Math.max(w,h)*.72)));
-    grad.addColorStop(0,'rgba(239,183,187,1)');grad.addColorStop(.2,'rgba(220,169,190,.93)');
-    grad.addColorStop(.43,'rgba(184,164,199,.8)');grad.addColorStop(.7,'rgba(133,157,185,.58)');
+    const grad=c.createRadialGradient(mx-12,my-9,1,mx,my,Math.max(68,Math.min(122,Math.max(w,h)*.62)));
+    grad.addColorStop(0,'rgba(226,188,192,.88)');grad.addColorStop(.2,'rgba(199,174,190,.72)');
+    grad.addColorStop(.43,'rgba(157,164,183,.48)');grad.addColorStop(.7,'rgba(112,128,148,.22)');
     grad.addColorStop(1,'rgba(41,39,41,0)');
-    c.globalAlpha=power*.48;c.fillStyle=grad;c.fillRect(0,0,w+PAD*2,h+PAD*2);
-    const shine=c.createRadialGradient(mx-26,my-20,1,mx-18,my-12,82);
-    shine.addColorStop(0,'rgba(255,239,237,.2)');shine.addColorStop(.5,'rgba(255,220,229,.07)');
+    c.globalAlpha=power*.42;c.fillStyle=grad;c.fillRect(0,0,w+PAD*2,h+PAD*2);
+    const shine=c.createRadialGradient(mx-20,my-15,1,mx-14,my-10,60);
+    shine.addColorStop(0,'rgba(255,239,237,.12)');shine.addColorStop(.5,'rgba(255,220,229,.045)');
     shine.addColorStop(1,'rgba(255,224,225,0)');
-    c.globalAlpha=power*.3;c.fillStyle=shine;c.fillRect(0,0,w+PAD*2,h+PAD*2);c.restore();
+    c.globalAlpha=power*.22;c.fillStyle=shine;c.fillRect(0,0,w+PAD*2,h+PAD*2);c.restore();
   }
   if(pair&&(item.el===pair.first||item.el===pair.second))drawBridge(c,item,pair,g);
   c.save();trace(c,points);c.strokeStyle='rgba(245,239,241,'+(.07+power*.13)+')';c.lineWidth=.8;c.stroke();c.restore();
