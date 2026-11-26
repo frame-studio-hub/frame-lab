@@ -1039,63 +1039,57 @@
     });
   }
 
-  // Print archive: smooth spring-like paper motion with stable pointer bounds.
+  // Print archive: one animation system owns the card transform.
+  // CSS hover transitions must never compete with these frame-by-frame updates.
   if (window.matchMedia('(hover: hover) and (pointer: fine)').matches && !reduceMotion && !lowPower) {
     $$('[data-print-card]').forEach(card => {
-      let pointerInside = false, pointerX = .5, pointerY = .5;
+      let inside = false, x = 0, y = 0;
       let targetX = 0, targetY = 0, currentX = 0, currentY = 0;
-      let shineX = 50, shineY = 50, targetShineX = 50, targetShineY = 50;
       let frame = 0, lastTime = 0;
-      const art = card.querySelector('.visual-print-art');
       const animate = now => {
         frame = 0;
         const dt = lastTime ? Math.min(40, now - lastTime) : 16.7;
         lastTime = now;
-        // Time-based damping gives the same calm response on 60–144 Hz screens.
-        const ease = 1 - Math.exp(-dt / (pointerInside ? 190 : 310));
+        // Slow, critically damped response; no CSS transition is layered on top.
+        const tau = inside ? 260 : 380;
+        const ease = 1 - Math.exp(-dt / tau);
         currentX += (targetX - currentX) * ease;
         currentY += (targetY - currentY) * ease;
-        shineX += (targetShineX - shineX) * ease;
-        shineY += (targetShineY - shineY) * ease;
         card.style.setProperty('--print-rotate-x', currentX.toFixed(3) + 'deg');
         card.style.setProperty('--print-rotate-y', currentY.toFixed(3) + 'deg');
-        card.style.setProperty('--print-shine-x', shineX.toFixed(2) + '%');
-        card.style.setProperty('--print-shine-y', shineY.toFixed(2) + '%');
-        if (Math.abs(targetX-currentX)>.008 || Math.abs(targetY-currentY)>.008 ||
-            Math.abs(targetShineX-shineX)>.04 || Math.abs(targetShineY-shineY)>.04) {
+        if (Math.abs(targetX-currentX)>.006 || Math.abs(targetY-currentY)>.006) {
           frame = requestAnimationFrame(animate);
         } else {
+          currentX = targetX;
+          currentY = targetY;
+          card.style.setProperty('--print-rotate-x', currentX.toFixed(3) + 'deg');
+          card.style.setProperty('--print-rotate-y', currentY.toFixed(3) + 'deg');
           lastTime = 0;
         }
       };
       const schedule = () => { if (!frame) frame = requestAnimationFrame(animate); };
+      const updateTarget = event => {
+        const rect = card.getBoundingClientRect();
+        const px = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
+        const py = Math.max(0, Math.min(1, (event.clientY - rect.top) / rect.height));
+        // Smoothstep response reaches a gentle maximum without a hard edge snap.
+        const soft = value => {
+          const v = Math.max(-1, Math.min(1, value));
+          return v * (1.5 - .5 * v * v);
+        };
+        targetY = soft((px - .5) * 2) * 2.8;
+        targetX = -soft((py - .5) * 2) * 2.3;
+        schedule();
+      };
       card.addEventListener('pointerenter', event => {
-        pointerInside = true;
-        const rect = card.getBoundingClientRect();
-        pointerX = Math.max(0,Math.min(1,(event.clientX-rect.left)/rect.width));
-        pointerY = Math.max(0,Math.min(1,(event.clientY-rect.top)/rect.height));
-        targetY = (pointerX-.5)*5.2;
-        targetX = (.5-pointerY)*4.2;
-        targetShineX = pointerX*100;
-        targetShineY = pointerY*100;
-        schedule();
-      }, {passive:true});
-      card.addEventListener('pointermove', event => {
-        const rect = card.getBoundingClientRect();
-        pointerX = Math.max(0,Math.min(1,(event.clientX-rect.left)/rect.width));
-        pointerY = Math.max(0,Math.min(1,(event.clientY-rect.top)/rect.height));
-        // A soft edge curve prevents a sudden snap in the final few pixels.
-        const soft = v => Math.sign(v)*(1-Math.exp(-Math.abs(v)*.78))/(1-Math.exp(-.78));
-        targetY = soft((pointerX-.5)*2)*4.4;
-        targetX = -soft((pointerY-.5)*2)*3.6;
-        targetShineX = pointerX*100;
-        targetShineY = pointerY*100;
-        schedule();
-      }, {passive:true});
+        inside = true;
+        updateTarget(event);
+      }, { passive: true });
+      card.addEventListener('pointermove', updateTarget, { passive: true });
       card.addEventListener('pointerleave', () => {
-        pointerInside = false;
-        targetX = 0; targetY = 0;
-        targetShineX = 50; targetShineY = 50;
+        inside = false;
+        targetX = 0;
+        targetY = 0;
         schedule();
       });
     });
