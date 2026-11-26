@@ -1107,6 +1107,7 @@ const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const BASE = '#292729';
 const states = new WeakMap();
 const items = new Set();
+let visualStateObserver = null;
 let raf = 0;
 let previousFrame = 0;
 let resizeObserver = null;
@@ -1151,6 +1152,7 @@ function isTransparent(color) {
 
 function refreshNativeStyle(state) {
   const el=state.el;
+  if (visualStateObserver) visualStateObserver.disconnect();
   // Temporarily remove only the engine class so authored hover/active/selected
   // styles can be read without the engine's transparent-paint override.
   el.classList.remove('liquid-cta');
@@ -1161,6 +1163,7 @@ function refreshNativeStyle(state) {
   state.originalBorderWidth=Math.max(1,parseFloat(style.borderTopWidth)||1);
   state.originalLiquidFill=style.getPropertyValue('--liquid-fill').trim();
   el.classList.add('liquid-cta');
+  if (visualStateObserver) visualStateObserver.observe(document.body,{subtree:true,attributes:true,attributeFilter:['class','aria-pressed','aria-selected','data-state']});
 }
 function fillOf(el,state) {
   const custom = state.originalLiquidFill;
@@ -1533,7 +1536,7 @@ const observer=new MutationObserver(records=>{
   });
 });
 observer.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class','aria-pressed','aria-selected','data-state']});
-const visualStateObserver=new MutationObserver(records=>{
+visualStateObserver=new MutationObserver(records=>{
   const touched=new Set();
   records.forEach(record=>{
     const state=states.get(record.target);
