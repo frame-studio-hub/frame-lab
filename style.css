@@ -3574,3 +3574,55 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 @media(prefers-reduced-motion:reduce){
   .matter-orbit-a,.matter-orbit-b,.signal-wave,.signal-wave-b{animation:none!important}
 }
+
+
+/* PRINT STUDIES — calm hover finish; the JS spring exclusively owns tilt. */
+.visual-study-deck [data-print-card]{
+  --print-rotate-x:0deg;
+  --print-rotate-y:0deg;
+  transform:perspective(1400px)
+    rotateX(var(--print-rotate-x))
+    rotateY(var(--print-rotate-y))
+    rotate(var(--print-rotate,0deg))
+    translateY(var(--print-lift,0px));
+  transition:box-shadow .55s cubic-bezier(.2,.7,.2,1),
+             border-color .55s cubic-bezier(.2,.7,.2,1),
+             filter .45s ease;
+  border-color:rgba(225,237,218,.17);
+  will-change:transform;
+}
+.visual-study-deck [data-print-card]:hover,
+.visual-study-deck [data-print-card]:focus-within{
+  /* No hover transform or lift: avoids CSS and pointer animation fighting. */
+  box-shadow:0 34px 72px rgba(0,0,0,.38),0 0 0 1px rgba(206,232,190,.12);
+  border-color:rgba(220,239,207,.34);
+}
+.visual-study-deck [data-print-card]:after{
+  opacity:.22!important;
+  inset:0;
+  background:
+    linear-gradient(132deg,rgba(255,255,255,.12),transparent 24%,transparent 70%,rgba(0,0,0,.08));
+  transition:none!important;
+}
+.visual-study-deck [data-print-card]:hover:after,
+.visual-study-deck [data-print-card]:focus-within:after{
+  opacity:.22!important;
+}
+.visual-study-deck [data-print-card]:before{
+  opacity:.1;
+  mix-blend-mode:soft-light;
+}
+.visual-study-deck [data-print-card] .visual-print-art{
+  transform:translateZ(12px);
+  backface-visibility:hidden;
+}
+.visual-study-deck .visual-print-type{--print-rotate:-3.2deg;--print-lift:5px}
+.visual-study-deck .visual-print-matter{--print-rotate:.6deg;--print-lift:-15px}
+.visual-study-deck .visual-print-signal{--print-rotate:2.8deg;--print-lift:7px}
+@media(hover:none),(pointer:coarse){
+  .visual-study-deck [data-print-card]{transition:box-shadow .35s,border-color .35s;will-change:auto}
+}
+@media(prefers-reduced-motion:reduce){
+  .visual-study-deck [data-print-card]{transition:none!important;transform:none!important;will-change:auto}
+  .visual-study-deck [data-print-card]:after{transition:none!important}
+}
