@@ -1121,6 +1121,12 @@ function wrapDirectText(el) {
     el.replaceChild(span, node);
   });
 }
+function elevateChildren(el) {
+  Array.from(el.children).forEach(child => {
+    if (getComputedStyle(child).position === 'static') child.style.position = 'relative';
+    child.style.zIndex = '2';
+  });
+}
 
 function getRadius(el, width, height) {
   const value = getComputedStyle(el).borderTopLeftRadius || '0px';
@@ -1276,6 +1282,7 @@ function init(el) {
   // Cloned carousel controls may carry a copied canvas and data attribute.
   el.querySelectorAll(':scope > canvas.liquid-canvas-layer').forEach(node => node.remove());
   wrapDirectText(el);
+  elevateChildren(el);
   if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
 
   el.classList.add('liquid-cta');
