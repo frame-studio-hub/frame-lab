@@ -3127,3 +3127,11 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
  .matter-selection.has-selection .matter-card.is-selected .matter-view-controls{left:12px;right:12px;bottom:40px}
 }
 @media(prefers-reduced-motion:reduce){.matter-view-controls{transition:none}}
+
+/* v4 sculpture-specific lighting */
+.matter-selection [data-matter-card="aether"] .matter-card-stage{
+ background:radial-gradient(ellipse at 50% 48%,rgba(135,210,190,.2),transparent 53%),linear-gradient(145deg,#17201d 0%,#090d0c 75%);
+}
+.matter-selection [data-matter-card="membrane"] .matter-card-stage{
+ background:radial-gradient(ellipse at 50% 48%,rgba(164,150,230,.2),transparent 54%),linear-gradient(145deg,#191a25 0%,#090b11 76%);
+}
