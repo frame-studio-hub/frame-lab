@@ -3436,3 +3436,22 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
   .project-orbit-node{transition:transform 1.05s cubic-bezier(.22,.75,.24,1),opacity .65s ease,filter .65s ease}
 }
 @media(prefers-reduced-motion:reduce){.orbit-art,.orbit-art:before,.orbit-art:after,.orbit-art i,.orbit-art b{transition:none!important}}
+
+
+/* Selected project cover: isolated pointer tilt, never applied to side cards */
+.project-orbit-node .orbit-node-surface{
+  transform-origin:50% 50%;
+  transform-style:preserve-3d;
+  will-change:transform;
+  transition:transform 720ms cubic-bezier(.18,.72,.22,1);
+}
+.project-orbit-node.is-current .orbit-node-surface{
+  backface-visibility:hidden;
+}
+.project-orbit-scene.is-dragging .orbit-node-surface{
+  transform:none!important;
+  transition:none!important;
+}
+@media(prefers-reduced-motion:reduce){
+  .project-orbit-node .orbit-node-surface{transition:none!important}
+}
