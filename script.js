@@ -1299,36 +1299,57 @@ function contourFor(state) {
 }
 
 function drawLocalContourRim(ctx,points,state,green) {
-  if (state.activity < .035 || points.length < 12) return;
-  let nearestIndex = 0, nearestDistance = Infinity;
-  for (let i=0;i<points.length;i++) {
-    const dx=points[i].x-state.x, dy=points[i].y-state.y;
-    const distance=dx*dx+dy*dy;
-    if (distance<nearestDistance) {nearestDistance=distance;nearestIndex=i;}
+  if (state.activity < .045 || points.length < 24) return;
+
+  // Find the nearest contour point, then draw a compact curved reflection.
+  // The arc is intentionally local: no full-width edge stroke or bottom stripe.
+  let nearestIndex=0, nearestDistance=Infinity;
+  for(let i=0;i<points.length;i++){
+    const dx=points[i].x-state.x,dy=points[i].y-state.y;
+    const d=dx*dx+dy*dy;
+    if(d<nearestDistance){nearestDistance=d;nearestIndex=i;}
   }
 
-  // Highlight only a short arc nearest the pointer. No full-width bottom line.
-  const halfSpan=clamp(Math.round(points.length*.052),7,17);
+  const span=clamp(Math.round(points.length*.026),4,9);
+  const arc=[];
+  for(let offset=-span;offset<=span;offset++){
+    arc.push(points[(nearestIndex+offset+points.length)%points.length]);
+  }
+  if(arc.length<3)return;
+
+  const speed=Math.min(1,Math.hypot(state.vx,state.vy)/12);
+  const alpha=state.activity*(green?.66:.52);
   ctx.save();
   ctx.beginPath();
-  for (let offset=-halfSpan;offset<=halfSpan;offset++) {
-    const index=(nearestIndex+offset+points.length)%points.length;
-    const point=points[index];
-    if (offset===-halfSpan) ctx.moveTo(point.x,point.y);
-    else ctx.lineTo(point.x,point.y);
+  ctx.moveTo(arc[0].x,arc[0].y);
+  for(let i=1;i<arc.length-1;i++){
+    const midX=(arc[i].x+arc[i+1].x)*.5;
+    const midY=(arc[i].y+arc[i+1].y)*.5;
+    ctx.quadraticCurveTo(arc[i].x,arc[i].y,midX,midY);
   }
+  const last=arc[arc.length-1];
+  ctx.lineTo(last.x,last.y);
   ctx.lineCap='round';
   ctx.lineJoin='round';
-  ctx.shadowBlur=green?7:5;
-  ctx.shadowColor=green?'rgba(241,247,216,.28)':'rgba(222,207,214,.22)';
+  ctx.lineWidth=green?1.35+speed*.45:1.15+speed*.35;
+  ctx.shadowBlur=green?9:7;
+  ctx.shadowColor=green?'rgba(246,255,220,.42)':'rgba(244,226,232,.34)';
   ctx.strokeStyle=green
-    ? 'rgba(248,251,226,'+(.12+state.activity*.55)+')'
-    : 'rgba(246,235,239,'+(.08+state.activity*.38)+')';
-  ctx.lineWidth=green?1.15:1;
+    ? 'rgba(248,255,229,'+alpha+')'
+    : 'rgba(250,239,242,'+alpha+')';
   ctx.stroke();
+
+  // A tiny specular point gives the contour a glass-like finish without a stripe.
+  const mid=arc[Math.floor(arc.length*.5)];
+  const dot=ctx.createRadialGradient(mid.x,mid.y,0,mid.x,mid.y,green?5.5:4.5);
+  dot.addColorStop(0,green?'rgba(255,255,237,'+(alpha*.72)+')':'rgba(255,248,248,'+(alpha*.62)+')');
+  dot.addColorStop(1,'rgba(255,255,255,0)');
+  ctx.fillStyle=dot;
+  ctx.beginPath();
+  ctx.arc(mid.x,mid.y,green?5.5:4.5,0,Math.PI*2);
+  ctx.fill();
   ctx.restore();
 }
-
 function draw(state) {
   const {ctx,canvas,width,height,dpr,activity} = state;
   if (width < 2 || height < 2) return;
