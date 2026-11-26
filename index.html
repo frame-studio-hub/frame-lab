@@ -15,24 +15,12 @@
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css?v=frame-digital-matter-v41">
   <link rel="stylesheet" href="reviews.css?v=frame-liquid-graphite-v40">
-  <script type="module" src="https://unpkg.com/@google/model-viewer@4.1.0/dist/model-viewer.min.js"></script>
   <style>
-    /* Mobile fallback: keep content readable without disabling the designed motion. */
     @media (max-width:700px) {
       html, body { min-height:100%; background:#090a09; color:#f0f0e9; }
       body, main, header, section, footer { visibility:visible; }
       body { opacity:1; }
     }
-
-    .object-stage{position:relative;min-height:320px}
-    .matter-3d{position:relative;display:block;width:min(100%,390px);height:310px;z-index:2;background:transparent;--poster-color:transparent;outline:none}
-    .matter-3d::part(default-progress-bar){height:2px;background:rgba(190,174,255,.8)}
-    .matter-3d::part(default-progress-mask){background:transparent}
-    .object-card-prism .object-halo{background:radial-gradient(circle,rgba(167,145,255,.2),rgba(125,104,210,.06) 43%,transparent 72%)}
-    .object-card-orbit .object-halo{background:radial-gradient(circle,rgba(255,125,170,.17),rgba(177,114,190,.05) 43%,transparent 72%)}
-    .object-card-cube .object-halo{background:radial-gradient(circle,rgba(95,195,220,.18),rgba(95,150,220,.05) 43%,transparent 72%)}
-    .matter-asset-credit{margin:14px 0 28px;text-align:right;color:rgba(232,240,228,.38);font-size:8px;letter-spacing:.12em}
-    @media(max-width:700px){.object-stage{min-height:280px}.matter-3d{height:275px;width:100%}.matter-asset-credit{text-align:left;line-height:1.8}}
   </style>
   <script>document.documentElement.classList.add('js');</script>
 </head>
@@ -240,37 +228,40 @@
         <h2 class="display-heading reveal">ЦИФРОВАЯ<br><em>МАТЕРИЯ</em><span class="lime-dot">.</span></h2>
         <p class="section-intro reveal">Три цифровых объекта: оптическая геометрия, орбитальные формы и хроматическая структура.</p>
       </div>
-      <div class="object-grid">
-        <article class="object-card object-card-prism">
-          <div class="object-card-meta mono"><span>01 / PRISM</span><span>OPTICAL GLASS</span></div>
-          <div class="object-stage">
-            <div class="object-halo"></div>
-            <model-viewer class="matter-3d matter-3d-knot" src="https://vinish-models.pages.dev/abstract-shapes/trefoil-knot.glb" alt="Детализированная скульптура Trefoil Knot из глянцевого материала" camera-controls auto-rotate rotation-per-second="13deg" interaction-prompt="none" shadow-intensity="0.85" exposure="1.12" environment-image="neutral" camera-orbit="25deg 72deg 2.8m" disable-pan></model-viewer>
-            <span class="object-coordinate mono">52° 31' / FL</span>
+      <div class="matter-introline mono"><span><i class="matter-live-dot"></i> REAL-TIME MATERIAL ENGINE</span><span>DRAG / ROTATE / EXPLORE</span></div>
+      <div class="object-grid matter-grid" id="matter-grid">
+        <article class="object-card object-card-prism matter-card" data-matter-card="helix">
+          <div class="object-card-meta mono"><span>01 / HELIX</span><span>IRIDESCENT ALLOY</span></div>
+          <div class="object-stage matter-stage">
+            <div class="matter-aura"></div><div class="matter-grid-floor"></div>
+            <canvas class="matter-canvas" data-sculpture="helix" aria-label="Интерактивная трёхмерная скульптура из переплетённых металлических лент"></canvas>
+            <div class="matter-stage-index mono">FL—001</div><div class="matter-crosshair" aria-hidden="true"></div>
+            <span class="object-coordinate mono">FORM STUDY / 52°31′N</span>
           </div>
-          <div class="object-card-caption"><div><span class="mono">REFRACTION / 001</span><h3>Prism One</h3></div><span class="object-index">01</span></div>
+          <div class="object-card-caption"><div><span class="mono">CHROMATIC / 001</span><h3>Helix No. 01</h3><p>Переплетение света и металла</p></div><span class="object-index">01</span></div>
         </article>
-        <article class="object-card object-card-orbit">
-          <div class="object-card-meta mono"><span>02 / ORBIT</span><span>LIQUID METAL</span></div>
-          <div class="object-stage">
-            <div class="object-halo"></div>
-            <model-viewer class="matter-3d matter-3d-blob" src="https://vinish-models.pages.dev/abstract-shapes/blob.glb" alt="Органическая объёмная скульптура Organic Blob" camera-controls auto-rotate rotation-per-second="-10deg" interaction-prompt="none" shadow-intensity="0.9" exposure="1.08" environment-image="neutral" camera-orbit="20deg 70deg 2.1m" disable-pan></model-viewer>
-            <span class="object-coordinate mono">FIELD / 002</span>
+        <article class="object-card object-card-orbit matter-card" data-matter-card="ribbon">
+          <div class="object-card-meta mono"><span>02 / MEMBRANE</span><span>OPTICAL GLASS</span></div>
+          <div class="object-stage matter-stage">
+            <div class="matter-aura"></div><div class="matter-grid-floor"></div>
+            <canvas class="matter-canvas" data-sculpture="ribbon" aria-label="Интерактивная трёхмерная переливающаяся скульптура из непрерывной ленты"></canvas>
+            <div class="matter-stage-index mono">FL—002</div><div class="matter-crosshair" aria-hidden="true"></div>
+            <span class="object-coordinate mono">SURFACE STUDY / 002</span>
           </div>
-          <div class="object-card-caption"><div><span class="mono">MOTION / 002</span><h3>Solaris</h3></div><span class="object-index">02</span></div>
+          <div class="object-card-caption"><div><span class="mono">REFRACTION / 002</span><h3>Soft Continuum</h3><p>Непрерывная форма в движении</p></div><span class="object-index">02</span></div>
         </article>
-        <article class="object-card object-card-cube">
-          <div class="object-card-meta mono"><span>03 / CUBE</span><span>CHROMATIC ALLOY</span></div>
-          <div class="object-stage">
-            <div class="object-halo"></div>
-            <model-viewer class="matter-3d matter-3d-mobius" src="https://vinish-models.pages.dev/abstract-shapes/moebius-strip.glb" alt="Объёмная скульптура Moebius Strip" camera-controls auto-rotate rotation-per-second="11deg" interaction-prompt="none" shadow-intensity="0.85" exposure="1.15" environment-image="neutral" camera-orbit="25deg 72deg 2.7m" disable-pan></model-viewer>
-            <span class="object-coordinate mono">VOLUME / 003</span>
+        <article class="object-card object-card-cube matter-card" data-matter-card="lattice">
+          <div class="object-card-meta mono"><span>03 / LATTICE</span><span>POLISHED TITANIUM</span></div>
+          <div class="object-stage matter-stage">
+            <div class="matter-aura"></div><div class="matter-grid-floor"></div>
+            <canvas class="matter-canvas" data-sculpture="lattice" aria-label="Интерактивная трёхмерная композиция из сложных орбитальных металлических элементов"></canvas>
+            <div class="matter-stage-index mono">FL—003</div><div class="matter-crosshair" aria-hidden="true"></div>
+            <span class="object-coordinate mono">STRUCTURE STUDY / 003</span>
           </div>
-          <div class="object-card-caption"><div><span class="mono">STRUCTURE / 003</span><h3>Chromatic</h3></div><span class="object-index">03</span></div>
+          <div class="object-card-caption"><div><span class="mono">GEOMETRY / 003</span><h3>Orbital Structure</h3><p>Многослойная пространственная система</p></div><span class="object-index">03</span></div>
         </article>
       </div>
 
-      <div class="matter-asset-credit mono">3D ASSETS — VINISH.DEV · CC BY 4.0 · MODELS: TREFOIL KNOT / ORGANIC BLOB / MOEBIUS STRIP</div>
       <div class="visual-study-wall">
         <div class="visual-study-heading">
           <span class="mono">03.1 / PRINT STUDIES — FLOATING ARCHIVE</span>
@@ -310,7 +301,7 @@
         <div class="visual-study-bottom mono"><span>ART DIRECTION / EXPERIMENTAL SERIES</span><span>MOVE THROUGH THE FRAME ↗</span></div>
       </div>
 
-      <div class="object-gallery-foot mono"><span>CSS 3D / REAL-TIME LIGHT STUDIES</span><span>NO HEAVY WEBGL REQUIRED</span></div>
+      <div class="object-gallery-foot mono"><span>GENERATIVE GEOMETRY / REAL-TIME SHADING</span><span>THREE UNIQUE DIGITAL SCULPTURES · FRAME LAB</span></div>
     </section>
 
     <section class="services section-pad" id="services">
@@ -437,6 +428,7 @@
   <div class="project-modal" id="project-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modal-title">
     <div class="modal-backdrop" data-close-modal></div><div class="modal-panel"><button class="modal-close" aria-label="Закрыть описание проекта" data-close-modal>×</button><span class="mono modal-kicker" id="modal-kicker">КОНЦЕПТ / 01</span><h2 id="modal-title">AETHER®</h2><p id="modal-description">Исследование фирменной идентичности.</p><div class="modal-meta mono"><span id="modal-category">АЙДЕНТИКА</span><span>АВТОРСКИЙ КОНЦЕПТ</span></div><p class="modal-disclaimer">Это авторское концептуальное исследование для портфолио FRAME LAB. Проект не является заказной клиентской работой.</p><a class="text-link" id="modal-project-link" href="https://www.instagram.com/frame.lab.co/" target="_blank" rel="noopener noreferrer">ОБСУДИТЬ ПРОЕКТ <span><svg class="ui-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M8 6h10v10"/></svg></span></a></div>
   </div>
+  <script type="module" src="matter-lab.js?v=frame-matter-01"></script>
   <script src="script.js?v=frame-liquid-graphite-v40" defer></script>
   <script src="analytics.js" defer></script>
   <script src="site-backend.js" defer></script>
