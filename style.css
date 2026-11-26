@@ -2953,3 +2953,50 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .object-stage .matter-model{position:relative;z-index:1}
 @media(max-width:700px){.matter-model{min-height:300px}}
 @media(prefers-reduced-motion:reduce){.matter-model{transition:none}}
+
+
+/* FRAME LAB / Digital Matter — custom real-time generative sculpture system */
+.object-gallery{background:
+  radial-gradient(ellipse at 50% 42%,rgba(74,87,116,.12),transparent 46%),
+  linear-gradient(180deg,#0b0e0d 0%,#080a09 100%)}
+.object-gallery:before{opacity:.7;background:
+  radial-gradient(ellipse at 14% 46%,rgba(88,205,190,.09),transparent 34%),
+  radial-gradient(ellipse at 86% 40%,rgba(155,113,255,.10),transparent 37%),
+  radial-gradient(ellipse at 50% 100%,rgba(200,255,90,.035),transparent 45%)}
+.object-gallery-heading{padding-bottom:clamp(34px,4vw,54px)}
+.matter-introline{display:flex;justify-content:space-between;align-items:center;gap:16px;margin:0 0 13px;padding:0 2px;color:rgba(223,231,219,.42);font-size:8px;letter-spacing:.16em}
+.matter-introline>span:first-child{display:flex;align-items:center;gap:9px}
+.matter-live-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#c7ff42;box-shadow:0 0 12px rgba(199,255,66,.8);animation:matterPulse 2s ease-in-out infinite}
+@keyframes matterPulse{50%{opacity:.35;box-shadow:0 0 3px rgba(199,255,66,.3)}}
+.matter-grid{gap:13px;align-items:stretch}
+.matter-card{border-radius:4px;background:linear-gradient(150deg,rgba(22,29,32,.96),rgba(9,12,13,.98));border:1px solid rgba(220,235,231,.13);box-shadow:0 24px 70px rgba(0,0,0,.34),inset 0 1px rgba(255,255,255,.055);transition:transform .55s cubic-bezier(.2,.75,.2,1),border-color .4s,box-shadow .4s}
+.matter-card:before{content:"";position:absolute;inset:0;z-index:3;pointer-events:none;opacity:.55;background:linear-gradient(135deg,rgba(255,255,255,.065),transparent 22%,transparent 72%,rgba(255,255,255,.025));mix-blend-mode:screen}
+.matter-card:after{content:"";position:absolute;inset:8px;z-index:3;border:1px solid rgba(255,255,255,.035);pointer-events:none}
+.matter-card:hover{transform:translateY(-8px);border-color:rgba(199,255,66,.34);box-shadow:0 34px 85px rgba(0,0,0,.45),0 0 34px rgba(112,199,190,.07),inset 0 1px rgba(255,255,255,.1)}
+.matter-card-prism{background:linear-gradient(150deg,#111d21,#090d10 72%)}
+.matter-card-orbit{background:linear-gradient(150deg,#1b1724,#0b0d13 72%)}
+.matter-card-cube{background:linear-gradient(150deg,#15201e,#090e0d 72%)}
+.matter-card .object-card-meta{padding:18px 18px 0;color:rgba(228,237,231,.57);font-size:7px;letter-spacing:.17em}
+.matter-stage{height:clamp(275px,30vw,390px);overflow:hidden;isolation:isolate;position:relative;background:
+  radial-gradient(ellipse at 50% 52%,rgba(99,131,144,.10),transparent 54%),
+  linear-gradient(180deg,rgba(255,255,255,.012),transparent 60%)}
+.matter-aura{position:absolute;z-index:0;width:82%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(117,221,210,.17),rgba(98,155,201,.075) 34%,rgba(120,89,184,.035) 56%,transparent 72%);filter:blur(12px);transform:translateZ(0);pointer-events:none}
+.matter-card-orbit .matter-aura{background:radial-gradient(circle,rgba(181,134,255,.18),rgba(97,164,213,.07) 39%,transparent 72%)}
+.matter-card-cube .matter-aura{background:radial-gradient(circle,rgba(170,220,160,.15),rgba(82,171,165,.065) 39%,transparent 72%)}
+.matter-grid-floor{position:absolute;z-index:0;left:-20%;right:-20%;bottom:-26%;height:65%;transform:perspective(320px) rotateX(66deg);transform-origin:center top;opacity:.2;background-image:linear-gradient(rgba(195,225,214,.14) 1px,transparent 1px),linear-gradient(90deg,rgba(195,225,214,.14) 1px,transparent 1px);background-size:34px 34px;mask-image:linear-gradient(180deg,transparent,black 25%,transparent 92%);pointer-events:none}
+.matter-canvas{position:absolute;inset:0;z-index:1;width:100%;height:100%;display:block;outline:none;touch-action:pan-y;cursor:grab}
+.matter-canvas:active{cursor:grabbing}
+.matter-stage-index{position:absolute;z-index:2;right:17px;top:17px;color:rgba(226,236,229,.25);font-size:7px;letter-spacing:.18em;pointer-events:none}
+.matter-crosshair{position:absolute;z-index:2;left:50%;top:50%;width:31px;height:31px;transform:translate(-50%,-50%);opacity:.15;pointer-events:none}
+.matter-crosshair:before,.matter-crosshair:after{content:"";position:absolute;background:rgba(231,244,231,.75)}
+.matter-crosshair:before{left:50%;top:0;bottom:0;width:1px}.matter-crosshair:after{top:50%;left:0;right:0;height:1px}
+.matter-card .object-coordinate{left:18px;bottom:16px;color:rgba(226,237,230,.34);font-size:6px;letter-spacing:.16em;z-index:3}
+.matter-card .object-card-caption{min-height:86px;padding:15px 18px 17px;border-top:1px solid rgba(236,244,230,.075);display:flex;align-items:flex-start;justify-content:space-between}
+.matter-card .object-card-caption .mono{font-size:7px;letter-spacing:.16em;color:rgba(223,232,224,.46)}
+.matter-card .object-card-caption h3{margin:7px 0 3px;font-size:clamp(19px,2vw,25px);letter-spacing:-.055em;color:#f1f2e9;font-weight:500}
+.matter-card .object-card-caption p{margin:0;color:rgba(218,226,216,.43);font-size:10px;letter-spacing:-.01em}
+.matter-card .object-index{font-size:11px;color:rgba(225,236,225,.32);padding-top:3px}
+.object-gallery-foot{margin-top:23px;padding-top:15px;border-top:1px solid rgba(232,240,230,.1);color:rgba(223,232,224,.35);font-size:7px;letter-spacing:.15em}
+@media(max-width:900px){.matter-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.matter-card:last-child{grid-column:1/-1;width:calc(50% - 7px);justify-self:center}.matter-stage{height:300px}}
+@media(max-width:650px){.matter-grid{grid-template-columns:1fr;gap:12px}.matter-card:last-child{grid-column:auto;width:100%}.matter-stage{height:clamp(285px,84vw,360px)}.matter-card .object-card-caption{min-height:82px}.matter-introline{font-size:6px;letter-spacing:.1em}.matter-card .object-card-meta{padding:15px 15px 0}.matter-card .object-card-caption{padding:14px 15px}.matter-card .object-coordinate{left:15px}.matter-card:hover{transform:none}.object-gallery-heading{align-items:flex-start;flex-direction:column}.object-gallery-heading .section-intro{max-width:390px}}
+@media(prefers-reduced-motion:reduce){.matter-live-dot{animation:none}.matter-card{transition:none}}
