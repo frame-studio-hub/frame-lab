@@ -2902,7 +2902,6 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
    transparent so the complete outer silhouette can deform as one surface. */
 .liquid-cta{
   background-color:transparent!important;
-  background-image:none!important;
   border-color:transparent!important;
 }
 .liquid-cta>.liquid-canvas-layer{
