@@ -1160,35 +1160,41 @@ function fillOf(el) {
 }
 
 function isGreenSurface(el) {
-  const style = getComputedStyle(el);
-  const sources = [
-    style.backgroundColor,
-    style.backgroundImage,
-    style.getPropertyValue('--liquid-fill')
-  ];
-  if (el.matches(
+  // Inspect the control and its visible inner surfaces too (project cards,
+  // cards with green artwork, and buttons whose fill is defined on a child).
+  const nodes = [el, ...Array.from(el.querySelectorAll('*')).slice(0,36)];
+  for (const node of nodes) {
+    const style = getComputedStyle(node);
+    const sources = [
+      style.backgroundColor,
+      style.backgroundImage,
+      style.getPropertyValue('--liquid-fill')
+    ];
+
+    for (const source of sources) {
+      if (!source) continue;
+      const colors = source.matchAll(/rgba?\(([^)]+)\)/gi);
+      for (const match of colors) {
+        const channels = match[1].match(/[\d.]+/g);
+        if (!channels || channels.length < 3) continue;
+        const r = Number(channels[0]), g = Number(channels[1]), b = Number(channels[2]);
+        // Include muted olive, sage and moss; exclude neutral grey.
+        if (g > 84 && g >= r * 1.055 && g >= b * 1.12) return true;
+      }
+      const hexes = source.matchAll(/#([0-9a-f]{6})\b/gi);
+      for (const match of hexes) {
+        const value = parseInt(match[1],16);
+        const r = value >> 16, g = (value >> 8) & 255, b = value & 255;
+        if (g > 84 && g >= r * 1.055 && g >= b * 1.12) return true;
+      }
+    }
+  }
+
+  return el.matches(
     '.filter-btn.active,.project-view-btn.active,.material-btn.active,' +
     '.planner-next:not(.planner-back),.round-link:hover,.modal-close:hover,' +
     '.header-contact:hover,.start-button:hover'
-  )) sources.push('rgb(199,255,66)');
-
-  for (const source of sources) {
-    if (!source) continue;
-    const colors = source.matchAll(/rgba?\(([^)]+)\)/gi);
-    for (const match of colors) {
-      const channels = match[1].match(/[\d.]+/g);
-      if (!channels || channels.length < 3) continue;
-      const r = Number(channels[0]), g = Number(channels[1]), b = Number(channels[2]);
-      if (g > 92 && g > r * 1.17 && g > b * 1.22) return true;
-    }
-    const hexes = source.matchAll(/#([0-9a-f]{6})\b/gi);
-    for (const match of hexes) {
-      const value = parseInt(match[1],16);
-      const r = value >> 16, g = (value >> 8) & 255, b = value & 255;
-      if (g > 92 && g > r * 1.17 && g > b * 1.22) return true;
-    }
-  }
-  return false;
+  );
 }
 
 function resize(state) {
@@ -1251,39 +1257,76 @@ function smoothContour(points) {
 }
 
 function contourFor(state) {
-  const {width, height, activity} = state;
-  const radius = radiusOf(state.el, width, height);
-  const minSide = Math.max(1, Math.min(width, height));
-  const count = clamp(Math.round((width + height) * .75), 84, 190);
-  const base = roundedRectContour(width, height, radius, count);
-  const reach = clamp(minSide * 1.18, 34, 78);
-  const amplitude = Math.min(8.5, minSide * .13);
-  const speed = Math.min(1, Math.hypot(state.vx, state.vy) / 15);
+  const {width,height,activity} = state;
+  const radius = radiusOf(state.el,width,height);
+  const minSide = Math.max(1,Math.min(width,height));
+  // Higher point density prevents the long lower edge from resolving as a
+  // straight, detached stroke on wide buttons.
+  const count = clamp(Math.round((width+height)*.92),112,256);
+  const base = roundedRectContour(width,height,radius,count);
+  const reach = clamp(minSide*1.18,34,86);
+  const amplitude = Math.min(10.5,minSide*.15);
+  const speed = Math.min(1,Math.hypot(state.vx,state.vy)/15);
   const phase = state.phase;
   const result = [];
 
-  base.forEach((point, index) => {
-    const dx = point.x - state.x, dy = point.y - state.y;
-    const distance = Math.hypot(dx, dy);
-    const influence = Math.exp(-Math.pow(distance / reach, 2));
-    const tailDistance = Math.hypot(point.x - state.tailX, point.y - state.tailY);
-    const tail = Math.exp(-Math.pow(tailDistance / (reach * .72), 2));
-    const angle = index / count * Math.PI * 2;
-    const wave = Math.sin(angle * 7 + phase) * .32 + Math.cos(angle * 11 - phase) * .18;
+  base.forEach((point,index) => {
+    const dx = point.x-state.x, dy = point.y-state.y;
+    const distance = Math.hypot(dx,dy);
+    const influence = Math.exp(-Math.pow(distance/reach,2));
+    const tailDistance = Math.hypot(point.x-state.tailX,point.y-state.tailY);
+    const tail = Math.exp(-Math.pow(tailDistance/(reach*.74),2));
+    const angle = index/count*Math.PI*2;
+    const wave =
+      Math.sin(angle*7+phase)*.34 +
+      Math.cos(angle*11-phase*.92)*.19 +
+      Math.sin(angle*3-phase*1.3)*.12;
     const pull = activity * (
-      influence * amplitude * (.78 + speed * .18) +
-      tail * amplitude * .17 +
-      wave * influence * .72
+      influence*amplitude*(.78+speed*.26) +
+      tail*amplitude*.23 +
+      wave*influence*.82
     );
-    const shear = activity * influence * Math.sin(angle * 5 + phase) * Math.min(1.25, amplitude * .17);
-    const x = point.x - point.nx * pull - point.ny * shear;
-    const y = point.y - point.ny * pull + point.nx * shear;
+    const shear = activity*influence*Math.sin(angle*5+phase)*Math.min(1.45,amplitude*.18);
+    const x = point.x-point.nx*pull-point.ny*shear;
+    const y = point.y-point.ny*pull+point.nx*shear;
     result.push({
-      x:clamp(x,.55,Math.max(.55,width-.55)),
-      y:clamp(y,.55,Math.max(.55,height-.55))
+      x:clamp(x,.65,Math.max(.65,width-.65)),
+      y:clamp(y,.65,Math.max(.65,height-.65))
     });
   });
-  return smoothContour(result);
+
+  return {path:smoothContour(result),points:result};
+}
+
+function drawLocalContourRim(ctx,points,state,green) {
+  if (state.activity < .035 || points.length < 12) return;
+  let nearestIndex = 0, nearestDistance = Infinity;
+  for (let i=0;i<points.length;i++) {
+    const dx=points[i].x-state.x, dy=points[i].y-state.y;
+    const distance=dx*dx+dy*dy;
+    if (distance<nearestDistance) {nearestDistance=distance;nearestIndex=i;}
+  }
+
+  // Highlight only a short arc nearest the pointer. No full-width bottom line.
+  const halfSpan=clamp(Math.round(points.length*.052),7,17);
+  ctx.save();
+  ctx.beginPath();
+  for (let offset=-halfSpan;offset<=halfSpan;offset++) {
+    const index=(nearestIndex+offset+points.length)%points.length;
+    const point=points[index];
+    if (offset===-halfSpan) ctx.moveTo(point.x,point.y);
+    else ctx.lineTo(point.x,point.y);
+  }
+  ctx.lineCap='round';
+  ctx.lineJoin='round';
+  ctx.shadowBlur=green?7:5;
+  ctx.shadowColor=green?'rgba(241,247,216,.28)':'rgba(222,207,214,.22)';
+  ctx.strokeStyle=green
+    ? 'rgba(248,251,226,'+(.12+state.activity*.55)+')'
+    : 'rgba(246,235,239,'+(.08+state.activity*.38)+')';
+  ctx.lineWidth=green?1.15:1;
+  ctx.stroke();
+  ctx.restore();
 }
 
 function draw(state) {
@@ -1293,23 +1336,23 @@ function draw(state) {
   ctx.clearRect(0,0,canvas.width,canvas.height);
   ctx.setTransform(dpr,0,0,dpr,0,0);
 
-  const path = contourFor(state);
+  const contour = contourFor(state);
+  const path = contour.path;
   const fill = fillOf(state.el);
   if (fill !== 'transparent') {
     ctx.fillStyle = fill;
     ctx.fill(path);
   }
 
+  const green = isGreenSurface(state.el);
   ctx.save();
   ctx.clip(path);
 
-  // Adaptive liquid palette: keep the cool metallic look on graphite,
-  // use a deep evergreen + champagne reflection on bright lime surfaces.
-  const green = isGreenSurface(state.el);
+  // The liquid field and its delayed wake stay inside the real button shape.
   if (activity > .001) {
-    const x = clamp(state.x,0,width), y = clamp(state.y,0,height);
-    const reach = clamp(Math.min(width,height) * 1.12,44,116);
-    const field = ctx.createRadialGradient(x-11,y-9,1,x,y,reach);
+    const x=clamp(state.x,0,width), y=clamp(state.y,0,height);
+    const reach=clamp(Math.min(width,height)*1.12,44,116);
+    const field=ctx.createRadialGradient(x-11-state.vx*1.3,y-9-state.vy*1.3,1,x,y,reach);
     if (green) {
       field.addColorStop(0,'rgba(12,35,20,.86)');
       field.addColorStop(.16,'rgba(21,52,30,.74)');
@@ -1324,12 +1367,12 @@ function draw(state) {
       field.addColorStop(.7,'rgba(106,122,143,.12)');
       field.addColorStop(1,'rgba(41,39,41,0)');
     }
-    ctx.globalAlpha = activity * (green ? .88 : .58);
-    ctx.fillStyle = field;
+    ctx.globalAlpha=activity*(green?.88:.58);
+    ctx.fillStyle=field;
     ctx.fillRect(0,0,width,height);
 
-    const trailRadius = reach * .58;
-    const trail = ctx.createRadialGradient(state.tailX,state.tailY,0,state.tailX,state.tailY,trailRadius);
+    const trailRadius=reach*.58;
+    const trail=ctx.createRadialGradient(state.tailX,state.tailY,0,state.tailX,state.tailY,trailRadius);
     if (green) {
       trail.addColorStop(0,'rgba(250,255,226,.34)');
       trail.addColorStop(.3,'rgba(216,234,181,.22)');
@@ -1340,44 +1383,34 @@ function draw(state) {
       trail.addColorStop(.48,'rgba(177,181,195,.08)');
       trail.addColorStop(1,'rgba(177,181,195,0)');
     }
-    ctx.globalAlpha = activity * (green ? .78 : .52);
-    ctx.fillStyle = trail;
+    ctx.globalAlpha=activity*(green?.78:.52);
+    ctx.fillStyle=trail;
     ctx.fillRect(0,0,width,height);
 
-    // Fine specular reflection gives the liquid contour depth.
-    const angle = Math.atan2(state.vy,state.vx);
-    const streak = clamp(Math.min(width,height) * .18,5,17);
+    // A narrow, polished reflection accelerates slightly with pointer speed.
+    const angle=Math.atan2(state.vy,state.vx);
+    const streak=clamp(Math.min(width,height)*(.18+Math.min(.06,Math.hypot(state.vx,state.vy)*.004)),5,20);
     ctx.save();
     ctx.translate(x-state.vx*1.5,y-state.vy*1.5);
     ctx.rotate(angle);
     ctx.beginPath();
     ctx.ellipse(0,0,streak*1.9,Math.max(1.5,streak*.19),0,0,Math.PI*2);
-    ctx.fillStyle = green
-      ? 'rgba(255,255,235,' + (activity*.34) + ')'
-      : 'rgba(255,245,241,' + (activity*.14) + ')';
+    const shine=ctx.createLinearGradient(-streak*2,0,streak*2,0);
+    shine.addColorStop(0,'rgba(255,255,255,0)');
+    shine.addColorStop(.36,green?'rgba(255,255,231,.12)':'rgba(255,245,241,.055)');
+    shine.addColorStop(.5,green?'rgba(255,255,245,.48)':'rgba(255,245,241,.2)');
+    shine.addColorStop(.64,green?'rgba(255,255,231,.12)':'rgba(255,245,241,.055)');
+    shine.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle=shine;
     ctx.fill();
     ctx.restore();
   }
 
   ctx.restore();
 
-  // On lime: a deep-forest contour remains visible against the bright fill.
-  ctx.save();
-  if (green) {
-    ctx.strokeStyle = 'rgba(17,45,25,' + (.38 + activity*.34) + ')';
-    ctx.lineWidth = 1.05;
-    ctx.stroke(path);
-    if (activity > .025) {
-      ctx.strokeStyle = 'rgba(255,255,232,' + (activity*.34) + ')';
-      ctx.lineWidth = .55;
-      ctx.stroke(path);
-    }
-  } else {
-    ctx.strokeStyle = 'rgba(245,239,241,' + (.10 + activity*.17) + ')';
-    ctx.lineWidth = .85;
-    ctx.stroke(path);
-  }
-  ctx.restore();
+  // Only the moving contact area receives a highlight. The idle perimeter
+  // is deliberately not stroked, removing the stray horizontal stripe.
+  drawLocalContourRim(ctx,contour.points,state,green);
 }
 
 function schedule() {
