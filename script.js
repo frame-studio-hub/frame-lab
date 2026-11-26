@@ -1102,7 +1102,7 @@
  * Every control owns its own pointer, contour, inertia and animation state.
  * No neighbouring-button blending and no fixed-size partial blob.
  */
-const SELECTOR = 'button,.header-contact,.start-button,#instagram-brief,.round-link,.service-brief-link';
+const SELECTOR = 'button:not(.project-orbit-node),.header-contact,.start-button,#instagram-brief,.round-link,.service-brief-link';
 const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const BASE = '#292729';
 const states = new WeakMap();
