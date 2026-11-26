@@ -3455,3 +3455,122 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 @media(prefers-reduced-motion:reduce){
   .project-orbit-node .orbit-node-surface{transition:none!important}
 }
+
+
+/* PRINT STUDIES / editorial exhibition pass */
+.visual-study-wall{
+  border-radius:4px;
+  border-color:rgba(208,231,204,.18);
+  background:
+    radial-gradient(ellipse at 50% 44%,rgba(154,197,133,.14),transparent 38%),
+    radial-gradient(ellipse at 8% 90%,rgba(199,255,66,.045),transparent 34%),
+    linear-gradient(132deg,#111a13 0%,#080d0a 56%,#101811 100%);
+  box-shadow:inset 0 1px rgba(255,255,255,.035),0 34px 100px rgba(0,0,0,.28);
+}
+.visual-study-wall:after{
+  content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.3;
+  background:radial-gradient(ellipse at 50% 100%,transparent 15%,rgba(0,0,0,.5) 100%);
+}
+.visual-study-deck{
+  gap:clamp(20px,3.6vw,58px);
+  padding-top:clamp(48px,6vw,82px);
+  padding-bottom:clamp(46px,5vw,72px);
+}
+.visual-print{
+  border-radius:2px;
+  box-shadow:0 32px 64px rgba(0,0,0,.36),0 2px 8px rgba(0,0,0,.2),inset 0 0 0 1px rgba(255,255,255,.12);
+  transition:transform .48s cubic-bezier(.2,.72,.2,1),box-shadow .48s cubic-bezier(.2,.72,.2,1),filter .4s;
+}
+.visual-print:before{
+  opacity:.12;
+  background-image:
+    radial-gradient(rgba(255,255,255,.5) .45px,transparent .8px),
+    linear-gradient(115deg,rgba(255,255,255,.13),transparent 35%,rgba(0,0,0,.08) 100%);
+  background-size:4px 4px,100% 100%;
+}
+.visual-print:after{
+  opacity:0;
+  background:
+    radial-gradient(ellipse at var(--print-shine-x,50%) var(--print-shine-y,50%),rgba(255,255,255,.3),transparent 38%),
+    linear-gradient(115deg,transparent 28%,rgba(255,255,255,.09) 48%,transparent 65%);
+  transition:opacity .45s;
+}
+.visual-print:hover,.visual-print:focus-within{
+  --print-lift:-8px;
+  box-shadow:0 42px 85px rgba(0,0,0,.48),0 0 38px rgba(199,255,66,.075),inset 0 0 0 1px rgba(255,255,255,.18);
+}
+.visual-print:hover:after{opacity:1}
+.visual-print-type{--print-rotate:-4.2deg;--print-lift:8px}
+.visual-print-matter{--print-rotate:1deg;--print-lift:-26px}
+.visual-print-signal{--print-rotate:3.8deg;--print-lift:11px}
+.visual-print-art{margin:14px 0 13px}
+.print-type-art{
+  background:
+    linear-gradient(90deg,transparent 0 49.7%,rgba(25,39,28,.09) 50%,transparent 50.3%),
+    linear-gradient(145deg,#f5f5ec 0%,#e1e5d9 54%,#c5cdbf 100%);
+}
+.print-type-art:after{
+  content:"";position:absolute;inset:8% 6%;border:1px solid rgba(31,48,34,.16);
+  pointer-events:none;
+}
+.print-type-main{
+  top:22%;font-size:clamp(43px,5.8vw,84px);
+  letter-spacing:-.105em;line-height:.76;
+  text-shadow:0 1px rgba(255,255,255,.45);
+}
+.print-type-index{font-size:clamp(29px,3vw,42px);font-style:italic}
+.print-type-glyph{
+  position:absolute;right:8%;top:43%;z-index:1;
+  color:rgba(44,63,46,.18);font:italic 500 clamp(35px,4vw,56px)/1 var(--serif);
+  transform:rotate(-12deg);letter-spacing:-.12em;
+}
+.print-type-glyph span{font:400 .5em var(--sans);vertical-align:middle}
+.print-matter-art{
+  background:
+    radial-gradient(ellipse at 51% 47%,rgba(168,223,170,.24),transparent 46%),
+    repeating-linear-gradient(0deg,transparent 0 29px,rgba(213,237,209,.035) 30px),
+    linear-gradient(150deg,#193426,#09120d 76%);
+}
+.matter-object{
+  width:40%;
+  background:radial-gradient(circle at 30% 23%,#f7fff0 0,#b6d1b5 5%,#64836b 19%,#15291c 49%,#050a07 68%,#c8dbc1 77%,#102017 88%);
+  box-shadow:inset -18px -22px 30px #030604,inset 5px 5px 14px rgba(255,255,255,.16),0 22px 44px rgba(0,0,0,.52),0 0 34px rgba(172,226,173,.12);
+}
+.matter-shard{
+  width:19%;left:65%;
+  background:linear-gradient(115deg,#f2ffe7 0%,#b4d4b2 24%,#52775d 56%,#172a1d 76%,#e4f1d8 100%);
+  filter:drop-shadow(10px 16px 14px rgba(0,0,0,.34)) drop-shadow(0 0 18px rgba(202,239,176,.22));
+}
+.matter-orbit{box-shadow:0 0 12px rgba(199,255,66,.055)}
+.matter-orbit-a{animation:printOrbitA 24s linear infinite}
+.matter-orbit-b{animation:printOrbitB 31s linear infinite}
+@keyframes printOrbitA{to{transform:translate(-50%,-50%) rotate(334deg)}}
+@keyframes printOrbitB{to{transform:translate(-50%,-50%) rotate(408deg)}}
+.print-signal-art{
+  background:
+    radial-gradient(circle at 68% 31%,rgba(250,255,239,.9),transparent 21%),
+    linear-gradient(145deg,#e2e5d8 0%,#b9c7b6 53%,#718879 100%);
+}
+.signal-sun{
+  width:39%;
+  background:radial-gradient(circle at 29% 25%,#fff 0,#e4edda 17%,#b2c8ae 39%,#637d69 72%,#273c2d 100%);
+  box-shadow:0 20px 42px rgba(23,39,29,.25),inset -9px -12px 20px rgba(23,39,29,.18);
+}
+.signal-wave{transform-origin:50% 50%;animation:signalDrift 12s ease-in-out infinite alternate}
+.signal-wave-b{animation-duration:16s;animation-direction:alternate-reverse}
+@keyframes signalDrift{from{transform:rotate(-22deg) translateY(-3%)}to{transform:rotate(-17deg) translateY(3%)}}
+.visual-study-heading>.mono{letter-spacing:.18em}
+.visual-study-heading p{max-width:410px}
+.visual-study-bottom{letter-spacing:.17em}
+@media(max-width:900px){
+  .visual-study-deck{gap:clamp(14px,2.5vw,26px)}
+  .visual-print-matter{--print-lift:-12px}
+}
+@media(max-width:650px){
+  .visual-study-deck{gap:16px}
+  .visual-print-matter{--print-lift:0px}
+  .matter-orbit-a,.matter-orbit-b,.signal-wave,.signal-wave-b{animation:none}
+}
+@media(prefers-reduced-motion:reduce){
+  .matter-orbit-a,.matter-orbit-b,.signal-wave,.signal-wave-b{animation:none!important}
+}
