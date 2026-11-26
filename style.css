@@ -2895,3 +2895,17 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 @media(prefers-reduced-motion:reduce){
   .liquid-cta>.liquid-canvas-layer{display:none!important}
 }
+
+
+/* FRAME LAB / FULL-SILHOUETTE LIQUID V32
+   The canvas now owns the visible fill and border; controls themselves are
+   transparent so the complete outer silhouette can deform as one surface. */
+.liquid-cta{
+  background-color:transparent!important;
+  background-image:none!important;
+  border-color:transparent!important;
+}
+.liquid-cta>.liquid-canvas-layer{
+  z-index:1!important;
+  overflow:visible!important;
+}
