@@ -3235,3 +3235,5 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .aether-coordinate{right:6%;bottom:14%;z-index:7}
 @media(max-width:900px){.aether-sculpture{width:min(72%,430px);top:56%}}
 @media(max-width:560px){.aether-sculpture{width:78%;top:57%}.aether-orbit-node{width:7px;height:7px}.aether-word{top:17%}}
+
+#work .project-card[data-scroll-paused="1"]{transform:none!important;transition:none!important}
