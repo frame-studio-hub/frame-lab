@@ -3180,3 +3180,36 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 @media(max-width:560px){.project-grid{grid-template-columns:1fr;gap:34px}.project-offset{margin-top:0}.project-wide{grid-column:auto;width:100%}.project-art,.project-wide .project-art{height:clamp(320px,92vw,430px)}.project-info{padding-top:13px}.project-info h3{font-size:18px}.nord-panel{inset:8% 11% 8% 8%;padding:18px}.nord-panel strong{font-size:clamp(54px,15vw,76px)}.nord-side{font-size:5px}.aether-orb{width:43%;left:42%;top:35%}.aether-word{top:17%;font-size:clamp(58px,15vw,82px)}.visual-print{width:100%;max-width:390px;aspect-ratio:.8}.visual-print-art{min-height:285px}.print-type-main{font-size:clamp(51px,14vw,70px)}.signal-word{font-size:clamp(42px,12vw,58px)}}
 @media(hover:none),(pointer:coarse){.project-card,.visual-print{transition:box-shadow .35s}.project-card:hover{transform:none}}
 @media(prefers-reduced-motion:reduce){.project-card,.visual-print{transition:none!important}}
+
+/* FIX — unified pointer tilt + stable internal geometry (all six cards) */
+#work .project-card{transform-style:preserve-3d;transform-origin:50% 50%;backface-visibility:hidden;will-change:transform;transition:transform .62s cubic-bezier(.16,1,.3,1),opacity .35s}
+#work .project-card .project-art{position:relative;transform-style:preserve-3d;backface-visibility:hidden;overflow:hidden}
+#work .project-card .project-art:before{background:radial-gradient(circle at var(--spot-x,50%) var(--spot-y,50%),rgba(246,255,239,.22),transparent 34%);transition:opacity .22s}
+#work .project-card:hover .project-art:before{opacity:1}
+#work .project-card .project-art>*{backface-visibility:hidden}
+/* Keep the 3D depth when ambient animations run; no layer may jump out of its anchor. */
+.art-aether .aether-orb{transform:translateZ(62px);animation:projectOrbStable 9s ease-in-out infinite}
+@keyframes projectOrbStable{0%,100%{transform:translate3d(0,0,62px) scale(1)}50%{transform:translate3d(0,-3px,62px) scale(1.045)}}
+.art-nord .nord-orb{transform:translateZ(58px);animation:nordOrbStable 12s ease-in-out infinite alternate}
+@keyframes nordOrbStable{from{transform:translate3d(0,0,58px) scale(1)}to{transform:translate3d(9px,-10px,58px) scale(1.045)}}
+.art-vanta .vanta-rings{transform:rotate(-25deg) translateZ(35px);transform-origin:50% 50%}
+.art-vanta .vanta-rings i{transform-origin:50% 50%;backface-visibility:hidden}
+.art-vanta .vanta-rings i:nth-child(1){animation:vantaRingOne 26s linear infinite}
+.art-vanta .vanta-rings i:nth-child(2){animation:vantaRingTwo 34s linear infinite}
+.art-vanta .vanta-rings i:nth-child(3){animation:vantaRingThree 42s linear infinite}
+@keyframes vantaRingOne{to{transform:rotate(360deg)}}@keyframes vantaRingTwo{to{transform:rotate(-360deg)}}@keyframes vantaRingThree{to{transform:rotate(360deg)}}
+.art-flux .flux-shape{transform:rotate(36deg) translateZ(58px);transform-origin:50% 50%;animation:fluxStable 12s ease-in-out infinite alternate}
+@keyframes fluxStable{to{transform:rotate(43deg) translate3d(-2%,2%,58px) scale(1.045);border-radius:54% 46% 52% 48%}}
+.art-object .object-stack{transform:rotate(-23deg) translateZ(55px);transform-origin:50% 50%;animation:objectStable 8s ease-in-out infinite}
+@keyframes objectStable{0%,100%{transform:rotate(-23deg) translate3d(0,0,55px)}50%{transform:rotate(-19deg) translate3d(0,-5px,55px)}}
+.art-sol .sol-sun{transform:translateZ(48px);animation:solStable 8s ease-in-out infinite alternate}
+@keyframes solStable{to{transform:translate3d(0,-5px,48px) scale(1.035)}}
+/* Orbital systems stay centered and contained inside their own artwork. */
+.art-aether .aether-geometry{inset:0;width:100%;height:100%;overflow:hidden;pointer-events:none}
+.art-vanta .vanta-rings{left:16.5%;top:17%;width:67%;height:67%;}
+.art-vanta .vanta-rings i{position:absolute;inset:0;border-radius:50%;}
+.art-vanta .vanta-rings i:nth-child(2){inset:10% -7%;}
+.art-vanta .vanta-rings i:nth-child(3){inset:-8% 8%;}
+.art-sol .sol-sun:after{inset:-14%;transform:rotate(-25deg) scaleY(.36);transform-origin:center}
+@media(hover:none),(pointer:coarse){#work .project-card{transform:none!important;transition:box-shadow .35s!important;will-change:auto}}
+@media(prefers-reduced-motion:reduce){#work .project-card{transition:none!important;will-change:auto}}
