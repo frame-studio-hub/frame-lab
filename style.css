@@ -2851,8 +2851,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 /* FRAME LAB / LIQUID CONTOUR V31 — complete per-control redraw. */
 .liquid-cta{
   isolation:isolate!important;
+  cursor:pointer;
   -webkit-tap-highlight-color:transparent;
-  background-color:transparent!important;
 }
 .liquid-cta>.liquid-canvas-layer{
   position:absolute!important;
