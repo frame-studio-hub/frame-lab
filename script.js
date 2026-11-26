@@ -287,6 +287,10 @@
       const active = i === orbitIndex;
       node.classList.toggle('is-current', active);
       node.setAttribute('aria-pressed', String(active));
+      if (!active) {
+        const surface = node.querySelector('.orbit-node-surface');
+        if (surface) { surface.style.transform = ''; surface.style.transition = 'transform 720ms cubic-bezier(.18,.72,.22,1)'; }
+      }
     });
     orbit?.querySelectorAll('.project-orbit-node.is-loop-clone').forEach(node => {
       const active = Number(node.dataset.project) === orbitIndex + 1;
@@ -334,10 +338,15 @@
     if (orbitSettleFrame) cancelAnimationFrame(orbitSettleFrame);
     stopOrbitMotion();
     const targetBase = (index % orbitNodes.length) * 60;
-    const delta = ((targetBase - orbitAngle + 540) % 360) - 180;
     const from = orbitAngle;
+    // Choose the nearest equivalent revolution. In particular, index 0 after
+    // index 5 must travel forward a few degrees, not backwards through 180°.
+    const candidates = [targetBase - 360, targetBase, targetBase + 360];
+    const targetAngle = candidates.reduce((best, value) =>
+      Math.abs(value - from) < Math.abs(best - from) ? value : best, candidates[0]);
+    const delta = targetAngle - from;
     const started = performance.now();
-    const duration = Math.max(900, Math.min(1650, 900 + Math.abs(delta) * 2.0));
+    const duration = Math.max(1050, Math.min(1900, 980 + Math.abs(delta) * 3.1));
     // Quintic smoothstep: zero velocity at both ends, with a gentle continuous handoff.
     const ease = t => t * t * t * (t * (t * 6 - 15) + 10);
     const step = now => {
@@ -448,14 +457,14 @@
       else stopOrbitMotion();
     };
     orbit.addEventListener('pointerover', event => {
-      if (!orbitDesktop.matches || orbitHoverLock) return;
+      if (!orbitDesktop.matches || orbitHoverLock || orbitDrag) return;
       const card = event.target.closest?.('.project-orbit-node');
       if (!card || !orbit.contains(card) || card.classList.contains('is-loop-clone')) return;
       if (card === hoveredOrbitCard) return;
       focusOrbitCard(card);
     });
     orbit.addEventListener('pointermove', event => {
-      if (!orbitDesktop.matches || !orbitHoverLock || orbitSettleFrame) return;
+      if (!orbitDesktop.matches || orbitDrag || !orbitHoverLock || orbitSettleFrame) return;
       const hit = document.elementFromPoint(event.clientX, event.clientY);
       const card = hit?.closest?.('.project-orbit-node');
       const nextCard = card && orbit.contains(card) && !card.classList.contains('is-loop-clone') ? card : null;
@@ -468,8 +477,48 @@
         resumeAfterCardLeave();
       }
     }, { passive:true });
+    // The centered cover borrows the same restrained pointer tilt as the
+    // project cards below. Side covers never tilt.
+    let deckTiltFrame = 0;
+    let deckTiltX = 0, deckTiltY = 0;
+    const clearDeckTilt = () => {
+      if (deckTiltFrame) cancelAnimationFrame(deckTiltFrame);
+      deckTiltFrame = 0;
+      orbitNodes.forEach(node => {
+        const surface = node.querySelector('.orbit-node-surface');
+        if (surface) {
+          surface.style.transform = '';
+          surface.style.transition = 'transform 720ms cubic-bezier(.18,.72,.22,1)';
+        }
+      });
+    };
+    const updateDeckTilt = event => {
+      if (!orbitDesktop.matches || orbitDrag || orbitSettleFrame) return;
+      const active = orbitNodes[orbitIndex];
+      if (!active || !active.matches(':hover')) { clearDeckTilt(); return; }
+      const rect = active.getBoundingClientRect();
+      const px = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
+      const py = Math.max(0, Math.min(1, (event.clientY - rect.top) / rect.height));
+      deckTiltY = (px - .5) * 8;
+      deckTiltX = (.5 - py) * 7;
+      if (deckTiltFrame) return;
+      deckTiltFrame = requestAnimationFrame(() => {
+        deckTiltFrame = 0;
+        const surface = active.querySelector('.orbit-node-surface');
+        if (!surface || active !== orbitNodes[orbitIndex] || orbitSettleFrame || orbitDrag) return;
+        surface.style.transition = 'transform 100ms cubic-bezier(.2,.72,.2,1)';
+        surface.style.transform = 'perspective(1100px) rotateX(' + deckTiltX.toFixed(2) + 'deg) rotateY(' + deckTiltY.toFixed(2) + 'deg) translateZ(8px)';
+      });
+    };
+    orbit.addEventListener('pointermove', updateDeckTilt, { passive:true });
+    orbit.addEventListener('pointerleave', clearDeckTilt);
+    orbitNodes.forEach(node => node.addEventListener('pointerenter', () => {
+      if (node !== orbitNodes[orbitIndex]) clearDeckTilt();
+    }, { passive:true }));
+
     // Ignore pointerout: the selected card intentionally moves away from the pointer.
     orbit.addEventListener('pointerleave', () => {
+      clearDeckTilt();
       orbit.style.setProperty('--orbit-light-x','50%');
       orbit.style.setProperty('--orbit-light-y','50%');
       hoveredOrbitCard = null;
@@ -495,7 +544,15 @@
     orbit.addEventListener('pointerdown', event => {
       if (!orbitDesktop.matches || event.button !== 0 || event.target.closest('a')) return;
       orbitDrag = { pointerId:event.pointerId, startX:event.clientX, startAngle:orbitAngle, targetAngle:orbitAngle, moved:false, frame:0 };
-      // Do not capture a click: capture begins only after a real drag threshold.
+      // A drag owns the interaction exclusively; hover/tilt must not start
+      // competing transitions while the pointer is captured.
+      hoveredOrbitCard = null;
+      orbitHoverLock = false;
+      clearDeckTilt();
+      if (orbitSettleFrame) cancelAnimationFrame(orbitSettleFrame);
+      orbitSettleFrame = 0;
+      if (orbitResumeTimer) window.clearTimeout(orbitResumeTimer);
+      orbitResumeTimer = 0;
       stopOrbitMotion();
     });
     orbit.addEventListener('pointermove', event => {
