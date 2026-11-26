@@ -329,8 +329,10 @@
     const delta = ((targetBase - orbitAngle + 540) % 360) - 180;
     const from = orbitAngle;
     const started = performance.now();
-    const duration = 980;
-    const ease = t => 1 - Math.pow(1 - t, 4);
+    const duration = 1280;
+    // Smooth, deliberate ease-in-out: the selected cover glides into the hero position
+    // without the sharp end-stop of the previous ease-out curve.
+    const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
     const step = now => {
       const t = Math.min(1, (now - started) / duration);
       renderOrbitAngle(from + delta * ease(t));
