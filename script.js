@@ -955,55 +955,46 @@
     window.addEventListener('scroll', () => {
       pageIsScrolling = true;
       tiltCards.forEach(card => {
-        card.dataset.scrollPaused = '1';
-        card.style.transition = 'transform 760ms cubic-bezier(.18,.72,.22,1), opacity .35s';
-        card.style.transform = '';
-      });
-      window.clearTimeout(scrollIdleTimer);
-      scrollIdleTimer = window.setTimeout(() => {
-        pageIsScrolling = false;
-        tiltCards.forEach(card => {
-          delete card.dataset.scrollPaused;
-          if (card.matches(':hover') && card.dataset.pointerInside === '1') {
-            card.style.transition = 'transform 720ms cubic-bezier(.2,.8,.2,1), opacity .35s';
-            card.dispatchEvent(new Event('frame:tilt-resume'));
-          }
-        });
-      }, 170);
-    }, { passive: true });
-
-    tiltCards.forEach(card => {
+      // Keep the article itself stationary as the pointer hit-area. Only the
+      // artwork plane tilts; transforming the hit-area caused edge leave/enter
+      // oscillation, which looked like violent shaking at the card corners.
+      const art = card.querySelector('.project-art');
+      if (!art) return;
       let frame = 0, pointerX = 0, pointerY = 0, pointerInside = false;
-      let currentX = 0, currentY = 0, targetX = 0, targetY = 0;
-      const applyTilt = () => {
+      let currentX = 0, currentY = 0, targetX = 0, targetY = 0, lastFrameTime = 0;
+      const applyTilt = now => {
         frame = 0;
-        if (pageIsScrolling) return;
+        if (pageIsScrolling) { lastFrameTime = 0; return; }
         if (pointerInside) {
           const rect = card.getBoundingClientRect();
           const px = Math.max(0, Math.min(1, (pointerX - rect.left) / rect.width));
           const py = Math.max(0, Math.min(1, (pointerY - rect.top) / rect.height));
-          // Lower angular travel and ease toward the pointer instead of snapping
-          // directly to the new angle at the edge of the card.
-          targetY = (px - .5) * 7;
-          targetX = (.5 - py) * 6;
-          const art = card.querySelector('.project-art');
-          if (art) {
-            art.style.setProperty('--spot-x', (px * 100).toFixed(1) + '%');
-            art.style.setProperty('--spot-y', (py * 100).toFixed(1) + '%');
-          }
+          // Soft saturation near the edges avoids a sudden angular jump when
+          // the pointer reaches the very last few pixels of the card.
+          const soft = value => {
+            const centered = (value - .5) * 2;
+            return Math.sign(centered) * (1 - Math.exp(-Math.abs(centered) * .72)) / (1 - Math.exp(-.72));
+          };
+          targetY = soft(px) * 4.2;
+          targetX = -soft(py) * 3.6;
+          art.style.setProperty('--spot-x', (px * 100).toFixed(1) + '%');
+          art.style.setProperty('--spot-y', (py * 100).toFixed(1) + '%');
         } else {
           targetX = 0;
           targetY = 0;
         }
-        // Frame-rate-independent exponential smoothing. The card eases through
-        // every intermediate angle, including abrupt pointer changes at corners.
-        const ease = 0.14;
+        const dt = lastFrameTime ? Math.min(40, now - lastFrameTime) : 16.7;
+        lastFrameTime = now;
+        // Time-based damping is consistent at 60/120/144 Hz.
+        const ease = 1 - Math.exp(-dt / (pointerInside ? 210 : 290));
         currentX += (targetX - currentX) * ease;
         currentY += (targetY - currentY) * ease;
-        card.style.transition = 'none';
-        card.style.transform = `perspective(1200px) rotateX(${currentX.toFixed(3)}deg) rotateY(${currentY.toFixed(3)}deg) translateY(${pointerInside ? -5 : 0}px)`;
-        if (Math.abs(targetX - currentX) > .015 || Math.abs(targetY - currentY) > .015) {
+        art.style.transition = 'none';
+        art.style.transform = `perspective(1500px) rotateX(${currentX.toFixed(3)}deg) rotateY(${currentY.toFixed(3)}deg)`;
+        if (Math.abs(targetX - currentX) > .008 || Math.abs(targetY - currentY) > .008) {
           frame = requestAnimationFrame(applyTilt);
+        } else {
+          lastFrameTime = 0;
         }
       };
       const scheduleTilt = () => {
@@ -1023,13 +1014,10 @@
         pointerInside = false; delete card.dataset.pointerInside;
         targetX = 0; targetY = 0;
         if (!frame && !pageIsScrolling) frame = requestAnimationFrame(applyTilt);
-        const art = card.querySelector('.project-art');
-        if (art) {
-          art.style.setProperty('--spot-x', '50%');
-          art.style.setProperty('--spot-y', '50%');
-        }
+        art.style.setProperty('--spot-x', '50%');
+        art.style.setProperty('--spot-y', '50%');
       });
-    });
+    });;
   }
 
   // Print archive: pointer-led paper cards, coalesced to one animation frame.
