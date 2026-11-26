@@ -1175,43 +1175,7 @@ function fillOf(el,state) {
     ? state.originalBackgroundColor : BASE;
 }
 
-function isGreenSurface(el) {
-  // Inspect the control and its visible inner surfaces too (project cards,
-  // cards with green artwork, and buttons whose fill is defined on a child).
-  const nodes = [el, ...Array.from(el.querySelectorAll('*')).slice(0,36)];
-  for (const node of nodes) {
-    const style = getComputedStyle(node);
-    const sources = [
-      style.backgroundColor,
-      style.backgroundImage,
-      style.getPropertyValue('--liquid-fill')
-    ];
-
-    for (const source of sources) {
-      if (!source) continue;
-      const colors = source.matchAll(/rgba?\(([^)]+)\)/gi);
-      for (const match of colors) {
-        const channels = match[1].match(/[\d.]+/g);
-        if (!channels || channels.length < 3) continue;
-        const r = Number(channels[0]), g = Number(channels[1]), b = Number(channels[2]);
-        // Include muted olive, sage and moss; exclude neutral grey.
-        if (g > 84 && g >= r * 1.055 && g >= b * 1.12) return true;
-      }
-      const hexes = source.matchAll(/#([0-9a-f]{6})\b/gi);
-      for (const match of hexes) {
-        const value = parseInt(match[1],16);
-        const r = value >> 16, g = (value >> 8) & 255, b = value & 255;
-        if (g > 84 && g >= r * 1.055 && g >= b * 1.12) return true;
-      }
-    }
-  }
-
-  return el.matches(
-    '.filter-btn.active,.project-view-btn.active,.material-btn.active,' +
-    '.planner-next:not(.planner-back),.round-link:hover,.modal-close:hover,' +
-    '.header-contact:hover,.start-button:hover'
-  );
-}
+function isGreenSurface() { return false; }
 
 function resize(state) {
   const width = Math.max(1, state.el.clientWidth || state.el.offsetWidth || 1);
