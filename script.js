@@ -1204,19 +1204,40 @@ function draw(state) {
   ctx.fillStyle = pool;
   ctx.fillRect(0, 0, width, height);
 
-  // A softer delayed lobe gives the surface a viscous response without
-  // connecting to any other control.
-  const tailRadius = reach * (.48 + speed * .12);
-  const tail = ctx.createRadialGradient(tx, ty, 0, tx, ty, tailRadius);
-  tail.addColorStop(0, 'rgba(228,238,207,.12)');
-  tail.addColorStop(.42, 'rgba(199,255,66,.055)');
-  tail.addColorStop(1, 'rgba(199,255,66,0)');
-  ctx.globalAlpha = power * .72;
-  ctx.fillStyle = tail;
-  ctx.fillRect(0, 0, width, height);
+  // One contained, softly deforming liquid lens follows the pointer.
+  // Its outline breathes locally; it never touches neighbouring controls.
+  const angle = Math.atan2(y - ty, x - tx);
+  const minSide = Math.min(width, height);
+  const blobX = clamp(Math.min(width * .35, minSide * .95), 12, 62) * (1 + speed * .18);
+  const blobY = clamp(Math.min(height * .46, minSide * .5), 8, 34) * (1 - speed * .12);
+  ctx.save();
+  ctx.translate(x - state.vx * 1.1, y - state.vy * 1.1);
+  ctx.rotate(angle);
+  ctx.beginPath();
+  const blobPoints = 72;
+  for (let i = 0; i < blobPoints; i++) {
+    const a = i / blobPoints * Math.PI * 2;
+    const wave = 1 + Math.sin(a * 3 + state.phase) * .055 + Math.cos(a * 5 - state.phase * 1.2) * .03;
+    const px = Math.cos(a) * blobX * wave;
+    const py = Math.sin(a) * blobY * (1 + Math.sin(a * 4 + state.phase * .8) * .04);
+    if (i === 0) ctx.moveTo(px, py);
+    else ctx.lineTo(px, py);
+  }
+  ctx.closePath();
+  const lens = ctx.createRadialGradient(-blobX * .22, -blobY * .28, 1, 0, 0, Math.max(blobX, blobY) * 1.42);
+  lens.addColorStop(0, 'rgba(255,255,248,.19)');
+  lens.addColorStop(.34, 'rgba(222,236,193,.13)');
+  lens.addColorStop(.72, 'rgba(199,255,66,.075)');
+  lens.addColorStop(1, 'rgba(199,255,66,0)');
+  ctx.globalAlpha = power * .78;
+  ctx.fillStyle = lens;
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(243,249,232,' + (power * .14) + ')';
+  ctx.lineWidth = .75;
+  ctx.stroke();
+  ctx.restore();
 
-  // Small moving specular highlight — a lens, not a travelling blob.
-  const angle = Math.atan2(state.vy, state.vx);
+  // A narrow specular streak completes the liquid lens.
   const streak = Math.min(width, height) * (.13 + speed * .045);
   ctx.save();
   ctx.translate(x - state.vx * 1.5, y - state.vy * 1.5);
@@ -1261,6 +1282,7 @@ function render(time) {
     state.vx = lerp(state.vx, state.x - oldX, .24);
     state.vy = lerp(state.vy, state.y - oldY, .24);
     state.power = lerp(state.power, target, (active ? .22 : .115) * dt);
+    state.phase += (active ? .038 : .02) * dt;
 
     if (active || state.power > .002) {
       draw(state);
@@ -1304,7 +1326,7 @@ function init(el) {
   const state = {
     el, canvas, ctx, width: 0, height: 0, dpr: DPR,
     x: 0, y: 0, targetX: 0, targetY: 0, tailX: 0, tailY: 0,
-    vx: 0, vy: 0, power: 0,
+    vx: 0, vy: 0, power: 0, phase: 0,
     hover: false, focused: false, pressed: false, wasVisible: false
   };
   states.set(el, state);
