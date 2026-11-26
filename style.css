@@ -2908,3 +2908,19 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
   z-index:1!important;
   overflow:visible!important;
 }
+
+
+/* FRAME LAB / NO GREEN BUTTON STATES */
+.filter-btn.active,.filter-btn:hover,
+.project-view-btn.active,.project-view-btn:hover,
+.material-btn.active,.material-btn:hover,
+.planner-next,.planner-next:hover,
+.round-link:hover,.modal-close:hover,
+.header-contact:hover,.start-button,.start-button:hover {
+ background:rgba(157,132,194,.14)!important;
+ border-color:rgba(190,166,222,.58)!important;
+ color:#eee5fa!important;
+ box-shadow:0 8px 26px rgba(117,86,157,.12)!important;
+}
+.material-btn.active:before{color:#c6a9ed!important}
+.header-contact span,.header-contact.liquid-cta .liquid-arrow,.start-button b{color:#d5c0f0!important}
