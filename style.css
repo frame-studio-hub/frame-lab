@@ -3237,3 +3237,102 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 @media(max-width:560px){.aether-sculpture{width:78%;top:57%}.aether-orbit-node{width:7px;height:7px}.aether-word{top:17%}}
 
 #work .project-card[data-scroll-paused="1"]{transform:none!important;transition:none!important}
+
+
+/* AETHER / art-directed orbital instrument — clean geometry, shared center */
+.art-aether{
+  background:
+    radial-gradient(ellipse at 67% 55%,rgba(125,157,119,.18),transparent 32%),
+    radial-gradient(ellipse at 25% 25%,rgba(199,255,66,.035),transparent 42%),
+    linear-gradient(135deg,#18221b 0%,#0e1711 54%,#080d09 100%);
+}
+.art-aether:before{
+  inset:4.5%;border:1px solid rgba(221,236,216,.15);
+  background:linear-gradient(90deg,transparent 49.96%,rgba(226,239,220,.045) 50%,transparent 50.04%);
+}
+.aether-word{
+  left:6.2%;top:15%;z-index:8;
+  font-size:clamp(48px,7vw,102px);line-height:.82;
+  letter-spacing:-.105em;color:#eef1e5;
+  text-shadow:0 8px 34px rgba(230,255,229,.08);
+}
+.aether-sculpture{
+  position:absolute;z-index:4;left:65%;top:56%;
+  width:min(55%,490px);aspect-ratio:1;
+  transform:translate(-50%,-50%);
+  transform-style:preserve-3d;pointer-events:none;
+  isolation:isolate;
+}
+.aether-orb{
+  position:absolute!important;left:29%!important;top:29%!important;
+  width:42%!important;aspect-ratio:1;z-index:4;border-radius:50%;
+  background:
+    radial-gradient(circle at 29% 22%,rgba(255,255,255,.98) 0 1.2%,rgba(233,241,229,.96) 3%,rgba(154,173,153,.9) 8%,rgba(74,95,77,.95) 18%,rgba(27,41,30,.98) 36%,rgba(5,10,7,1) 61%,rgba(12,19,13,1) 72%,rgba(109,128,106,.95) 84%,rgba(13,20,14,1) 100%)!important;
+  box-shadow:inset -24px -28px 45px rgba(0,0,0,.92),inset 9px 8px 17px rgba(255,255,255,.58),0 28px 58px rgba(0,0,0,.58),0 0 38px rgba(190,220,183,.10)!important;
+  transform:translateZ(34px)!important;animation:aetherSphereFloat 7.5s ease-in-out infinite!important;
+}
+.aether-orb:after{
+  content:"";position:absolute;inset:0;border-radius:50%;
+  background:radial-gradient(ellipse at 30% 20%,rgba(255,255,255,.23),transparent 28%,transparent 60%,rgba(0,0,0,.22) 100%);
+  mix-blend-mode:screen;
+}
+.aether-orbit{
+  position:absolute;left:50%;top:50%;display:block;
+  border-radius:50%;transform-style:preserve-3d;
+  transform-origin:50% 50%;pointer-events:none;
+}
+.aether-orbit-back{
+  width:100%;height:43%;
+  border:1px solid rgba(199,255,66,.66);
+  box-shadow:0 0 15px rgba(199,255,66,.08);
+  animation:aetherOrbitBack 22s linear infinite;
+}
+.aether-orbit-front{
+  width:77%;height:112%;
+  border:1.5px solid rgba(218,230,214,.78);
+  box-shadow:0 0 14px rgba(218,230,214,.08),inset 0 0 10px rgba(218,230,214,.04);
+  animation:aetherOrbitFront 28s linear infinite;
+}
+.aether-satellite{
+  position:absolute;display:block;width:11px;height:11px;
+  left:50%;top:-5.5px;border-radius:50%;
+  background:radial-gradient(circle at 30% 25%,#fff 0 8%,#e4ffad 22%,#c7ff42 48%,#617e24 100%);
+  box-shadow:0 0 8px rgba(199,255,66,.85),0 0 22px rgba(199,255,66,.34);
+}
+.aether-satellite-light{
+  width:7px;height:7px;top:auto;bottom:-3.5px;left:22%;
+  background:radial-gradient(circle at 30% 25%,#fff,#dce8d8 35%,#788879 100%);
+  box-shadow:0 0 12px rgba(224,238,220,.55);
+}
+.aether-geometry{display:none!important}
+.aether-coordinate{
+  right:6%;bottom:14%;z-index:8;
+  font:7px var(--mono);letter-spacing:.16em;color:#b7c3b1;
+}
+.aether-coordinate i{font-style:normal;color:var(--lime);padding:0 5px}
+.art-aether .art-label{left:6%;bottom:7%;z-index:8;letter-spacing:.2em}
+@keyframes aetherOrbitBack{
+  from{transform:translate(-50%,-50%) rotate(-28deg)}
+  to{transform:translate(-50%,-50%) rotate(332deg)}
+}
+@keyframes aetherOrbitFront{
+  from{transform:translate(-50%,-50%) rotate(52deg)}
+  to{transform:translate(-50%,-50%) rotate(412deg)}
+}
+@keyframes aetherSphereFloat{
+  0%,100%{transform:translate3d(0,0,34px) scale(1)}
+  50%{transform:translate3d(0,-7px,34px) scale(1.018)}
+}
+@media(max-width:900px){
+  .aether-sculpture{left:65%;top:58%;width:min(61%,440px)}
+  .aether-word{top:16%;font-size:clamp(54px,11vw,90px)}
+}
+@media(max-width:560px){
+  .aether-sculpture{left:51%;top:59%;width:78%}
+  .aether-word{left:7%;top:14%;font-size:clamp(48px,14vw,76px)}
+  .aether-orbit-front{height:105%}
+  .aether-satellite{width:8px;height:8px;top:-4px}
+}
+@media(prefers-reduced-motion:reduce){
+  .aether-orbit-back,.aether-orbit-front,.aether-orb{animation:none!important}
+}
