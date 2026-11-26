@@ -877,14 +877,36 @@
   window.addEventListener('scroll', updateHeaderState, { passive: true });
   updateHeaderState();
 
-  // One shared premium corner-tilt controller for all six portfolio cards.
-  // Same response curve and intensity on every card; RAF keeps motion smooth.
+  // Pointer tilt pauses while the page is scrolling and resumes only after it settles.
   if (window.matchMedia('(hover: hover) and (pointer: fine)').matches && !reduceMotion) {
     const tiltCards = Array.from(document.querySelectorAll('#work .project-card'));
+    let pageIsScrolling = false;
+    let scrollIdleTimer = 0;
+    window.addEventListener('scroll', () => {
+      pageIsScrolling = true;
+      tiltCards.forEach(card => {
+        card.dataset.scrollPaused = '1';
+        card.style.transition = 'transform 760ms cubic-bezier(.18,.72,.22,1), opacity .35s';
+        card.style.transform = '';
+      });
+      window.clearTimeout(scrollIdleTimer);
+      scrollIdleTimer = window.setTimeout(() => {
+        pageIsScrolling = false;
+        tiltCards.forEach(card => {
+          delete card.dataset.scrollPaused;
+          if (card.matches(':hover') && card.dataset.pointerInside === '1') {
+            card.style.transition = 'transform 720ms cubic-bezier(.2,.8,.2,1), opacity .35s';
+            card.dispatchEvent(new Event('frame:tilt-resume'));
+          }
+        });
+      }, 170);
+    }, { passive: true });
+
     tiltCards.forEach(card => {
-      let frame = 0, pointerX = 0, pointerY = 0, active = false;
+      let frame = 0, pointerX = 0, pointerY = 0, pointerInside = false;
       const applyTilt = () => {
         frame = 0;
+        if (pageIsScrolling || !pointerInside) return;
         const rect = card.getBoundingClientRect();
         const px = Math.max(0, Math.min(1, (pointerX - rect.left) / rect.width));
         const py = Math.max(0, Math.min(1, (pointerY - rect.top) / rect.height));
@@ -896,24 +918,31 @@
         if (art) {
           art.style.setProperty('--spot-x', (px * 100).toFixed(1) + '%');
           art.style.setProperty('--spot-y', (py * 100).toFixed(1) + '%');
-          art.style.setProperty('--tilt-glow', (Math.max(Math.abs(px - .5), Math.abs(py - .5)) * 100).toFixed(1) + '%');
         }
       };
-      card.addEventListener('pointermove', event => {
-        pointerX = event.clientX; pointerY = event.clientY; active = true;
-        if (!frame) frame = requestAnimationFrame(applyTilt);
+      const scheduleTilt = () => {
+        if (!frame && !pageIsScrolling && pointerInside) frame = requestAnimationFrame(applyTilt);
+      };
+      card.addEventListener('pointerenter', event => {
+        pointerInside = true; card.dataset.pointerInside = '1';
+        pointerX = event.clientX; pointerY = event.clientY;
+        scheduleTilt();
       }, { passive: true });
+      card.addEventListener('pointermove', event => {
+        pointerX = event.clientX; pointerY = event.clientY;
+        if (!pageIsScrolling) scheduleTilt();
+      }, { passive: true });
+      card.addEventListener('frame:tilt-resume', scheduleTilt);
       card.addEventListener('pointerleave', () => {
-        active = false;
+        pointerInside = false; delete card.dataset.pointerInside;
         if (frame) cancelAnimationFrame(frame);
         frame = 0;
-        card.style.transition = 'transform 620ms cubic-bezier(.16,1,.3,1), opacity .35s';
+        card.style.transition = 'transform 760ms cubic-bezier(.18,.72,.22,1), opacity .35s';
         card.style.transform = '';
         const art = card.querySelector('.project-art');
         if (art) {
           art.style.setProperty('--spot-x', '50%');
           art.style.setProperty('--spot-y', '50%');
-          art.style.removeProperty('--tilt-glow');
         }
       });
     });
