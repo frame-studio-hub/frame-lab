@@ -1039,33 +1039,67 @@
     });
   }
 
-  // Print archive: pointer-led paper cards, coalesced to one animation frame.
+  // Print archive: smooth spring-like paper motion with stable pointer bounds.
   if (window.matchMedia('(hover: hover) and (pointer: fine)').matches && !reduceMotion && !lowPower) {
     $$('[data-print-card]').forEach(card => {
-      let frame = 0, px = 0, py = 0;
+      let pointerInside = false, pointerX = .5, pointerY = .5;
+      let targetX = 0, targetY = 0, currentX = 0, currentY = 0;
+      let shineX = 50, shineY = 50, targetShineX = 50, targetShineY = 50;
+      let frame = 0, lastTime = 0;
+      const art = card.querySelector('.visual-print-art');
+      const animate = now => {
+        frame = 0;
+        const dt = lastTime ? Math.min(40, now - lastTime) : 16.7;
+        lastTime = now;
+        // Time-based damping gives the same calm response on 60–144 Hz screens.
+        const ease = 1 - Math.exp(-dt / (pointerInside ? 190 : 310));
+        currentX += (targetX - currentX) * ease;
+        currentY += (targetY - currentY) * ease;
+        shineX += (targetShineX - shineX) * ease;
+        shineY += (targetShineY - shineY) * ease;
+        card.style.setProperty('--print-rotate-x', currentX.toFixed(3) + 'deg');
+        card.style.setProperty('--print-rotate-y', currentY.toFixed(3) + 'deg');
+        card.style.setProperty('--print-shine-x', shineX.toFixed(2) + '%');
+        card.style.setProperty('--print-shine-y', shineY.toFixed(2) + '%');
+        if (Math.abs(targetX-currentX)>.008 || Math.abs(targetY-currentY)>.008 ||
+            Math.abs(targetShineX-shineX)>.04 || Math.abs(targetShineY-shineY)>.04) {
+          frame = requestAnimationFrame(animate);
+        } else {
+          lastTime = 0;
+        }
+      };
+      const schedule = () => { if (!frame) frame = requestAnimationFrame(animate); };
+      card.addEventListener('pointerenter', event => {
+        pointerInside = true;
+        const rect = card.getBoundingClientRect();
+        pointerX = Math.max(0,Math.min(1,(event.clientX-rect.left)/rect.width));
+        pointerY = Math.max(0,Math.min(1,(event.clientY-rect.top)/rect.height));
+        targetY = (pointerX-.5)*5.2;
+        targetX = (.5-pointerY)*4.2;
+        targetShineX = pointerX*100;
+        targetShineY = pointerY*100;
+        schedule();
+      }, {passive:true});
       card.addEventListener('pointermove', event => {
         const rect = card.getBoundingClientRect();
-        px = (event.clientX - rect.left) / rect.width - .5;
-        py = (event.clientY - rect.top) / rect.height - .5;
-        if (frame) return;
-        frame = requestAnimationFrame(() => {
-          card.style.setProperty('--print-rotate-x', (py * -3.5).toFixed(2) + 'deg');
-          card.style.setProperty('--print-rotate-y', (px * 4.5).toFixed(2) + 'deg');
-          card.style.setProperty('--print-shine-x', ((px + .5) * 100).toFixed(1) + '%');
-          card.style.setProperty('--print-shine-y', ((py + .5) * 100).toFixed(1) + '%');
-          frame = 0;
-        });
-      }, { passive:true });
+        pointerX = Math.max(0,Math.min(1,(event.clientX-rect.left)/rect.width));
+        pointerY = Math.max(0,Math.min(1,(event.clientY-rect.top)/rect.height));
+        // A soft edge curve prevents a sudden snap in the final few pixels.
+        const soft = v => Math.sign(v)*(1-Math.exp(-Math.abs(v)*.78))/(1-Math.exp(-.78));
+        targetY = soft((pointerX-.5)*2)*4.4;
+        targetX = -soft((pointerY-.5)*2)*3.6;
+        targetShineX = pointerX*100;
+        targetShineY = pointerY*100;
+        schedule();
+      }, {passive:true});
       card.addEventListener('pointerleave', () => {
-        cancelAnimationFrame(frame); frame = 0;
-        card.style.setProperty('--print-rotate-x','0deg');
-        card.style.setProperty('--print-rotate-y','0deg');
-        card.style.setProperty('--print-shine-x','50%');
-        card.style.setProperty('--print-shine-y','50%');
+        pointerInside = false;
+        targetX = 0; targetY = 0;
+        targetShineX = 50; targetShineY = 50;
+        schedule();
       });
     });
   }
-
 
   // Micro-detail pointer lighting for UI surfaces. Values are coalesced into one frame.
   if (!coarsePointer && !reduceMotion && !lowPower) {
