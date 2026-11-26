@@ -1149,6 +1149,19 @@ function isTransparent(color) {
   return values.length >= 4 && Number(values[3]) <= .01;
 }
 
+function refreshNativeStyle(state) {
+  const el=state.el;
+  // Temporarily remove only the engine class so authored hover/active/selected
+  // styles can be read without the engine's transparent-paint override.
+  el.classList.remove('liquid-cta');
+  const style=getComputedStyle(el);
+  state.originalBackgroundColor=style.backgroundColor;
+  state.originalBackgroundImage=style.backgroundImage;
+  state.originalBorderColor=style.borderTopColor;
+  state.originalBorderWidth=Math.max(1,parseFloat(style.borderTopWidth)||1);
+  state.originalLiquidFill=style.getPropertyValue('--liquid-fill').trim();
+  el.classList.add('liquid-cta');
+}
 function fillOf(el,state) {
   const custom = state.originalLiquidFill;
   if (custom) return custom;
@@ -1298,58 +1311,6 @@ function contourFor(state) {
   return {path:smoothContour(result),points:result};
 }
 
-function drawLocalContourRim(ctx,points,state,green) {
-  if (state.activity < .045 || points.length < 24) return;
-
-  // Find the nearest contour point, then draw a compact curved reflection.
-  // The arc is intentionally local: no full-width edge stroke or bottom stripe.
-  let nearestIndex=0, nearestDistance=Infinity;
-  for(let i=0;i<points.length;i++){
-    const dx=points[i].x-state.x,dy=points[i].y-state.y;
-    const d=dx*dx+dy*dy;
-    if(d<nearestDistance){nearestDistance=d;nearestIndex=i;}
-  }
-
-  const span=clamp(Math.round(points.length*.026),4,9);
-  const arc=[];
-  for(let offset=-span;offset<=span;offset++){
-    arc.push(points[(nearestIndex+offset+points.length)%points.length]);
-  }
-  if(arc.length<3)return;
-
-  const speed=Math.min(1,Math.hypot(state.vx,state.vy)/12);
-  const alpha=state.activity*(green?.66:.52);
-  ctx.save();
-  ctx.beginPath();
-  ctx.moveTo(arc[0].x,arc[0].y);
-  for(let i=1;i<arc.length-1;i++){
-    const midX=(arc[i].x+arc[i+1].x)*.5;
-    const midY=(arc[i].y+arc[i+1].y)*.5;
-    ctx.quadraticCurveTo(arc[i].x,arc[i].y,midX,midY);
-  }
-  const last=arc[arc.length-1];
-  ctx.lineTo(last.x,last.y);
-  ctx.lineCap='round';
-  ctx.lineJoin='round';
-  ctx.lineWidth=green?1.35+speed*.45:1.15+speed*.35;
-  ctx.shadowBlur=green?9:7;
-  ctx.shadowColor=green?'rgba(199,164,255,.48)':'rgba(205,177,255,.42)';
-  ctx.strokeStyle=green
-    ? 'rgba(248,255,229,'+alpha+')'
-    : 'rgba(250,239,242,'+alpha+')';
-  ctx.stroke();
-
-  // A tiny specular point gives the contour a glass-like finish without a stripe.
-  const mid=arc[Math.floor(arc.length*.5)];
-  const dot=ctx.createRadialGradient(mid.x,mid.y,0,mid.x,mid.y,green?5.5:4.5);
-  dot.addColorStop(0,green?'rgba(244,232,255,'+(alpha*.72)+')':'rgba(248,239,255,'+(alpha*.68)+')');
-  dot.addColorStop(1,'rgba(255,255,255,0)');
-  ctx.fillStyle=dot;
-  ctx.beginPath();
-  ctx.arc(mid.x,mid.y,green?5.5:4.5,0,Math.PI*2);
-  ctx.fill();
-  ctx.restore();
-}
 function draw(state) {
   const {ctx,canvas,width,height,dpr,activity} = state;
   if (width < 2 || height < 2) return;
@@ -1362,16 +1323,6 @@ function draw(state) {
   const fill = fillOf(state.el,state);
   ctx.fillStyle = fill;
   ctx.fill(path);
-
-  // Draw the actual button boundary from the same deformed path as its fill.
-  // The old CSS rectangle is made transparent, so the whole control—not an
-  // inner glow inside a static button—now follows the liquid contour.
-  ctx.save();
-  ctx.strokeStyle = state.originalBorderColor || 'rgba(255,255,255,.16)';
-  ctx.lineWidth = state.originalBorderWidth;
-  ctx.lineJoin = 'round';
-  ctx.stroke(path);
-  ctx.restore();
 
   const green = isGreenSurface(state.el);
   ctx.save();
@@ -1422,9 +1373,6 @@ function draw(state) {
 
   ctx.restore();
 
-  // Only the moving contact area receives a highlight. The idle perimeter
-  // is deliberately not stroked, removing the stray horizontal stripe.
-  drawLocalContourRim(ctx,contour.points,state,green);
 }
 
 function schedule() {
@@ -1532,6 +1480,7 @@ function init(el) {
   },{passive:true});
   el.addEventListener('pointerleave',()=>{
     state.hover=false;
+    state.pressed=false;
     schedule();
   },{passive:true});
   el.addEventListener('pointerdown',event=>{
@@ -1540,7 +1489,7 @@ function init(el) {
     schedule();
   },{passive:true});
   el.addEventListener('focusin',()=>{
-    state.focused=true;
+    state.focused=el.matches(':focus-visible');
     state.targetX=state.width*.5;
     state.targetY=state.height*.5;
     schedule();
@@ -1583,7 +1532,21 @@ const observer=new MutationObserver(records=>{
     });
   });
 });
-observer.observe(document.body,{childList:true,subtree:true});
+observer.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class','aria-pressed','aria-selected','data-state']});
+const visualStateObserver=new MutationObserver(records=>{
+  const touched=new Set();
+  records.forEach(record=>{
+    const state=states.get(record.target);
+    if(state)touched.add(state);
+  });
+  touched.forEach(state=>{
+    refreshNativeStyle(state);
+    state.needsDraw=true;
+    if(state.hover || state.pressed || state.focused) schedule();
+    else draw(state);
+  });
+});
+visualStateObserver.observe(document.body,{subtree:true,attributes:true,attributeFilter:['class','aria-pressed','aria-selected','data-state']});
 
 document.addEventListener('pointerup',()=>{
   items.forEach(state=>{
