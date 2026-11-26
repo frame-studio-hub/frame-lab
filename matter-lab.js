@@ -25,9 +25,9 @@ function makeRibbonGeometry(pathFn,width=.3,twist=2.2,steps=260,sides=28){
   for(let j=0;j<=sides;j++){
    const v=j/sides*2-1,angle=v*Math.PI*.5+u*Math.PI*twist;
    const w=width*(.78+.22*Math.cos(u*Math.PI*6));
-   const offset=side.multiplyScalar(0); // keep frame vectors immutable for this sample
-   const point=p.clone().addScaledVector(frameAt(u).side,Math.sin(angle)*w*v*.18)
-    .addScaledVector(frameAt(u).normal,Math.cos(angle)*w*.62*v)
+   const frame=frameAt(u);
+   const point=p.clone().addScaledVector(frame.side,Math.sin(angle)*w*v*.18)
+    .addScaledVector(frame.normal,Math.cos(angle)*w*.62*v)
     .addScaledVector(frameAt(u).normal,Math.sin(u*Math.PI*8+v*2)*.045);
    positions.push(point.x,point.y,point.z);uvs.push(u,j/sides);
   }
@@ -140,12 +140,12 @@ function init(canvas){
  const env=new THREE.PMREMGenerator(renderer);scene.environment=env.fromScene(new RoomEnvironment(),.04).texture;env.dispose();
  const object=kind==="aether"?createAether():kind==="membrane"?createVeil():createVector();scene.add(object);
  const particles=dust();scene.add(particles);
- const state={canvas,renderer,scene,camera,object,particles,visible:false,kind,playing:!reducedMotion,time:0,px:0,py:0,tx:0,ty:0,dragging:false,lastX:0,lastY:0,base:new THREE.Euler(0,0,0),speed:1};
+ const state={canvas,renderer,scene,camera,object,particles,visible:false,kind,playing:!reducedMotion,time:0,px:0,py:0,tx:0,ty:0,dragging:false,lastX:0,lastY:0,dragX:0,dragY:0,speed:1};
  const resize=()=>{const r=canvas.getBoundingClientRect(),w=Math.max(1,Math.floor(r.width)),h=Math.max(1,Math.floor(r.height));renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();};
  const ro=new ResizeObserver(resize);ro.observe(canvas);resize();
  canvas.addEventListener("pointerdown",e=>{if(e.button!==0)return;state.dragging=true;state.lastX=e.clientX;state.lastY=e.clientY;canvas.setPointerCapture?.(e.pointerId);});
  canvas.addEventListener("pointermove",e=>{
-  if(state.dragging){const dx=e.clientX-state.lastX,dy=e.clientY-state.lastY;state.object.rotation.y+=dx*.008;state.object.rotation.x+=dy*.008;state.lastX=e.clientX;state.lastY=e.clientY;}
+  if(state.dragging){const dx=e.clientX-state.lastX,dy=e.clientY-state.lastY;state.dragY+=dx*.008;state.dragX+=dy*.008;state.lastX=e.clientX;state.lastY=e.clientY;}
   else{const r=canvas.getBoundingClientRect();state.tx=((e.clientX-r.left)/r.width-.5)*.28;state.ty=((e.clientY-r.top)/r.height-.5)*.22;}
  },{passive:true});
  const release=()=>{state.dragging=false;state.tx=0;state.ty=0;};canvas.addEventListener("pointerup",release);canvas.addEventListener("pointercancel",release);canvas.addEventListener("lostpointercapture",release);
@@ -165,8 +165,9 @@ cards.forEach(card=>{
  card.querySelector(".matter-select")?.addEventListener("click",()=>selectCard(card));
  const state=scenes.find(s=>s.canvas===card.querySelector("canvas"));
  const toggle=card.querySelector("[data-motion-toggle]");
+ if(state&&toggle)toggle.textContent=state.playing?"PAUSE MOTION":"PLAY MOTION";
  toggle?.addEventListener("click",()=>{if(!state)return;state.playing=!state.playing;toggle.textContent=state.playing?"PAUSE MOTION":"PLAY MOTION";toggle.setAttribute("aria-pressed",String(!state.playing));});
- card.querySelector("[data-view-reset]")?.addEventListener("click",()=>{if(!state)return;state.object.rotation.set(0,0,0);state.tx=state.ty=state.px=state.py=0;state.camera.position.set(0,0,state.kind==="aether"?4.05:4.25);state.camera.lookAt(0,0,0);});
+ card.querySelector("[data-view-reset]")?.addEventListener("click",()=>{if(!state)return;state.object.rotation.set(0,0,0);state.dragX=state.dragY=0;state.tx=state.ty=state.px=state.py=0;state.camera.position.set(0,0,state.kind==="aether"?4.05:4.25);state.camera.lookAt(0,0,0);});
 });
 document.querySelector("#matter-reset")?.addEventListener("click",()=>{cards.forEach(c=>c.classList.remove("is-selected"));grid.classList.remove("has-selection");resizeAll();});
 function animateObject(s,dt){
@@ -180,9 +181,11 @@ function render(now){
  const dt=Math.min(.04,(now-last)/1000||0);last=now;
  for(const s of scenes){
   if(!s.visible)continue;
-  if(s.playing&&!reducedMotion){s.time+=dt;s.particles.rotation.y=-s.time*.012;animateObject(s,dt);}
+  if(s.playing){s.time+=dt;s.particles.rotation.y=-s.time*.012;animateObject(s,dt);}
   s.px+=(s.tx-s.px)*.055;s.py+=(s.ty-s.py)*.055;
-  if(!s.dragging){s.object.rotation.y+=s.px*.012;s.object.rotation.x+=(s.py-s.object.rotation.x)*.018;}
+  s.object.rotation.y=s.time*(s.kind==="aether"?.105:.075)+s.dragY+s.px*.045;
+  s.object.rotation.x=Math.sin(s.time*.22)*.055+s.dragX+s.py*.04;
+  s.object.rotation.z=Math.sin(s.time*.16)*.025;
   s.renderer.render(s.scene,s.camera);
  }
  requestAnimationFrame(render);
