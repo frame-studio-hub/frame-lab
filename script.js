@@ -1494,6 +1494,7 @@ function init(el) {
   const ctx = canvas.getContext('2d',{alpha:true,desynchronized:true});
   if (!ctx) {
     canvas.remove();
+    el.classList.remove('liquid-cta');
     el.classList.add('liquid-fallback');
     return;
   }
