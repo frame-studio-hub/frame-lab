@@ -1093,21 +1093,23 @@
 )();
 
 
+
 (() => {
 'use strict';
 
 /*
- * FRAME LAB — independent liquid surface.
- * One pointer field per control: no neighbour search, no bridges, no shared
- * coordinates. The light remains clipped to the control's own shape.
+ * FRAME LAB — closed-contour liquid surface.
+ * Every control owns its own pointer, contour, inertia and animation state.
+ * No neighbouring-button blending and no fixed-size partial blob.
  */
 const SELECTOR = 'button,[role="button"],.header-contact,.start-button,#instagram-brief,.round-link,.service-brief-link';
 const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const DPR = Math.min(window.devicePixelRatio || 1, 1.5);
+const BASE = '#292729';
 const states = new WeakMap();
 const items = new Set();
 let raf = 0;
-let lastFrame = 0;
+let previousFrame = 0;
+let resizeObserver = null;
 
 const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
 const lerp = (a, b, t) => a + (b - a) * t;
@@ -1121,138 +1123,197 @@ function wrapDirectText(el) {
     el.replaceChild(span, node);
   });
 }
-function elevateChildren(el) {
+
+function liftContent(el) {
   Array.from(el.children).forEach(child => {
+    if (child.classList.contains('liquid-canvas-layer')) return;
     if (getComputedStyle(child).position === 'static') child.style.position = 'relative';
     child.style.zIndex = '2';
   });
 }
 
-function getRadius(el, width, height) {
-  const value = getComputedStyle(el).borderTopLeftRadius || '0px';
-  const min = Math.min(width, height);
-  if (value.includes('%')) return clamp(parseFloat(value) / 100 * min, 0, min * .5);
-  return clamp(parseFloat(value) || 0, 0, min * .5);
+function radiusOf(el, width, height) {
+  const raw = getComputedStyle(el).borderTopLeftRadius || '0px';
+  const minSide = Math.min(width, height);
+  const radius = raw.includes('%')
+    ? parseFloat(raw) / 100 * minSide
+    : parseFloat(raw);
+  return clamp(Number.isFinite(radius) ? radius : 0, 0, minSide * .5);
 }
 
-function roundedPath(ctx, width, height, radius) {
-  const x = .5, y = .5, w = Math.max(1, width - 1), h = Math.max(1, height - 1);
-  const r = clamp(radius, 0, Math.min(w, h) * .5);
-  ctx.beginPath();
-  if (typeof ctx.roundRect === 'function') {
-    ctx.roundRect(x, y, w, h, r);
-  } else {
-    ctx.moveTo(x + r, y);
-    ctx.lineTo(x + w - r, y);
-    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-    ctx.lineTo(x + w, y + h - r);
-    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-    ctx.lineTo(x + r, y + h);
-    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-    ctx.lineTo(x, y + r);
-    ctx.quadraticCurveTo(x, y, x + r, y);
-  }
-  ctx.closePath();
+function isTransparent(color) {
+  if (!color || color === 'transparent') return true;
+  const match = color.match(/rgba?\(([^)]+)\)/i);
+  if (!match) return false;
+  const values = match[1].split(/[,\s/]+/).filter(Boolean);
+  return values.length >= 4 && Number(values[3]) <= .01;
+}
+
+function fillOf(el) {
+  const style = getComputedStyle(el);
+  const custom = style.getPropertyValue('--liquid-fill').trim();
+  if (custom) return custom;
+  if (style.backgroundImage && style.backgroundImage !== 'none') return 'transparent';
+  if (!isTransparent(style.backgroundColor)) return style.backgroundColor;
+  if (el.matches('.project-card,.project-index-row,.process-step,.lab-button')) return 'transparent';
+  return BASE;
 }
 
 function resize(state) {
   const width = Math.max(1, state.el.clientWidth || state.el.offsetWidth || 1);
   const height = Math.max(1, state.el.clientHeight || state.el.offsetHeight || 1);
-  if (Math.abs(width - state.width) < .25 && Math.abs(height - state.height) < .25) return;
+  const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+  if (Math.abs(width - state.width) < .25 &&
+      Math.abs(height - state.height) < .25 &&
+      Math.abs(dpr - state.dpr) < .01) return;
+
   state.width = width;
   state.height = height;
-  state.dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-  state.canvas.width = Math.max(1, Math.round(width * state.dpr));
-  state.canvas.height = Math.max(1, Math.round(height * state.dpr));
-  state.ctx.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);
+  state.dpr = dpr;
+  state.canvas.width = Math.max(1, Math.round(width * dpr));
+  state.canvas.height = Math.max(1, Math.round(height * dpr));
+  state.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
 
-function setPointer(state, event) {
-  const rect = state.el.getBoundingClientRect();
-  if (rect.width < 1 || rect.height < 1) return;
-  state.targetX = clamp((event.clientX - rect.left) / rect.width * state.width, 0, state.width);
-  state.targetY = clamp((event.clientY - rect.top) / rect.height * state.height, 0, state.height);
+function roundedRectContour(width, height, radius, count) {
+  const r = clamp(radius, 0, Math.min(width, height) * .5);
+  const horizontal = Math.max(0, width - r * 2);
+  const vertical = Math.max(0, height - r * 2);
+  const quarter = Math.PI * r * .5;
+
+  const segments = [
+    {length:horizontal, point:t=>({x:r+t,y:0,nx:0,ny:-1})},
+    {length:quarter, point:t=>{const a=-Math.PI*.5+t/Math.max(r,1e-4);return {x:width-r+r*Math.cos(a),y:r+r*Math.sin(a),nx:Math.cos(a),ny:Math.sin(a)}}},
+    {length:vertical, point:t=>({x:width,y:r+t,nx:1,ny:0})},
+    {length:quarter, point:t=>{const a=t/Math.max(r,1e-4);return {x:width-r+r*Math.cos(a),y:height-r+r*Math.sin(a),nx:Math.cos(a),ny:Math.sin(a)}}},
+    {length:horizontal, point:t=>({x:width-r-t,y:height,nx:0,ny:1})},
+    {length:quarter, point:t=>{const a=Math.PI*.5+t/Math.max(r,1e-4);return {x:r+r*Math.cos(a),y:height-r+r*Math.sin(a),nx:Math.cos(a),ny:Math.sin(a)}}},
+    {length:vertical, point:t=>({x:0,y:height-r-t,nx:-1,ny:0})},
+    {length:quarter, point:t=>{const a=Math.PI+t/Math.max(r,1e-4);return {x:r+r*Math.cos(a),y:r+r*Math.sin(a),nx:Math.cos(a),ny:Math.sin(a)}}}
+  ].filter(segment => segment.length > .001);
+
+  const perimeter = segments.reduce((sum, segment) => sum + segment.length, 0);
+  const points = [];
+  for (let i = 0; i < count; i++) {
+    let distance = perimeter * i / count;
+    let selected = segments[segments.length - 1];
+    for (const segment of segments) {
+      if (distance <= segment.length) { selected = segment; break; }
+      distance -= segment.length;
+    }
+    points.push(selected.point(distance));
+  }
+  return points;
+}
+
+function smoothContour(points) {
+  const first = points[0], last = points[points.length - 1];
+  const path = new Path2D();
+  path.moveTo((last.x + first.x) * .5, (last.y + first.y) * .5);
+  for (let i = 0; i < points.length; i++) {
+    const a = points[i], b = points[(i + 1) % points.length];
+    path.quadraticCurveTo(a.x, a.y, (a.x + b.x) * .5, (a.y + b.y) * .5);
+  }
+  path.closePath();
+  return path;
+}
+
+function contourFor(state) {
+  const {width, height, activity} = state;
+  const radius = radiusOf(state.el, width, height);
+  const minSide = Math.max(1, Math.min(width, height));
+  const count = clamp(Math.round((width + height) * .75), 84, 190);
+  const base = roundedRectContour(width, height, radius, count);
+  const reach = clamp(minSide * 1.18, 34, 78);
+  const amplitude = Math.min(8.5, minSide * .13);
+  const speed = Math.min(1, Math.hypot(state.vx, state.vy) / 15);
+  const phase = state.phase;
+  const result = [];
+
+  base.forEach((point, index) => {
+    const dx = point.x - state.x, dy = point.y - state.y;
+    const distance = Math.hypot(dx, dy);
+    const influence = Math.exp(-Math.pow(distance / reach, 2));
+    const tailDistance = Math.hypot(point.x - state.tailX, point.y - state.tailY);
+    const tail = Math.exp(-Math.pow(tailDistance / (reach * .72), 2));
+    const angle = index / count * Math.PI * 2;
+    const wave = Math.sin(angle * 7 + phase) * .32 + Math.cos(angle * 11 - phase) * .18;
+    const pull = activity * (
+      influence * amplitude * (.78 + speed * .18) +
+      tail * amplitude * .17 +
+      wave * influence * .72
+    );
+    const shear = activity * influence * Math.sin(angle * 5 + phase) * Math.min(1.25, amplitude * .17);
+    const x = point.x - point.nx * pull - point.ny * shear;
+    const y = point.y - point.ny * pull + point.nx * shear;
+    result.push({
+      x:clamp(x,.55,Math.max(.55,width-.55)),
+      y:clamp(y,.55,Math.max(.55,height-.55))
+    });
+  });
+  return smoothContour(result);
 }
 
 function draw(state) {
-  const {ctx, canvas, width, height, dpr, power} = state;
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  if (power < .002 || width < 2 || height < 2) return;
+  const {ctx,canvas,width,height,dpr,activity} = state;
+  if (width < 2 || height < 2) return;
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.setTransform(dpr,0,0,dpr,0,0);
 
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  const radius = getRadius(state.el, width, height);
-  const x = clamp(state.x, 0, width);
-  const y = clamp(state.y, 0, height);
-  const tx = clamp(state.tailX, 0, width);
-  const ty = clamp(state.tailY, 0, height);
-  const speed = Math.min(1, Math.hypot(state.vx, state.vy) / 18);
-  const reach = clamp(Math.min(width, height) * 1.15, 42, 112);
-
-  ctx.save();
-  roundedPath(ctx, width, height, radius);
-  ctx.clip();
-
-  // Main translucent pool: pale graphite, restrained studio-lime reflection.
-  const pool = ctx.createRadialGradient(x - state.vx * 1.2, y - state.vy * 1.2, 1, x, y, reach);
-  pool.addColorStop(0, 'rgba(248,250,239,.19)');
-  pool.addColorStop(.19, 'rgba(213,229,179,.15)');
-  pool.addColorStop(.46, 'rgba(199,255,66,.085)');
-  pool.addColorStop(.76, 'rgba(165,190,130,.035)');
-  pool.addColorStop(1, 'rgba(165,190,130,0)');
-  ctx.globalAlpha = power * .88;
-  ctx.fillStyle = pool;
-  ctx.fillRect(0, 0, width, height);
-
-  // One contained, softly deforming liquid lens follows the pointer.
-  // Its outline breathes locally; it never touches neighbouring controls.
-  const angle = Math.atan2(y - ty, x - tx);
-  const minSide = Math.min(width, height);
-  const blobX = clamp(Math.min(width * .35, minSide * .95), 12, 62) * (1 + speed * .18);
-  const blobY = clamp(Math.min(height * .46, minSide * .5), 8, 34) * (1 - speed * .12);
-  ctx.save();
-  ctx.translate(x - state.vx * 1.1, y - state.vy * 1.1);
-  ctx.rotate(angle);
-  ctx.beginPath();
-  const blobPoints = 72;
-  for (let i = 0; i < blobPoints; i++) {
-    const a = i / blobPoints * Math.PI * 2;
-    const wave = 1 + Math.sin(a * 3 + state.phase) * .055 + Math.cos(a * 5 - state.phase * 1.2) * .03;
-    const px = Math.cos(a) * blobX * wave;
-    const py = Math.sin(a) * blobY * (1 + Math.sin(a * 4 + state.phase * .8) * .04);
-    if (i === 0) ctx.moveTo(px, py);
-    else ctx.lineTo(px, py);
+  const path = contourFor(state);
+  const fill = fillOf(state.el);
+  if (fill !== 'transparent') {
+    ctx.fillStyle = fill;
+    ctx.fill(path);
   }
-  ctx.closePath();
-  const lens = ctx.createRadialGradient(-blobX * .22, -blobY * .28, 1, 0, 0, Math.max(blobX, blobY) * 1.42);
-  lens.addColorStop(0, 'rgba(255,255,248,.19)');
-  lens.addColorStop(.34, 'rgba(222,236,193,.13)');
-  lens.addColorStop(.72, 'rgba(199,255,66,.075)');
-  lens.addColorStop(1, 'rgba(199,255,66,0)');
-  ctx.globalAlpha = power * .78;
-  ctx.fillStyle = lens;
-  ctx.fill();
-  ctx.strokeStyle = 'rgba(243,249,232,' + (power * .14) + ')';
-  ctx.lineWidth = .75;
-  ctx.stroke();
-  ctx.restore();
 
-  // A narrow specular streak completes the liquid lens.
-  const streak = Math.min(width, height) * (.13 + speed * .045);
   ctx.save();
-  ctx.translate(x - state.vx * 1.5, y - state.vy * 1.5);
-  ctx.rotate(angle);
-  ctx.beginPath();
-  ctx.ellipse(0, 0, streak * 1.8, Math.max(2, streak * .22), 0, 0, Math.PI * 2);
-  ctx.fillStyle = 'rgba(255,255,247,' + (power * (.055 + speed * .025)) + ')';
-  ctx.fill();
+  ctx.clip(path);
+
+  // Soft liquid field follows the pointer, clipped to the complete button.
+  if (activity > .001) {
+    const x = clamp(state.x,0,width), y = clamp(state.y,0,height);
+    const reach = clamp(Math.min(width,height) * 1.12,44,116);
+    const field = ctx.createRadialGradient(x-11,y-9,1,x,y,reach);
+    field.addColorStop(0,'rgba(238,210,213,.62)');
+    field.addColorStop(.18,'rgba(204,190,203,.48)');
+    field.addColorStop(.42,'rgba(151,159,177,.28)');
+    field.addColorStop(.7,'rgba(106,122,143,.12)');
+    field.addColorStop(1,'rgba(41,39,41,0)');
+    ctx.globalAlpha = activity * .58;
+    ctx.fillStyle = field;
+    ctx.fillRect(0,0,width,height);
+
+    const trailRadius = reach * .58;
+    const trail = ctx.createRadialGradient(state.tailX,state.tailY,0,state.tailX,state.tailY,trailRadius);
+    trail.addColorStop(0,'rgba(239,224,225,.15)');
+    trail.addColorStop(.48,'rgba(177,181,195,.08)');
+    trail.addColorStop(1,'rgba(177,181,195,0)');
+    ctx.globalAlpha = activity * .52;
+    ctx.fillStyle = trail;
+    ctx.fillRect(0,0,width,height);
+
+    // Fine specular reflection gives the liquid contour depth.
+    const angle = Math.atan2(state.vy,state.vx);
+    const streak = clamp(Math.min(width,height) * .18,5,17);
+    ctx.save();
+    ctx.translate(x-state.vx*1.5,y-state.vy*1.5);
+    ctx.rotate(angle);
+    ctx.beginPath();
+    ctx.ellipse(0,0,streak*1.9,Math.max(1.5,streak*.19),0,0,Math.PI*2);
+    ctx.fillStyle = 'rgba(255,245,241,' + (activity*.14) + ')';
+    ctx.fill();
+    ctx.restore();
+  }
+
   ctx.restore();
 
-  // A quiet inner rim gives the highlight a finished glass-surface edge.
-  roundedPath(ctx, width, height, radius);
-  ctx.strokeStyle = 'rgba(232,241,216,' + (power * .105) + ')';
-  ctx.lineWidth = .8;
-  ctx.stroke();
+  // The full perimeter is always closed and redrawn on every frame.
+  ctx.save();
+  ctx.strokeStyle = 'rgba(245,239,241,' + (.10 + activity*.17) + ')';
+  ctx.lineWidth = .85;
+  ctx.stroke(path);
   ctx.restore();
 }
 
@@ -1262,9 +1323,9 @@ function schedule() {
 
 function render(time) {
   raf = 0;
-  const dt = clamp((lastFrame ? time - lastFrame : 16.67) / 16.67, .45, 2.4);
-  lastFrame = time;
-  let running = false;
+  const dt = clamp((previousFrame ? (time-previousFrame)/16.67 : 1),.45,2.4);
+  previousFrame = time;
+  let active = false;
 
   items.forEach(state => {
     if (!state.el.isConnected) {
@@ -1272,39 +1333,36 @@ function render(time) {
       return;
     }
     resize(state);
-    const active = state.hover || state.focused || state.pressed;
-    const target = active ? 1 : 0;
+    const engaged = state.hover || state.focused || state.pressed;
+    const target = engaged ? 1 : 0;
     const oldX = state.x, oldY = state.y;
-    state.x = lerp(state.x, state.targetX, (active ? .27 : .16) * dt);
-    state.y = lerp(state.y, state.targetY, (active ? .27 : .16) * dt);
-    state.tailX = lerp(state.tailX, state.x, .105 * dt);
-    state.tailY = lerp(state.tailY, state.y, .105 * dt);
-    state.vx = lerp(state.vx, state.x - oldX, .24);
-    state.vy = lerp(state.vy, state.y - oldY, .24);
-    state.power = lerp(state.power, target, (active ? .22 : .115) * dt);
-    state.phase += (active ? .038 : .02) * dt;
+    state.x = lerp(state.x,state.targetX,(engaged?.24:.14)*dt);
+    state.y = lerp(state.y,state.targetY,(engaged?.24:.14)*dt);
+    state.tailX = lerp(state.tailX,state.x,.075*dt);
+    state.tailY = lerp(state.tailY,state.y,.075*dt);
+    state.vx = lerp(state.vx,(state.x-oldX)/Math.max(.45,dt),.25);
+    state.vy = lerp(state.vy,(state.y-oldY)/Math.max(.45,dt),.25);
+    state.activity = lerp(state.activity,target,(engaged?.24:.12)*dt);
+    state.phase += (engaged?.055:.024)*dt;
 
-    if (active || state.power > .002) {
+    if (engaged || state.activity > .002 || state.needsDraw) {
       draw(state);
-      running = true;
-    } else if (state.wasVisible) {
-      draw(state);
-      state.wasVisible = false;
+      state.needsDraw = false;
     }
-    if (active || state.power > .002) state.wasVisible = true;
+    if (engaged || state.activity > .002) active = true;
   });
 
-  if (running && !document.hidden) raf = requestAnimationFrame(render);
-  else lastFrame = 0;
+  if (active && !document.hidden) raf = requestAnimationFrame(render);
+  else previousFrame = 0;
 }
 
 function init(el) {
   if (!(el instanceof Element) || states.has(el)) return;
 
-  // Cloned carousel controls may carry a copied canvas and data attribute.
-  el.querySelectorAll(':scope > canvas.liquid-canvas-layer').forEach(node => node.remove());
+  // Orbit clones can copy the old canvas. Remove only that copied layer.
+  el.querySelectorAll(':scope > canvas.liquid-canvas-layer').forEach(node=>node.remove());
   wrapDirectText(el);
-  elevateChildren(el);
+  liftContent(el);
   if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
 
   el.classList.add('liquid-cta');
@@ -1312,11 +1370,10 @@ function init(el) {
 
   const canvas = document.createElement('canvas');
   canvas.className = 'liquid-canvas-layer';
-  canvas.setAttribute('aria-hidden', 'true');
-  canvas.setAttribute('tabindex', '-1');
+  canvas.setAttribute('aria-hidden','true');
   el.prepend(canvas);
 
-  const ctx = canvas.getContext('2d', {alpha: true, desynchronized: true});
+  const ctx = canvas.getContext('2d',{alpha:true,desynchronized:true});
   if (!ctx) {
     canvas.remove();
     el.classList.add('liquid-fallback');
@@ -1324,111 +1381,111 @@ function init(el) {
   }
 
   const state = {
-    el, canvas, ctx, width: 0, height: 0, dpr: DPR,
-    x: 0, y: 0, targetX: 0, targetY: 0, tailX: 0, tailY: 0,
-    vx: 0, vy: 0, power: 0, phase: 0,
-    hover: false, focused: false, pressed: false, wasVisible: false
+    el,canvas,ctx,width:0,height:0,dpr:1,
+    x:0,y:0,targetX:0,targetY:0,tailX:0,tailY:0,
+    vx:0,vy:0,activity:0,phase:0,
+    hover:false,focused:false,pressed:false,needsDraw:true
   };
-  states.set(el, state);
+  states.set(el,state);
   items.add(state);
   resize(state);
-  state.x = state.targetX = state.tailX = state.width * .5;
-  state.y = state.targetY = state.tailY = state.height * .5;
+  state.x=state.targetX=state.tailX=state.width*.5;
+  state.y=state.targetY=state.tailY=state.height*.5;
+  draw(state);
+  if (resizeObserver) resizeObserver.observe(el);
 
-  el.addEventListener('pointerenter', event => {
+  el.addEventListener('pointerenter',event=>{
     if (event.pointerType === 'touch') return;
-    state.hover = true;
-    setPointer(state, event);
+    state.hover=true;
+    updatePointer(state,event);
     schedule();
-  }, {passive: true});
-  el.addEventListener('pointermove', event => {
+  },{passive:true});
+  el.addEventListener('pointermove',event=>{
     if (event.pointerType === 'touch' && !state.pressed) return;
-    setPointer(state, event);
-    if (event.pointerType !== 'touch') state.hover = true;
+    updatePointer(state,event);
+    if (event.pointerType !== 'touch') state.hover=true;
     schedule();
-  }, {passive: true});
-  el.addEventListener('pointerleave', () => {
-    state.hover = false;
+  },{passive:true});
+  el.addEventListener('pointerleave',()=>{
+    state.hover=false;
     schedule();
-  }, {passive: true});
-  el.addEventListener('pointerdown', event => {
-    if (event.pointerType === 'touch') setPointer(state, event);
-    state.pressed = true;
+  },{passive:true});
+  el.addEventListener('pointerdown',event=>{
+    updatePointer(state,event);
+    state.pressed=true;
     schedule();
-  }, {passive: true});
-  el.addEventListener('focusin', () => {
-    state.focused = true;
-    state.targetX = state.width * .5;
-    state.targetY = state.height * .5;
+  },{passive:true});
+  el.addEventListener('focusin',()=>{
+    state.focused=true;
+    state.targetX=state.width*.5;
+    state.targetY=state.height*.5;
     schedule();
   });
-  el.addEventListener('focusout', event => {
+  el.addEventListener('focusout',event=>{
     if (event.relatedTarget && el.contains(event.relatedTarget)) return;
-    state.focused = false;
+    state.focused=false;
     schedule();
   });
 }
 
+function updatePointer(state,event) {
+  const rect=state.el.getBoundingClientRect();
+  state.targetX=clamp((event.clientX-rect.left)/Math.max(1,rect.width)*state.width,0,state.width);
+  state.targetY=clamp((event.clientY-rect.top)/Math.max(1,rect.height)*state.height,0,state.height);
+}
+
 document.querySelectorAll(SELECTOR).forEach(init);
 
-const observer = new MutationObserver(records => {
-  records.forEach(record => {
-    record.addedNodes.forEach(node => {
+if ('ResizeObserver' in window) {
+  resizeObserver = new ResizeObserver(entries=>{
+    entries.forEach(entry=>{
+      const state=states.get(entry.target);
+      if (!state) return;
+      resize(state);
+      state.needsDraw=true;
+      if (state.hover || state.focused || state.pressed) schedule();
+      else draw(state);
+    });
+  });
+  items.forEach(state=>resizeObserver.observe(state.el));
+}
+
+const observer=new MutationObserver(records=>{
+  records.forEach(record=>{
+    record.addedNodes.forEach(node=>{
       if (!(node instanceof Element)) return;
       if (node.matches(SELECTOR)) init(node);
       node.querySelectorAll(SELECTOR).forEach(init);
     });
   });
 });
-observer.observe(document.body, {childList: true, subtree: true});
+observer.observe(document.body,{childList:true,subtree:true});
 
-if ('ResizeObserver' in window) {
-  const resizeObserver = new ResizeObserver(entries => {
-    entries.forEach(entry => {
-      const state = states.get(entry.target);
-      if (!state) return;
-      resize(state);
-      if (state.power > .002) schedule();
-    });
-  });
-  items.forEach(state => resizeObserver.observe(state.el));
-  const mutationResizeObserver = new MutationObserver(records => {
-    records.forEach(record => record.addedNodes.forEach(node => {
-      if (!(node instanceof Element)) return;
-      if (states.has(node)) resizeObserver.observe(node);
-      node.querySelectorAll(SELECTOR).forEach(el => {
-        if (states.has(el)) resizeObserver.observe(el);
-      });
-    }));
-  });
-  mutationResizeObserver.observe(document.body, {childList: true, subtree: true});
-}
-
-document.addEventListener('pointerup', () => {
-  items.forEach(state => {
+document.addEventListener('pointerup',()=>{
+  items.forEach(state=>{
     if (state.pressed) {
-      state.pressed = false;
+      state.pressed=false;
       schedule();
     }
   });
-}, true);
-document.addEventListener('pointercancel', () => {
-  items.forEach(state => {
+},true);
+document.addEventListener('pointercancel',()=>{
+  items.forEach(state=>{
     if (state.pressed) {
-      state.pressed = false;
+      state.pressed=false;
       schedule();
     }
   });
-}, true);
-document.addEventListener('visibilitychange', () => {
+},true);
+document.addEventListener('visibilitychange',()=>{
   if (!document.hidden) return;
   if (raf) cancelAnimationFrame(raf);
-  raf = 0;
-  lastFrame = 0;
-  items.forEach(state => {
-    state.hover = false;
-    state.pressed = false;
-    state.power = 0;
+  raf=0;
+  previousFrame=0;
+  items.forEach(state=>{
+    state.hover=false;
+    state.pressed=false;
+    state.activity=0;
     draw(state);
   });
 });
