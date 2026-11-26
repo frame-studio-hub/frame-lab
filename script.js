@@ -1489,6 +1489,7 @@ function init(el) {
   el.addEventListener('pointerdown',event=>{
     updatePointer(state,event);
     state.pressed=true;
+    refreshNativeStyle(state);
     schedule();
   },{passive:true});
   el.addEventListener('focusin',()=>{
