@@ -3213,3 +3213,25 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .art-sol .sol-sun:after{inset:-14%;transform:rotate(-25deg) scaleY(.36);transform-origin:center}
 @media(hover:none),(pointer:coarse){#work .project-card{transform:none!important;transition:box-shadow .35s!important;will-change:auto}}
 @media(prefers-reduced-motion:reduce){#work .project-card{transition:none!important;will-change:auto}}
+
+/* AETHER / 001 — centered machined armillary sculpture */
+.art-aether{background:radial-gradient(ellipse at 51% 53%,rgba(151,183,151,.18),transparent 37%),linear-gradient(145deg,#1a241c 0%,#101711 52%,#080c09 100%)}
+.art-aether:before{inset:5%;border-color:rgba(221,236,216,.13);background:linear-gradient(90deg,transparent 49.92%,rgba(226,239,220,.065) 50%,transparent 50.08%),linear-gradient(0deg,transparent 49.92%,rgba(226,239,220,.065) 50%,transparent 50.08%)}
+.aether-sculpture{position:absolute;z-index:3;left:50%;top:55%;width:min(66%,440px);aspect-ratio:1;transform:translate(-50%,-50%);transform-style:preserve-3d;pointer-events:none}
+.aether-orb{position:absolute!important;width:43%!important;aspect-ratio:1;left:28.5%!important;top:28.5%!important;z-index:4;border-radius:50%;background:radial-gradient(circle at 29% 20%,#fff 0,#e9eee4 2.5%,#b8c4b5 7%,#6c7d6d 14%,#344537 27%,#101912 48%,#050906 59%,#829482 68%,#dce6d8 72%,#526453 80%,#0a100b 100%)!important;box-shadow:inset -24px -28px 44px rgba(0,0,0,.88),inset 8px 7px 18px rgba(255,255,255,.82),0 26px 55px rgba(0,0,0,.62),0 0 48px rgba(198,229,193,.17)!important;transform:translateZ(32px)!important;animation:none!important}
+.aether-orb:after{content:"";position:absolute;inset:12%;border-radius:50%;background:radial-gradient(circle at 28% 20%,rgba(255,255,255,.28),transparent 28%);mix-blend-mode:screen}
+.aether-orbit{position:absolute;left:50%;top:50%;border-radius:50%;transform-style:preserve-3d;pointer-events:none}
+.aether-orbit-back{width:94%;height:36%;border:1px solid rgba(210,230,210,.62);transform:translate(-50%,-50%) rotate(-29deg) translateZ(-20px);box-shadow:0 0 18px rgba(205,231,205,.08),inset 0 0 14px rgba(205,231,205,.06)}
+.aether-orbit-front{width:83%;height:48%;border:2px solid transparent;background:linear-gradient(110deg,rgba(9,15,10,.2),rgba(231,241,224,.92),rgba(100,127,104,.7),rgba(232,241,223,.9),rgba(8,14,9,.3)) border-box;mask:linear-gradient(#000 0 0) padding-box,linear-gradient(#000 0 0);-webkit-mask:linear-gradient(#000 0 0) padding-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;transform:translate(-50%,-50%) rotate(54deg) translateZ(42px);filter:drop-shadow(0 0 8px rgba(220,239,216,.22))}
+.aether-orbit-thin{width:105%;height:60%;border:1px solid rgba(199,255,66,.52);transform:translate(-50%,-50%) rotate(-54deg) translateZ(12px);box-shadow:0 0 14px rgba(199,255,66,.09)}
+.aether-orbit-node{position:absolute;z-index:6;width:9px;height:9px;left:13%;top:24%;border-radius:50%;background:radial-gradient(circle at 32% 28%,#fff,#c7ff42 35%,#526b22 72%);box-shadow:0 0 16px rgba(199,255,66,.7);transform:translateZ(48px)}
+.aether-geometry{z-index:1!important;overflow:hidden!important}
+.aether-geometry .aether-axis{stroke:rgba(218,233,216,.11);stroke-width:.8;fill:none;stroke-dasharray:2 8}
+.aether-geometry .aether-guide{stroke:rgba(213,230,211,.16);stroke-width:.8;stroke-dasharray:1 7;fill:none}
+.aether-geometry .aether-guide-inner{stroke:rgba(199,255,66,.12);stroke-dasharray:2 10}
+.aether-geometry .aether-tick{stroke:rgba(224,239,220,.35);stroke-width:1;fill:none}
+.aether-geometry .aether-diagonal{stroke:url(#aetherLine);stroke-width:.8;fill:none}
+.aether-word{top:15%;left:6%;font-size:clamp(48px,7vw,104px);z-index:7}
+.aether-coordinate{right:6%;bottom:14%;z-index:7}
+@media(max-width:900px){.aether-sculpture{width:min(72%,430px);top:56%}}
+@media(max-width:560px){.aether-sculpture{width:78%;top:57%}.aether-orbit-node{width:7px;height:7px}.aether-word{top:17%}}
