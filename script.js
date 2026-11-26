@@ -1174,14 +1174,14 @@ function isGreenSurface(el) {
 
   for (const source of sources) {
     if (!source) continue;
-    const colors = source.matchAll(/rgba?\\(([^)]+)\\)/gi);
+    const colors = source.matchAll(/rgba?\(([^)]+)\)/gi);
     for (const match of colors) {
-      const channels = match[1].match(/[\\d.]+/g);
+      const channels = match[1].match(/[\d.]+/g);
       if (!channels || channels.length < 3) continue;
       const r = Number(channels[0]), g = Number(channels[1]), b = Number(channels[2]);
       if (g > 92 && g > r * 1.17 && g > b * 1.22) return true;
     }
-    const hexes = source.matchAll(/#([0-9a-f]{6})\\b/gi);
+    const hexes = source.matchAll(/#([0-9a-f]{6})\b/gi);
     for (const match of hexes) {
       const value = parseInt(match[1],16);
       const r = value >> 16, g = (value >> 8) & 255, b = value & 255;
