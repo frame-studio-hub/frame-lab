@@ -2941,10 +2941,6 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
   .hero-sculpture,.sculpture-loop,.sculpture-glass,.sculpture-core,.sculpture-beam,.ticker-track{animation:none!important}
   .project-orbit-node,.liquid-cta,.liquid-cta:after{transition:none!important}
 }
-@media(hover:none),(pointer:coarse){
-  .filter-btn.liquid-cta:after,.project-view-btn.liquid-cta:after,.project-mono-toggle.liquid-cta:after,.material-btn.liquid-cta:after,.lab-button.liquid-cta:after,.project-orbit-controls button.liquid-cta:after,.planner-next.liquid-cta:after,.planner-back.liquid-cta:after{display:none}
-  .filter-btn.liquid-cta:active,.project-view-btn.liquid-cta:active,.project-mono-toggle.liquid-cta:active,.material-btn.liquid-cta:active,.lab-button.liquid-cta:active,.planner-next.liquid-cta:active,.planner-back.liquid-cta:active{background:linear-gradient(120deg,rgba(236,139,201,.2),rgba(141,156,255,.18));border-color:rgba(201,166,255,.8)}
-}
 
 /* Project deck: no finite progress indicator; a continuous circular desktop deck. */
 .project-deck-progress{display:none!important}
@@ -2982,10 +2978,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
   overflow:hidden!important;
   pointer-events:none!important;
 }
-.liquid-cta>:not(.liquid-canvas-layer){
-  position:relative;
-  z-index:2;
-}
+.liquid-cta>:not(.liquid-canvas-layer){z-index:2}
 .liquid-cta>.liquid-label-fragment{
   position:relative!important;
   display:inline-block!important;
