@@ -877,25 +877,44 @@
   window.addEventListener('scroll', updateHeaderState, { passive: true });
   updateHeaderState();
 
+  // One shared premium corner-tilt controller for all six portfolio cards.
+  // Same response curve and intensity on every card; RAF keeps motion smooth.
   if (window.matchMedia('(hover: hover) and (pointer: fine)').matches && !reduceMotion) {
-    projectCards.forEach(card => {
-      card.addEventListener('pointermove', event => {
+    const tiltCards = Array.from(document.querySelectorAll('#work .project-card'));
+    tiltCards.forEach(card => {
+      let frame = 0, pointerX = 0, pointerY = 0, active = false;
+      const applyTilt = () => {
+        frame = 0;
         const rect = card.getBoundingClientRect();
-        const px = (event.clientX - rect.left) / rect.width;
-        const py = (event.clientY - rect.top) / rect.height;
-        card.style.setProperty('--tilt-x', (((px - .5) * 7).toFixed(2)) + 'deg');
-        card.style.setProperty('--tilt-y', (((.5 - py) * 6).toFixed(2)) + 'deg');
-        const art = $('.project-art', card);
+        const px = Math.max(0, Math.min(1, (pointerX - rect.left) / rect.width));
+        const py = Math.max(0, Math.min(1, (pointerY - rect.top) / rect.height));
+        const rotateY = (px - .5) * 12;
+        const rotateX = (.5 - py) * 10;
+        card.style.transition = 'transform 90ms cubic-bezier(.2,.72,.2,1), opacity .35s';
+        card.style.transform = `perspective(1200px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-5px)`;
+        const art = card.querySelector('.project-art');
         if (art) {
           art.style.setProperty('--spot-x', (px * 100).toFixed(1) + '%');
           art.style.setProperty('--spot-y', (py * 100).toFixed(1) + '%');
+          art.style.setProperty('--tilt-glow', (Math.max(Math.abs(px - .5), Math.abs(py - .5)) * 100).toFixed(1) + '%');
         }
-      });
+      };
+      card.addEventListener('pointermove', event => {
+        pointerX = event.clientX; pointerY = event.clientY; active = true;
+        if (!frame) frame = requestAnimationFrame(applyTilt);
+      }, { passive: true });
       card.addEventListener('pointerleave', () => {
-        card.style.setProperty('--tilt-x', '0deg');
-        card.style.setProperty('--tilt-y', '0deg');
-        const art = $('.project-art', card);
-        if (art) { art.style.setProperty('--spot-x', '50%'); art.style.setProperty('--spot-y', '50%'); }
+        active = false;
+        if (frame) cancelAnimationFrame(frame);
+        frame = 0;
+        card.style.transition = 'transform 620ms cubic-bezier(.16,1,.3,1), opacity .35s';
+        card.style.transform = '';
+        const art = card.querySelector('.project-art');
+        if (art) {
+          art.style.setProperty('--spot-x', '50%');
+          art.style.setProperty('--spot-y', '50%');
+          art.style.removeProperty('--tilt-glow');
+        }
       });
     });
   }
