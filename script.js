@@ -955,9 +955,25 @@
     window.addEventListener('scroll', () => {
       pageIsScrolling = true;
       tiltCards.forEach(card => {
-      // Keep the article itself stationary as the pointer hit-area. Only the
-      // artwork plane tilts; transforming the hit-area caused edge leave/enter
-      // oscillation, which looked like violent shaking at the card corners.
+        card.dataset.scrollPaused = '1';
+        const art = card.querySelector('.project-art');
+        if (art) art.style.transform = '';
+      });
+      window.clearTimeout(scrollIdleTimer);
+      scrollIdleTimer = window.setTimeout(() => {
+        pageIsScrolling = false;
+        tiltCards.forEach(card => {
+          delete card.dataset.scrollPaused;
+          if (card.matches(':hover') && card.dataset.pointerInside === '1') {
+            card.dispatchEvent(new Event('frame:tilt-resume'));
+          }
+        });
+      }, 170);
+    }, { passive: true });
+
+    tiltCards.forEach(card => {
+      // Keep the article itself stationary as the pointer hit-area. Only its
+      // artwork plane tilts, preventing edge leave/enter feedback and jitter.
       const art = card.querySelector('.project-art');
       if (!art) return;
       let frame = 0, pointerX = 0, pointerY = 0, pointerInside = false;
@@ -969,8 +985,7 @@
           const rect = card.getBoundingClientRect();
           const px = Math.max(0, Math.min(1, (pointerX - rect.left) / rect.width));
           const py = Math.max(0, Math.min(1, (pointerY - rect.top) / rect.height));
-          // Soft saturation near the edges avoids a sudden angular jump when
-          // the pointer reaches the very last few pixels of the card.
+          // Soft saturation prevents a sharp angular response in the last pixels.
           const soft = value => {
             const centered = (value - .5) * 2;
             return Math.sign(centered) * (1 - Math.exp(-Math.abs(centered) * .72)) / (1 - Math.exp(-.72));
@@ -985,7 +1000,6 @@
         }
         const dt = lastFrameTime ? Math.min(40, now - lastFrameTime) : 16.7;
         lastFrameTime = now;
-        // Time-based damping is consistent at 60/120/144 Hz.
         const ease = 1 - Math.exp(-dt / (pointerInside ? 210 : 290));
         currentX += (targetX - currentX) * ease;
         currentY += (targetY - currentY) * ease;
@@ -1001,23 +1015,28 @@
         if (!frame && !pageIsScrolling) frame = requestAnimationFrame(applyTilt);
       };
       card.addEventListener('pointerenter', event => {
-        pointerInside = true; card.dataset.pointerInside = '1';
-        pointerX = event.clientX; pointerY = event.clientY;
+        pointerInside = true;
+        card.dataset.pointerInside = '1';
+        pointerX = event.clientX;
+        pointerY = event.clientY;
         scheduleTilt();
       }, { passive: true });
       card.addEventListener('pointermove', event => {
-        pointerX = event.clientX; pointerY = event.clientY;
+        pointerX = event.clientX;
+        pointerY = event.clientY;
         if (!pageIsScrolling) scheduleTilt();
       }, { passive: true });
       card.addEventListener('frame:tilt-resume', scheduleTilt);
       card.addEventListener('pointerleave', () => {
-        pointerInside = false; delete card.dataset.pointerInside;
-        targetX = 0; targetY = 0;
+        pointerInside = false;
+        delete card.dataset.pointerInside;
+        targetX = 0;
+        targetY = 0;
         if (!frame && !pageIsScrolling) frame = requestAnimationFrame(applyTilt);
         art.style.setProperty('--spot-x', '50%');
         art.style.setProperty('--spot-y', '50%');
       });
-    });;
+    });
   }
 
   // Print archive: pointer-led paper cards, coalesced to one animation frame.
