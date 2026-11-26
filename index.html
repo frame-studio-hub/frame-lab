@@ -15,6 +15,7 @@
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css?v=frame-digital-matter-v41">
   <link rel="stylesheet" href="reviews.css?v=frame-liquid-graphite-v40">
+  <script type="module" src="https://unpkg.com/@google/model-viewer@4.1.0/dist/model-viewer.min.js"></script>
   <style>
     /* Mobile fallback: keep content readable without disabling the designed motion. */
     @media (max-width:700px) {
@@ -22,6 +23,16 @@
       body, main, header, section, footer { visibility:visible; }
       body { opacity:1; }
     }
+
+    .object-stage{position:relative;min-height:320px}
+    .matter-3d{position:relative;display:block;width:min(100%,390px);height:310px;z-index:2;background:transparent;--poster-color:transparent;outline:none}
+    .matter-3d::part(default-progress-bar){height:2px;background:rgba(190,174,255,.8)}
+    .matter-3d::part(default-progress-mask){background:transparent}
+    .object-card-prism .object-halo{background:radial-gradient(circle,rgba(167,145,255,.2),rgba(125,104,210,.06) 43%,transparent 72%)}
+    .object-card-orbit .object-halo{background:radial-gradient(circle,rgba(255,125,170,.17),rgba(177,114,190,.05) 43%,transparent 72%)}
+    .object-card-cube .object-halo{background:radial-gradient(circle,rgba(95,195,220,.18),rgba(95,150,220,.05) 43%,transparent 72%)}
+    .matter-asset-credit{margin:14px 0 28px;text-align:right;color:rgba(232,240,228,.38);font-size:8px;letter-spacing:.12em}
+    @media(max-width:700px){.object-stage{min-height:280px}.matter-3d{height:275px;width:100%}.matter-asset-credit{text-align:left;line-height:1.8}}
   </style>
   <script>document.documentElement.classList.add('js');</script>
 </head>
@@ -234,7 +245,7 @@
           <div class="object-card-meta mono"><span>01 / PRISM</span><span>OPTICAL GLASS</span></div>
           <div class="object-stage">
             <div class="object-halo"></div>
-            <div class="model-prism" aria-hidden="true"><span class="prism-face prism-face-a"></span><span class="prism-face prism-face-b"></span><span class="prism-face prism-face-c"></span><span class="prism-face prism-face-d"></span><span class="prism-body"></span><span class="prism-glint"></span></div>
+            <model-viewer class="matter-3d matter-3d-knot" src="https://vinish-models.pages.dev/abstract-shapes/trefoil-knot.glb" alt="Детализированная скульптура Trefoil Knot из глянцевого материала" camera-controls auto-rotate rotation-per-second="13deg" interaction-prompt="none" shadow-intensity="0.85" exposure="1.12" environment-image="neutral" camera-orbit="25deg 72deg 2.8m" disable-pan></model-viewer>
             <span class="object-coordinate mono">52° 31' / FL</span>
           </div>
           <div class="object-card-caption"><div><span class="mono">REFRACTION / 001</span><h3>Prism One</h3></div><span class="object-index">01</span></div>
@@ -243,7 +254,7 @@
           <div class="object-card-meta mono"><span>02 / ORBIT</span><span>LIQUID METAL</span></div>
           <div class="object-stage">
             <div class="object-halo"></div>
-            <div class="model-orbit" aria-hidden="true"><span class="orbit-sphere"></span><span class="orbit-loop orbit-loop-a"></span><span class="orbit-loop orbit-loop-b"></span><span class="orbit-loop orbit-loop-c"></span><span class="orbit-spark"></span></div>
+            <model-viewer class="matter-3d matter-3d-blob" src="https://vinish-models.pages.dev/abstract-shapes/blob.glb" alt="Органическая объёмная скульптура Organic Blob" camera-controls auto-rotate rotation-per-second="-10deg" interaction-prompt="none" shadow-intensity="0.9" exposure="1.08" environment-image="neutral" camera-orbit="20deg 70deg 2.1m" disable-pan></model-viewer>
             <span class="object-coordinate mono">FIELD / 002</span>
           </div>
           <div class="object-card-caption"><div><span class="mono">MOTION / 002</span><h3>Solaris</h3></div><span class="object-index">02</span></div>
@@ -252,13 +263,14 @@
           <div class="object-card-meta mono"><span>03 / CUBE</span><span>CHROMATIC ALLOY</span></div>
           <div class="object-stage">
             <div class="object-halo"></div>
-            <div class="model-cube" aria-hidden="true"><span class="cube-face cube-front"></span><span class="cube-face cube-back"></span><span class="cube-face cube-right"></span><span class="cube-face cube-left"></span><span class="cube-face cube-top"></span><span class="cube-face cube-bottom"></span><span class="cube-core"></span></div>
+            <model-viewer class="matter-3d matter-3d-mobius" src="https://vinish-models.pages.dev/abstract-shapes/moebius-strip.glb" alt="Объёмная скульптура Moebius Strip" camera-controls auto-rotate rotation-per-second="11deg" interaction-prompt="none" shadow-intensity="0.85" exposure="1.15" environment-image="neutral" camera-orbit="25deg 72deg 2.7m" disable-pan></model-viewer>
             <span class="object-coordinate mono">VOLUME / 003</span>
           </div>
           <div class="object-card-caption"><div><span class="mono">STRUCTURE / 003</span><h3>Chromatic</h3></div><span class="object-index">03</span></div>
         </article>
       </div>
 
+      <div class="matter-asset-credit mono">3D ASSETS — VINISH.DEV · CC BY 4.0 · MODELS: TREFOIL KNOT / ORGANIC BLOB / MOEBIUS STRIP</div>
       <div class="visual-study-wall">
         <div class="visual-study-heading">
           <span class="mono">03.1 / PRINT STUDIES — FLOATING ARCHIVE</span>
