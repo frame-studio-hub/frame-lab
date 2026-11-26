@@ -974,24 +974,40 @@
 
     tiltCards.forEach(card => {
       let frame = 0, pointerX = 0, pointerY = 0, pointerInside = false;
+      let currentX = 0, currentY = 0, targetX = 0, targetY = 0;
       const applyTilt = () => {
         frame = 0;
-        if (pageIsScrolling || !pointerInside) return;
-        const rect = card.getBoundingClientRect();
-        const px = Math.max(0, Math.min(1, (pointerX - rect.left) / rect.width));
-        const py = Math.max(0, Math.min(1, (pointerY - rect.top) / rect.height));
-        const rotateY = (px - .5) * 12;
-        const rotateX = (.5 - py) * 10;
-        card.style.transition = 'transform 90ms cubic-bezier(.2,.72,.2,1), opacity .35s';
-        card.style.transform = `perspective(1200px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-5px)`;
-        const art = card.querySelector('.project-art');
-        if (art) {
-          art.style.setProperty('--spot-x', (px * 100).toFixed(1) + '%');
-          art.style.setProperty('--spot-y', (py * 100).toFixed(1) + '%');
+        if (pageIsScrolling) return;
+        if (pointerInside) {
+          const rect = card.getBoundingClientRect();
+          const px = Math.max(0, Math.min(1, (pointerX - rect.left) / rect.width));
+          const py = Math.max(0, Math.min(1, (pointerY - rect.top) / rect.height));
+          // Lower angular travel and ease toward the pointer instead of snapping
+          // directly to the new angle at the edge of the card.
+          targetY = (px - .5) * 7;
+          targetX = (.5 - py) * 6;
+          const art = card.querySelector('.project-art');
+          if (art) {
+            art.style.setProperty('--spot-x', (px * 100).toFixed(1) + '%');
+            art.style.setProperty('--spot-y', (py * 100).toFixed(1) + '%');
+          }
+        } else {
+          targetX = 0;
+          targetY = 0;
+        }
+        // Frame-rate-independent exponential smoothing. The card eases through
+        // every intermediate angle, including abrupt pointer changes at corners.
+        const ease = 0.14;
+        currentX += (targetX - currentX) * ease;
+        currentY += (targetY - currentY) * ease;
+        card.style.transition = 'none';
+        card.style.transform = `perspective(1200px) rotateX(${currentX.toFixed(3)}deg) rotateY(${currentY.toFixed(3)}deg) translateY(${pointerInside ? -5 : 0}px)`;
+        if (Math.abs(targetX - currentX) > .015 || Math.abs(targetY - currentY) > .015) {
+          frame = requestAnimationFrame(applyTilt);
         }
       };
       const scheduleTilt = () => {
-        if (!frame && !pageIsScrolling && pointerInside) frame = requestAnimationFrame(applyTilt);
+        if (!frame && !pageIsScrolling) frame = requestAnimationFrame(applyTilt);
       };
       card.addEventListener('pointerenter', event => {
         pointerInside = true; card.dataset.pointerInside = '1';
@@ -1005,10 +1021,8 @@
       card.addEventListener('frame:tilt-resume', scheduleTilt);
       card.addEventListener('pointerleave', () => {
         pointerInside = false; delete card.dataset.pointerInside;
-        if (frame) cancelAnimationFrame(frame);
-        frame = 0;
-        card.style.transition = 'transform 760ms cubic-bezier(.18,.72,.22,1), opacity .35s';
-        card.style.transform = '';
+        targetX = 0; targetY = 0;
+        if (!frame && !pageIsScrolling) frame = requestAnimationFrame(applyTilt);
         const art = card.querySelector('.project-art');
         if (art) {
           art.style.setProperty('--spot-x', '50%');
