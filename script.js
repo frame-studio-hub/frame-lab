@@ -1167,7 +1167,7 @@
   document.documentElement.classList.add('motion-ready');
 
   // Subtle pointer parallax is restricted to the hero object and never runs on touch screens.
-  const hero = $('.hero'), heroObject = $('.hero-object');
+  const hero = $('.hero'), heroObject = $('.hero-visual');
   if (hero && heroObject && !coarsePointer && !reduceMotion && !lowPower) {
     let heroFrame = 0, heroX = 0, heroY = 0;
     hero.addEventListener('pointermove', event => {
