@@ -3104,3 +3104,26 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 }
 @media(max-width:420px){.matter-card-caption p{max-width:230px}.matter-select{padding:9px 8px;font-size:6px}.matter-selection.has-selection .matter-card.is-selected .matter-card-stage{height:370px}}
 @media(prefers-reduced-motion:reduce){.matter-selection,.matter-selection .matter-card,.matter-card-stage,.matter-focus-label{transition:none}}
+
+/* Matter Lab v3 — cinematic sculpture viewer */
+.matter-introline{letter-spacing:.13em}
+.matter-view-controls{position:absolute;z-index:5;left:14px;right:14px;bottom:42px;display:flex;align-items:center;gap:7px;opacity:0;transform:translateY(7px);pointer-events:none;transition:opacity .3s,transform .3s}
+.matter-card.is-selected .matter-view-controls{opacity:1;transform:translateY(0);pointer-events:auto}
+.matter-view-controls button{border:1px solid rgba(222,240,231,.26);background:rgba(7,12,13,.72);backdrop-filter:blur(12px);color:rgba(239,246,239,.86);padding:9px 11px;font:7px var(--mono,monospace);letter-spacing:.11em;cursor:pointer;transition:background .2s,border-color .2s,color .2s}
+.matter-view-controls button:hover{border-color:rgba(202,255,93,.65);background:rgba(202,255,93,.1);color:#d9ff91}
+.matter-view-controls span{margin-left:auto;color:rgba(227,238,229,.4);font-size:6px;letter-spacing:.14em}
+.matter-selection .matter-card-stage{background:radial-gradient(ellipse at 50% 48%,rgba(114,208,195,.17),transparent 56%),linear-gradient(150deg,#111a1c,#080c0e 78%)}
+.matter-selection [data-matter-card="membrane"] .matter-card-stage{background:radial-gradient(ellipse at 50% 48%,rgba(157,142,225,.17),transparent 58%),linear-gradient(150deg,#171721,#090b10 78%)}
+.matter-selection [data-matter-card="orbit"] .matter-card-stage{background:radial-gradient(ellipse at 50% 48%,rgba(178,226,121,.13),transparent 58%),linear-gradient(150deg,#141d19,#080d0b 78%)}
+.matter-selection.has-selection .matter-card.is-selected .matter-card-stage{height:clamp(470px,54vw,660px)}
+.matter-selection.has-selection .matter-card.is-selected .matter-view-controls{left:22px;right:22px;bottom:48px}
+.matter-canvas{cursor:grab;touch-action:pan-y}
+.matter-canvas:active{cursor:grabbing}
+@media(max-width:760px){
+ .matter-selection.has-selection .matter-card.is-selected .matter-card-stage{height:clamp(390px,112vw,540px)}
+ .matter-view-controls{left:10px;right:10px;bottom:35px;gap:5px}
+ .matter-view-controls button{padding:9px 8px;font-size:6px}
+ .matter-view-controls span{font-size:5px}
+ .matter-selection.has-selection .matter-card.is-selected .matter-view-controls{left:12px;right:12px;bottom:40px}
+}
+@media(prefers-reduced-motion:reduce){.matter-view-controls{transition:none}}
