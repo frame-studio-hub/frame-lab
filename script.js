@@ -1159,6 +1159,38 @@ function fillOf(el) {
   return BASE;
 }
 
+function isGreenSurface(el) {
+  const style = getComputedStyle(el);
+  const sources = [
+    style.backgroundColor,
+    style.backgroundImage,
+    style.getPropertyValue('--liquid-fill')
+  ];
+  if (el.matches(
+    '.filter-btn.active,.project-view-btn.active,.material-btn.active,' +
+    '.planner-next:not(.planner-back),.round-link:hover,.modal-close:hover,' +
+    '.header-contact:hover,.start-button:hover'
+  )) sources.push('rgb(199,255,66)');
+
+  for (const source of sources) {
+    if (!source) continue;
+    const colors = source.matchAll(/rgba?\\(([^)]+)\\)/gi);
+    for (const match of colors) {
+      const channels = match[1].match(/[\\d.]+/g);
+      if (!channels || channels.length < 3) continue;
+      const r = Number(channels[0]), g = Number(channels[1]), b = Number(channels[2]);
+      if (g > 92 && g > r * 1.17 && g > b * 1.22) return true;
+    }
+    const hexes = source.matchAll(/#([0-9a-f]{6})\\b/gi);
+    for (const match of hexes) {
+      const value = parseInt(match[1],16);
+      const r = value >> 16, g = (value >> 8) & 255, b = value & 255;
+      if (g > 92 && g > r * 1.17 && g > b * 1.22) return true;
+    }
+  }
+  return false;
+}
+
 function resize(state) {
   const width = Math.max(1, state.el.clientWidth || state.el.offsetWidth || 1);
   const height = Math.max(1, state.el.clientHeight || state.el.offsetHeight || 1);
@@ -1271,26 +1303,44 @@ function draw(state) {
   ctx.save();
   ctx.clip(path);
 
-  // Soft liquid field follows the pointer, clipped to the complete button.
+  // Adaptive liquid palette: keep the cool metallic look on graphite,
+  // use a deep evergreen + champagne reflection on bright lime surfaces.
+  const green = isGreenSurface(state.el);
   if (activity > .001) {
     const x = clamp(state.x,0,width), y = clamp(state.y,0,height);
     const reach = clamp(Math.min(width,height) * 1.12,44,116);
     const field = ctx.createRadialGradient(x-11,y-9,1,x,y,reach);
-    field.addColorStop(0,'rgba(238,210,213,.62)');
-    field.addColorStop(.18,'rgba(204,190,203,.48)');
-    field.addColorStop(.42,'rgba(151,159,177,.28)');
-    field.addColorStop(.7,'rgba(106,122,143,.12)');
-    field.addColorStop(1,'rgba(41,39,41,0)');
-    ctx.globalAlpha = activity * .58;
+    if (green) {
+      field.addColorStop(0,'rgba(12,35,20,.86)');
+      field.addColorStop(.16,'rgba(21,52,30,.74)');
+      field.addColorStop(.38,'rgba(34,75,43,.49)');
+      field.addColorStop(.63,'rgba(75,105,54,.24)');
+      field.addColorStop(.84,'rgba(238,244,210,.10)');
+      field.addColorStop(1,'rgba(238,244,210,0)');
+    } else {
+      field.addColorStop(0,'rgba(238,210,213,.62)');
+      field.addColorStop(.18,'rgba(204,190,203,.48)');
+      field.addColorStop(.42,'rgba(151,159,177,.28)');
+      field.addColorStop(.7,'rgba(106,122,143,.12)');
+      field.addColorStop(1,'rgba(41,39,41,0)');
+    }
+    ctx.globalAlpha = activity * (green ? .88 : .58);
     ctx.fillStyle = field;
     ctx.fillRect(0,0,width,height);
 
     const trailRadius = reach * .58;
     const trail = ctx.createRadialGradient(state.tailX,state.tailY,0,state.tailX,state.tailY,trailRadius);
-    trail.addColorStop(0,'rgba(239,224,225,.15)');
-    trail.addColorStop(.48,'rgba(177,181,195,.08)');
-    trail.addColorStop(1,'rgba(177,181,195,0)');
-    ctx.globalAlpha = activity * .52;
+    if (green) {
+      trail.addColorStop(0,'rgba(250,255,226,.34)');
+      trail.addColorStop(.3,'rgba(216,234,181,.22)');
+      trail.addColorStop(.68,'rgba(93,125,68,.11)');
+      trail.addColorStop(1,'rgba(93,125,68,0)');
+    } else {
+      trail.addColorStop(0,'rgba(239,224,225,.15)');
+      trail.addColorStop(.48,'rgba(177,181,195,.08)');
+      trail.addColorStop(1,'rgba(177,181,195,0)');
+    }
+    ctx.globalAlpha = activity * (green ? .78 : .52);
     ctx.fillStyle = trail;
     ctx.fillRect(0,0,width,height);
 
@@ -1302,18 +1352,31 @@ function draw(state) {
     ctx.rotate(angle);
     ctx.beginPath();
     ctx.ellipse(0,0,streak*1.9,Math.max(1.5,streak*.19),0,0,Math.PI*2);
-    ctx.fillStyle = 'rgba(255,245,241,' + (activity*.14) + ')';
+    ctx.fillStyle = green
+      ? 'rgba(255,255,235,' + (activity*.34) + ')'
+      : 'rgba(255,245,241,' + (activity*.14) + ')';
     ctx.fill();
     ctx.restore();
   }
 
   ctx.restore();
 
-  // The full perimeter is always closed and redrawn on every frame.
+  // On lime: a deep-forest contour remains visible against the bright fill.
   ctx.save();
-  ctx.strokeStyle = 'rgba(245,239,241,' + (.10 + activity*.17) + ')';
-  ctx.lineWidth = .85;
-  ctx.stroke(path);
+  if (green) {
+    ctx.strokeStyle = 'rgba(17,45,25,' + (.38 + activity*.34) + ')';
+    ctx.lineWidth = 1.05;
+    ctx.stroke(path);
+    if (activity > .025) {
+      ctx.strokeStyle = 'rgba(255,255,232,' + (activity*.34) + ')';
+      ctx.lineWidth = .55;
+      ctx.stroke(path);
+    }
+  } else {
+    ctx.strokeStyle = 'rgba(245,239,241,' + (.10 + activity*.17) + ')';
+    ctx.lineWidth = .85;
+    ctx.stroke(path);
+  }
   ctx.restore();
 }
 
