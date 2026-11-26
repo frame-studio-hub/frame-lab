@@ -1795,75 +1795,6 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
   .ambient-backdrop #gravity-canvas{opacity:.2}
 }
 
-/* A button remains quiet at rest, then swells into a liquid silhouette. */
-.liquid-cta{
-  position:relative;isolation:isolate;overflow:hidden;
-  transition:
-    border-radius .58s cubic-bezier(.2,.8,.2,1),
-    background-color .38s,color .32s,border-color .32s,
-    box-shadow .42s,translate .3s;
-}
-.liquid-cta>*{position:relative;z-index:2}
-.liquid-cta:after{
-  content:"";position:absolute;z-index:0;inset:-24%;
-  pointer-events:none;opacity:0;
-  border-radius:58% 42% 61% 39% / 52% 43% 57% 48%;
-  background:
-    radial-gradient(ellipse at 27% 36%,rgba(255,103,190,.94),transparent 39%),
-    radial-gradient(ellipse at 76% 65%,rgba(130,95,255,.92),transparent 43%),
-    radial-gradient(ellipse at 52% 10%,rgba(247,167,227,.68),transparent 45%),
-    linear-gradient(125deg,#22152b,#302044 55%,#171225);
-  transform:scale(.62) rotate(-15deg);
-  transition:opacity .35s,transform .72s cubic-bezier(.2,.8,.2,1),border-radius .6s;
-}
-.liquid-cta:hover{
-  border-radius:42% 58% 39% 61% / 56% 42% 58% 44%;
-  translate:0 -2px;
-}
-.liquid-cta:hover:after,.liquid-cta:focus-visible:after{
-  opacity:1;
-  transform:scale(1.08) rotate(7deg);
-  border-radius:39% 61% 54% 46% / 42% 56% 44% 58%;
-}
-.liquid-cta:active{
-  border-radius:48% 52% 45% 55% / 48% 48% 52% 52%;
-  translate:0 0;
-}
-.liquid-cta:before{z-index:1;opacity:.8}
-.liquid-cta:hover:before{opacity:.34}
-.header-contact.liquid-cta{
-  border-color:rgba(199,255,66,.5);
-  background:rgba(10,13,10,.72);
-}
-.header-contact.liquid-cta:hover{
-  color:#fff7ff;
-  background:#17101f;
-  border-color:rgba(221,150,255,.76);
-  box-shadow:0 0 0 1px rgba(229,156,255,.09),0 10px 32px rgba(173,83,217,.22);
-}
-.header-contact.liquid-cta:hover .ui-arrow,
-.start-button.liquid-cta:hover .ui-arrow{transform:translate(2px,-2px);color:#fff}
-.start-button.liquid-cta{
-  border:1px solid rgba(199,255,66,.72);
-  overflow:hidden;
-}
-.start-button.liquid-cta:hover{
-  color:#fff7ff;
-  background:#17101f;
-  border-color:rgba(221,150,255,.76);
-  box-shadow:0 15px 42px rgba(173,83,217,.24),0 0 24px rgba(255,103,190,.12);
-}
-.start-button.liquid-cta b{transition:transform .35s,color .25s}
-.start-button.liquid-cta:hover b{transform:translate(2px,-2px);color:#fff}
-@media(hover:none),(pointer:coarse){
-  .liquid-cta,.liquid-cta:after{transition:none}
-  .liquid-cta:hover{border-radius:inherit;translate:0 0}
-  .liquid-cta:hover:after{opacity:0;transform:scale(.62) rotate(-15deg)}
-}
-@media(prefers-reduced-motion:reduce){
-  .liquid-cta,.liquid-cta:after,.liquid-cta:before{transition:none!important}
-}
-.lite-device .liquid-cta:after{transition:opacity .2s}
 .lite-device .ambient-backdrop #gravity-canvas{opacity:.16}
 
 /* Let the gravity field breathe through the dark hero surface; light chapter remains opaque. */
@@ -2753,50 +2684,6 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
   .project-orbit-ring{height:205px;gap:9px;padding-inline:14px}
   .project-orbit-node{flex-basis:210px;width:210px;height:188px}
 }
-/* =========================================================
-   FRAME LAB / MOBILE ART-DIRECTION + LIQUID GLASS CONTROLS
-   ========================================================= */
-:root{--liquid-violet:#a78bfa;--liquid-pink:#ec8bc9;--liquid-blue:#8d9cff}
-.liquid-cta:after{
-  background:
-    radial-gradient(ellipse at 24% 32%,rgba(246,133,205,.96),transparent 40%),
-    radial-gradient(ellipse at 78% 68%,rgba(128,111,255,.94),transparent 44%),
-    radial-gradient(ellipse at 54% 5%,rgba(188,166,255,.72),transparent 43%),
-    linear-gradient(125deg,#24142f,#34204a 52%,#171329);
-  filter:saturate(1.12);
-}
-.liquid-cta:hover,.liquid-cta:focus-visible{
-  border-color:rgba(201,166,255,.78)!important;
-  box-shadow:0 10px 34px rgba(137,94,219,.18),inset 0 1px rgba(255,255,255,.18);
-}
-.filter-btn.liquid-cta,.project-view-btn.liquid-cta,.project-mono-toggle.liquid-cta,
-.material-btn.liquid-cta,.lab-button.liquid-cta,.project-orbit-controls button.liquid-cta,
-.planner-next.liquid-cta,.planner-back.liquid-cta,.process-step.liquid-cta{
-  isolation:isolate;overflow:hidden;position:relative;z-index:0;
-}
-.filter-btn.liquid-cta>*,.project-view-btn.liquid-cta>*,.project-mono-toggle.liquid-cta>*,
-.material-btn.liquid-cta>*,.lab-button.liquid-cta>*,.project-orbit-controls button.liquid-cta>*{position:relative;z-index:2}
-.filter-btn.liquid-cta:after,.project-view-btn.liquid-cta:after,.project-mono-toggle.liquid-cta:after,
-.material-btn.liquid-cta:after,.lab-button.liquid-cta:after,.project-orbit-controls button.liquid-cta:after,
-.planner-next.liquid-cta:after,.planner-back.liquid-cta:after{
-  inset:-45%;opacity:0;transform:translateX(-35%) rotate(-18deg) scale(.72);
-  border-radius:42% 58% 48% 52% / 55% 42% 58% 45%;
-}
-.filter-btn.liquid-cta:hover:after,.filter-btn.liquid-cta:focus-visible:after,
-.project-view-btn.liquid-cta:hover:after,.project-view-btn.liquid-cta:focus-visible:after,
-.project-mono-toggle.liquid-cta:hover:after,.project-mono-toggle.liquid-cta:focus-visible:after,
-.material-btn.liquid-cta:hover:after,.material-btn.liquid-cta:focus-visible:after,
-.lab-button.liquid-cta:hover:after,.lab-button.liquid-cta:focus-visible:after,
-.project-orbit-controls button.liquid-cta:hover:after,.planner-next.liquid-cta:hover:after,.planner-back.liquid-cta:hover:after{
-  opacity:1;transform:translateX(0) rotate(0) scale(1.08);
-}
-.filter-btn.liquid-cta:hover,.project-view-btn.liquid-cta:hover,.project-mono-toggle.liquid-cta:hover,
-.material-btn.liquid-cta:hover,.lab-button.liquid-cta:hover,.project-orbit-controls button.liquid-cta:hover,
-.planner-next.liquid-cta:hover,.planner-back.liquid-cta:hover{color:#fff!important;border-color:rgba(207,171,255,.8)!important}
-.filter-btn.active.liquid-cta,.project-view-btn.active.liquid-cta,.material-btn.active.liquid-cta{
-  box-shadow:inset 0 0 0 1px rgba(199,255,66,.18),0 0 22px rgba(199,255,66,.07);
-}
-
 /* The mobile layout is art-directed as a compact editorial experience, not a compressed desktop. */
 @media(max-width:700px){
   :root{--pad:18px}
