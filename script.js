@@ -306,12 +306,20 @@
       const raw = ((i * 60 - orbitAngle + 540) % 360) - 180;
       const offset = raw / 60;
       const distance = Math.abs(offset);
-      const visible = distance < 1.52;
-      const scale = distance < .5 ? 1 : .66;
+      const visible = distance < 2.05;
+      // Continuous interpolation prevents the neighboring cover from popping in
+      // when it crosses the old hard 0.5 / 1.52 distance thresholds.
+      const smooth = (a, b, v) => {
+        const q = Math.max(0, Math.min(1, (v - a) / (b - a)));
+        return q * q * (3 - 2 * q);
+      };
+      const sideBlend = smooth(.18, 1.05, distance);
+      const fade = 1 - smooth(1.12, 2.02, distance);
+      const scale = 1 - sideBlend * .34;
       const x = offset * spread;
-      const z = distance < .5 ? 48 : -105;
-      const rotateY = distance < .5 ? 0 : Math.max(-17, Math.min(17, -offset * 10));
-      const opacity = distance < .5 ? 1 : visible ? .9 : 0;
+      const z = 48 - sideBlend * 153;
+      const rotateY = Math.max(-17, Math.min(17, -offset * 10)) * sideBlend;
+      const opacity = fade * (distance < .5 ? 1 : .92);
       node.style.transform = 'translate(-50%,-50%) translate3d(' + x.toFixed(2) + 'px,0,' + z + 'px) rotateY(' + rotateY.toFixed(2) + 'deg) scale(' + scale + ')';
       node.style.opacity = String(opacity);
       node.style.zIndex = String(distance < .5 ? 30 : visible ? 20 : 0);
@@ -329,10 +337,9 @@
     const delta = ((targetBase - orbitAngle + 540) % 360) - 180;
     const from = orbitAngle;
     const started = performance.now();
-    const duration = 1280;
-    // Smooth, deliberate ease-in-out: the selected cover glides into the hero position
-    // without the sharp end-stop of the previous ease-out curve.
-    const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    const duration = Math.max(900, Math.min(1650, 900 + Math.abs(delta) * 2.0));
+    // Quintic smoothstep: zero velocity at both ends, with a gentle continuous handoff.
+    const ease = t => t * t * t * (t * (t * 6 - 15) + 10);
     const step = now => {
       const t = Math.min(1, (now - started) / duration);
       renderOrbitAngle(from + delta * ease(t));
@@ -504,20 +511,9 @@
           const width = orbit.clientWidth || window.innerWidth;
           const spread = Math.max(260, Math.min(540, width * .43, width / 2 - 120));
           orbitDrag.targetAngle = orbitDrag.startAngle - (dx / spread) * 60;
-          if (!orbitDrag.frame) {
-            const paintDrag = () => {
-              if (!orbitDrag) return;
-              const difference = orbitDrag.targetAngle - orbitAngle;
-              if (Math.abs(difference) < .08) {
-                renderOrbitAngle(orbitDrag.targetAngle);
-                orbitDrag.frame = 0;
-                return;
-              }
-              renderOrbitAngle(orbitAngle + difference * .34);
-              orbitDrag.frame = requestAnimationFrame(paintDrag);
-            };
-            orbitDrag.frame = requestAnimationFrame(paintDrag);
-          }
+          // During a deliberate drag the deck follows the pointer 1:1.
+          // No spring lag means it cannot jump ahead or catch up in a second burst.
+          renderOrbitAngle(orbitDrag.targetAngle);
         }
       }
     }, { passive:true });
@@ -528,12 +524,27 @@
         window.setTimeout(() => { suppressOrbitClick = false; }, 350);
       }
       if (orbitDrag.frame) cancelAnimationFrame(orbitDrag.frame);
-      if (orbitDrag.moved) renderOrbitAngle(orbitDrag.targetAngle);
+      const didMove = orbitDrag.moved;
+      const releaseAngle = orbitAngle;
       orbit.classList.remove('is-dragging');
       if (orbitCaption) orbitCaption.textContent = 'AUTO DECK / DRAG TO EXPLORE';
       orbitDrag = null;
-      if (!orbit.matches(':hover')) orbitPointerInside = false;
-      if (!orbitFocusInside) startOrbitMotion();
+      if (didMove) {
+        // Snap to the nearest cover through the same cinematic transition as click/auto.
+        const nearest = (Math.round(releaseAngle / 60) % orbitNodes.length + orbitNodes.length) % orbitNodes.length;
+        animateOrbitToIndex(nearest);
+        if (orbitResumeTimer) window.clearTimeout(orbitResumeTimer);
+        orbitResumeTimer = window.setTimeout(() => {
+          orbitResumeTimer = 0;
+          if (!orbit.matches(':hover') && !orbitFocusInside) {
+            orbitPointerInside = false;
+            startOrbitMotion();
+          }
+        }, 1750);
+      } else {
+        if (!orbit.matches(':hover')) orbitPointerInside = false;
+        if (!orbitFocusInside) startOrbitMotion();
+      }
     };
     orbit.addEventListener('pointerup', finishOrbitDrag);
     orbit.addEventListener('pointercancel', finishOrbitDrag);
