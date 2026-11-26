@@ -3135,3 +3135,273 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .matter-selection [data-matter-card="membrane"] .matter-card-stage{
  background:radial-gradient(ellipse at 50% 48%,rgba(164,150,230,.2),transparent 54%),linear-gradient(145deg,#191a25 0%,#090b11 76%);
 }
+
+
+/* =========================================================
+   FRAME LAB / ART CARD SYSTEM 2026
+   Rich editorial compositions + shared pointer-driven depth.
+   ========================================================= */
+.project-grid{perspective:1800px;gap:clamp(34px,5vw,76px) clamp(18px,2vw,30px)}
+.project-card{
+  --card-rx:0deg;--card-ry:0deg;--card-px:50%;--card-py:50%;
+  transform:perspective(1500px) rotateX(var(--card-rx)) rotateY(var(--card-ry));
+  transform-style:preserve-3d;will-change:transform;
+  transition:transform .55s cubic-bezier(.18,.72,.2,1),opacity .35s;
+}
+.project-card:hover{
+  transform:perspective(1500px) rotateX(var(--card-rx)) rotateY(var(--card-ry)) translateY(-5px);
+}
+.project-art{
+  border-radius:4px;min-height:310px;
+  box-shadow:0 28px 70px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.16);
+  transform-style:preserve-3d;
+}
+.project-art:before{
+  z-index:6;opacity:0;
+  background:radial-gradient(460px circle at var(--card-px) var(--card-py),rgba(244,255,229,.23),transparent 42%);
+  mix-blend-mode:screen;transition:opacity .4s;
+}
+.project-card:hover .project-art:before{opacity:1}
+.project-art:after{
+  z-index:7;opacity:.55;
+  background:linear-gradient(125deg,rgba(255,255,255,.16),transparent 23%,transparent 72%,rgba(0,0,0,.35));
+}
+.project-card:hover .project-art{box-shadow:0 38px 90px rgba(0,0,0,.38),0 0 0 1px rgba(199,255,66,.25),inset 0 1px rgba(255,255,255,.2)}
+.project-info{padding:19px 4px 0}
+.project-info h3{font-size:clamp(18px,1.5vw,23px);letter-spacing:-.06em}
+.project-type{font-size:8px;letter-spacing:.15em}
+
+/* AETHER — dark mineral field, precision rings and a suspended chrome body. */
+.art-aether{
+  background:
+    radial-gradient(ellipse at 52% 58%,rgba(176,208,176,.2),transparent 36%),
+    radial-gradient(ellipse at 78% 18%,rgba(199,255,66,.09),transparent 35%),
+    linear-gradient(145deg,#202820 0%,#101611 48%,#080b09 100%);
+}
+.art-aether:before{
+  content:"";position:absolute;inset:7%;z-index:1;border:1px solid rgba(210,237,203,.22);
+  background:linear-gradient(115deg,transparent 30%,rgba(220,246,222,.035),transparent 65%);
+  clip-path:polygon(0 0,100% 0,100% 100%,0 100%);
+}
+.art-aether:after{
+  background:
+    radial-gradient(ellipse at 50% 50%,transparent 36%,rgba(0,0,0,.35) 100%),
+    linear-gradient(135deg,rgba(255,255,255,.1),transparent 35%,transparent 68%,rgba(0,0,0,.4));
+}
+.aether-word{
+  top:9%;left:7%;font-size:clamp(42px,6.5vw,88px);letter-spacing:-.105em;
+  text-shadow:0 8px 38px rgba(220,255,222,.16);transform:translateZ(48px);
+}
+.aether-orb{
+  width:46%;left:29%;top:27%;
+  background:
+    radial-gradient(circle at 31% 23%,#fff 0,#e8eee2 2%,#89958a 7%,#26332b 18%,#d7e3d5 25%,#5b6b5e 34%,#101713 53%,#c2d0c0 63%,#29352d 70%,#070b09 100%);
+  box-shadow:inset -26px -34px 55px #050806,inset 10px 8px 24px rgba(255,255,255,.7),0 34px 90px rgba(0,0,0,.65),0 0 75px rgba(188,236,190,.12);
+  transform:translateZ(68px);
+}
+.art-aether .aether-orb:before,.art-aether .aether-orb:after{
+  content:"";position:absolute;inset:-17% -26%;border:1px solid rgba(218,244,222,.62);border-radius:50%;
+  transform:rotate(-27deg) scaleY(.38);box-shadow:0 0 26px rgba(214,255,222,.12);
+}
+.art-aether .aether-orb:after{inset:-29% -9%;border-color:rgba(199,255,66,.48);transform:rotate(34deg) scaleY(.58)}
+.art-aether .art-coordinate{top:auto;right:7%;bottom:10%;font-size:7px;letter-spacing:.16em;color:#c2d0bd}
+.art-aether .art-label{bottom:10%;left:7%;font-size:7px;color:#aab8a8}
+
+/* NØRD — architectural editorial layout, not a plain floating sheet. */
+.art-nord{
+  color:#11160f;
+  background:
+    radial-gradient(ellipse at 78% 78%,rgba(236,243,220,.5),transparent 33%),
+    linear-gradient(135deg,#b8c1b1,#e4e5d9 42%,#929d8e 100%);
+}
+.art-nord:before{
+  content:"";position:absolute;inset:4%;z-index:1;border:1px solid rgba(21,31,23,.32);
+  background:repeating-linear-gradient(90deg,transparent 0 11.8%,rgba(22,34,24,.055) 12% 12.12%);
+}
+.nord-panel{
+  inset:10% 13% 10% 11%;padding:clamp(18px,2.5vw,34px);
+  background:linear-gradient(145deg,#f2f2e9 0%,#e5e8dc 66%,#c6cec0 100%);
+  border:1px solid rgba(255,255,255,.75);
+  box-shadow:0 24px 70px rgba(10,18,12,.28),inset 0 0 0 7px rgba(255,255,255,.18);
+  transform:translateZ(42px) rotate(-1.2deg);
+}
+.nord-panel:before{
+  content:"N / Ø";position:absolute;right:7%;top:8%;font:8px var(--mono);letter-spacing:.18em;color:#657264;
+}
+.nord-panel:after{
+  content:"DIGITAL DESIGN / 2026";position:absolute;left:7%;bottom:7%;font:7px var(--mono);letter-spacing:.14em;color:#667064;
+}
+.nord-panel>span{font:8px var(--mono);letter-spacing:.16em;color:#657064}
+.nord-panel strong{
+  position:relative;z-index:2;font-size:clamp(43px,6vw,78px);line-height:.82;
+  letter-spacing:-.105em;font-weight:700;max-width:80%;text-wrap:balance;
+}
+.nord-panel i{font-size:0;width:42px;height:42px;border:1px solid #303b30;border-radius:50%;display:grid;place-items:center}
+.nord-panel i svg{width:19px;height:19px}
+.nord-orb{
+  z-index:3;width:38%;right:-5%;bottom:-5%;
+  background:radial-gradient(circle at 28% 23%,#fff 0,#e6ebdc 5%,#899588 22%,#303b31 50%,#dfe6d6 66%,#303a31 79%,#111710 100%);
+  box-shadow:inset -20px -24px 35px rgba(0,0,0,.38),0 25px 65px rgba(0,0,0,.36),0 0 55px rgba(237,255,225,.22);
+  transform:translateZ(70px);
+}
+.nord-orb:before,.nord-orb:after{
+  content:"";position:absolute;inset:-20% -40%;border:1px solid rgba(29,48,35,.62);border-radius:50%;transform:rotate(-25deg) scaleY(.3)
+}
+.nord-orb:after{inset:-34% -20%;border-color:rgba(245,255,235,.75);transform:rotate(24deg) scaleY(.42)}
+
+/* VANTA — dark orbital instrument with a central dimensional lens. */
+.art-vanta{
+  background:radial-gradient(ellipse at 50% 45%,#354238 0,#19231c 35%,#080d0a 78%);
+}
+.vanta-rings{filter:drop-shadow(0 0 18px rgba(198,255,214,.17));transform:rotate(-25deg) translateZ(42px)}
+.vanta-rings i{border-color:rgba(220,245,224,.7);box-shadow:0 0 30px rgba(199,255,66,.13),inset 0 0 25px rgba(215,255,230,.05)}
+.vanta-rings:after{
+  content:"";position:absolute;width:38%;aspect-ratio:1;border-radius:50%;
+  background:radial-gradient(circle at 30% 25%,#f4fff0,#91a898 12%,#26392d 45%,#080d0a 75%);
+  box-shadow:0 0 65px rgba(199,255,190,.22),inset -12px -15px 25px #050806;
+}
+.vanta-name{text-shadow:0 8px 40px rgba(230,255,235,.18);transform:translateZ(50px)}
+.vanta-caption{letter-spacing:.16em;color:#c1d0c2}
+
+/* FLUX — kinetic satin ribbon with layered specular highlights. */
+.art-flux{background:radial-gradient(ellipse at 48% 48%,#8c9b78,#344633 55%,#111910 100%)}
+.flux-type{top:6%;left:6%;font-size:clamp(90px,17vw,220px);text-shadow:0 12px 40px rgba(0,0,0,.15);transform:translateZ(38px)}
+.flux-shape{
+  width:34%;right:22%;height:140%;top:-20%;border-radius:48% 52% 38% 62%;
+  background:linear-gradient(90deg,#101710 0%,#dfe9d2 13%,#647a60 24%,#f7ffe8 38%,#879c7b 49%,#1c2b1e 61%,#e6efdc 76%,#172319 100%);
+  box-shadow:inset 12px 0 24px rgba(255,255,255,.42),inset -16px 0 28px rgba(0,0,0,.42),0 38px 75px rgba(0,0,0,.4);
+  transform:rotate(36deg) translateZ(60px);
+}
+.flux-shape:after{content:"";position:absolute;inset:0 35%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.5),transparent);filter:blur(8px)}
+
+/* OBJECT 05 — sculptural nested metal membranes. */
+.art-object{background:radial-gradient(ellipse at 50% 45%,#e5e9d9,#8d9888 55%,#303b31 100%)}
+.object-stack{filter:drop-shadow(0 28px 35px rgba(0,0,0,.3));transform:rotate(-23deg) translateZ(55px)}
+.object-stack i{border:1px solid rgba(242,255,238,.75);background:linear-gradient(105deg,rgba(255,255,255,.88),rgba(57,76,61,.55) 36%,rgba(239,255,229,.7) 58%,rgba(20,32,23,.45));box-shadow:inset 12px 0 34px rgba(255,255,255,.62),inset -12px -8px 30px rgba(0,0,0,.18),18px 22px 45px rgba(0,0,0,.2)}
+.object-number{font-size:clamp(70px,9vw,112px);color:#182219;text-shadow:0 4px 20px rgba(255,255,255,.2)}
+.object-caption{color:#28372a;letter-spacing:.16em}
+
+/* SØL — warm atmospheric horizon and layered sun. */
+.art-sol{background:linear-gradient(155deg,#e8e3d4 0%,#aab29d 48%,#39483b 100%)}
+.sol-sun{width:58%;right:5%;top:12%;box-shadow:0 0 0 1px rgba(245,255,229,.35),0 25px 80px rgba(26,38,28,.38),0 0 90px rgba(250,255,218,.2)}
+.sol-sun:before,.sol-sun:after{content:"";position:absolute;inset:-14%;border:1px solid rgba(249,255,230,.7);border-radius:50%;transform:scaleY(.32) rotate(-22deg)}
+.sol-sun:after{inset:-27% -5%;border-color:rgba(31,53,37,.5);transform:scaleY(.55) rotate(32deg)}
+.sol-copy{top:10%;left:8%;transform:translateZ(42px)}
+.sol-copy strong{font-size:clamp(48px,6.5vw,82px);text-shadow:0 8px 32px rgba(255,255,255,.18)}
+.sol-bottom{color:#28382c;letter-spacing:.14em}
+
+/* Print archive: premium paper objects with shared 3D tracking. */
+.visual-study-wall{
+  position:relative;margin-top:clamp(55px,7vw,100px);padding:clamp(22px,3vw,38px);
+  border:1px solid rgba(225,239,220,.16);border-radius:18px;overflow:hidden;
+  background:
+    radial-gradient(ellipse at 50% 42%,rgba(156,190,151,.09),transparent 50%),
+    linear-gradient(145deg,rgba(18,27,20,.88),rgba(7,11,8,.96));
+  box-shadow:0 35px 100px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.04);
+}
+.visual-study-wall:before{
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:.24;
+  background-image:linear-gradient(rgba(221,239,218,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(221,239,218,.045) 1px,transparent 1px);
+  background-size:34px 34px;mask-image:linear-gradient(180deg,#000,transparent 88%);
+}
+.visual-study-heading,.visual-study-bottom{position:relative;z-index:2}
+.visual-study-heading p{max-width:340px;color:#b4bcae;line-height:1.65}
+.visual-study-deck{position:relative;z-index:2;gap:clamp(22px,4vw,66px);padding:38px 2% 50px;perspective:1600px;align-items:center}
+.visual-print{
+  --card-rx:0deg;--card-ry:0deg;--card-px:50%;--card-py:50%;
+  flex:1 1 0;width:auto;min-width:0;max-width:390px;min-height:440px;
+  padding:13px;border-radius:4px;
+  background:linear-gradient(145deg,#f2f2e8,#cfd4c8);
+  color:#11170f;border:1px solid rgba(255,255,255,.65);
+  box-shadow:0 28px 60px rgba(0,0,0,.34),inset 0 1px rgba(255,255,255,.9);
+  transform:perspective(1200px) rotateX(var(--card-rx)) rotateY(var(--card-ry)) rotate(var(--paper-rotate,0deg));
+  transform-style:preserve-3d;will-change:transform;
+  transition:transform .55s cubic-bezier(.18,.72,.2,1),box-shadow .45s,border-color .35s;
+}
+.visual-print-type{--paper-rotate:-3deg}
+.visual-print-matter{--paper-rotate:1deg;background:linear-gradient(145deg,#12271e,#08140f);color:#e8efe3}
+.visual-print-signal{--paper-rotate:3deg}
+.visual-print:hover{
+  box-shadow:0 42px 85px rgba(0,0,0,.48),0 0 0 1px rgba(199,255,66,.35),inset 0 1px rgba(255,255,255,.8);
+}
+.visual-print:after{
+  content:"";position:absolute;inset:0;z-index:8;pointer-events:none;opacity:0;
+  background:radial-gradient(430px circle at var(--card-px) var(--card-py),rgba(255,255,255,.45),transparent 45%);
+  mix-blend-mode:soft-light;transition:opacity .35s;
+}
+.visual-print:hover:after{opacity:1}
+.visual-print-meta,.visual-print-foot{font-size:7px;letter-spacing:.16em}
+.visual-print-art{height:clamp(310px,31vw,420px);border-radius:1px;overflow:hidden}
+.print-type-art{background:linear-gradient(135deg,#f1f1e7,#d8ddd0)}
+.print-type-art:before{
+  content:"";position:absolute;inset:0;opacity:.45;
+  background:repeating-linear-gradient(90deg,transparent 0 28px,rgba(31,44,32,.12) 29px 30px);
+}
+.print-type-main{font-size:clamp(47px,5.5vw,76px);letter-spacing:-.105em;text-shadow:0 4px 20px rgba(20,30,20,.08)}
+.print-type-index{font-size:clamp(22px,2.5vw,34px);font-family:'Instrument Serif',serif;font-style:italic}
+.print-type-line{height:1px;background:#526253;transform:rotate(-17deg);box-shadow:0 0 12px rgba(45,67,48,.25)}
+.print-matter-art{
+  background:
+    radial-gradient(ellipse at 50% 54%,rgba(160,211,171,.22),transparent 50%),
+    linear-gradient(145deg,#183326,#08150f);
+}
+.matter-object{
+  width:42%;aspect-ratio:1;border-radius:50%;left:34%;top:25%;
+  background:radial-gradient(circle at 28% 23%,#fff 0,#cce2cf 5%,#587b62 17%,#172a20 48%,#050b07 69%,#a7c7ac 80%,#101a13 100%);
+  box-shadow:inset -18px -24px 35px #030805,0 20px 55px rgba(0,0,0,.45),0 0 48px rgba(183,255,195,.16);
+}
+.matter-object:before,.matter-object:after{content:"";position:absolute;inset:-28% -35%;border:1px solid rgba(203,255,201,.62);border-radius:50%;transform:rotate(-25deg) scaleY(.45)}
+.matter-object:after{inset:-42% -8%;border-color:rgba(199,255,66,.48);transform:rotate(28deg) scaleY(.55)}
+.matter-shard{
+  width:22%;height:58%;left:63%;top:13%;clip-path:polygon(60% 0,100% 73%,22% 100%,0 32%);
+  background:linear-gradient(145deg,#efffe0 0%,#b8d6b2 30%,#4d7156 62%,rgba(210,255,208,.2));
+  filter:drop-shadow(0 18px 25px rgba(0,0,0,.4));transform:rotate(12deg);
+}
+.matter-caption{font-size:clamp(24px,2.6vw,36px);letter-spacing:-.08em}
+.print-signal-art{
+  background:
+    radial-gradient(ellipse at 70% 32%,rgba(240,255,224,.65),transparent 30%),
+    linear-gradient(150deg,#dce4d5,#a6b5a5 55%,#6b8171);
+}
+.signal-sun{
+  width:38%;aspect-ratio:1;right:10%;top:13%;
+  background:radial-gradient(circle at 30% 25%,#fff,#dce9d4 18%,#8ea58f 55%,#394c3e 100%);
+  box-shadow:0 20px 45px rgba(28,46,33,.3),0 0 45px rgba(244,255,224,.4);
+}
+.signal-wave{border-color:rgba(28,53,37,.65);box-shadow:0 0 15px rgba(255,255,255,.18)}
+.signal-word{font-size:clamp(33px,4vw,54px);letter-spacing:-.1em;text-shadow:0 3px 20px rgba(255,255,255,.16)}
+.signal-coordinate{font-size:7px;letter-spacing:.16em}
+.visual-study-bottom{font-size:7px;letter-spacing:.14em;color:#9da99b}
+.visual-study-bottom span:last-child{color:var(--lime)}
+
+/* Mobile: keep the same visual language, stack cards without losing depth. */
+@media(max-width:900px){
+ .visual-study-wall{margin-inline:-4px;padding:20px 15px;border-radius:12px}
+ .visual-study-deck{display:grid;grid-template-columns:1fr;gap:24px;padding:24px 0}
+ .visual-print{width:100%;max-width:none;min-height:0;min-height:390px;transform:none!important}
+ .visual-print-art{height:320px}
+ .visual-print-type,.visual-print-matter,.visual-print-signal{--paper-rotate:0deg}
+ .project-art{height:clamp(290px,78vw,430px);min-height:0}
+ .project-offset{margin-top:12px}
+ .project-wide{width:100%}
+ .project-wide .project-info{max-width:none}
+ .nord-panel{padding:20px}
+ .nord-panel strong{font-size:clamp(44px,11vw,72px)}
+}
+@media(max-width:520px){
+ .visual-print{min-height:350px;padding:10px}
+ .visual-print-art{height:285px}
+ .visual-print-meta,.visual-print-foot{font-size:6px}
+ .project-art{height:clamp(270px,82vw,360px);border-radius:3px}
+ .project-info{padding-top:13px}
+ .project-info h3{font-size:18px}
+ .nord-panel{inset:9% 9% 9% 8%;padding:16px}
+ .nord-panel strong{font-size:clamp(42px,12vw,60px)}
+}
+@media(hover:none),(pointer:coarse){
+ .project-card,.visual-print{transform:none!important;transition:box-shadow .35s,border-color .35s}
+ .project-card:active .project-art,.visual-print:active{box-shadow:0 18px 55px rgba(0,0,0,.4),0 0 0 1px rgba(199,255,66,.3)}
+}
+@media(prefers-reduced-motion:reduce){
+ .project-card,.visual-print,.project-art,.visual-print:after{transition:none!important;animation:none!important}
+}
