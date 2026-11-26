@@ -2847,10 +2847,12 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 
 
 
-/* FRAME LAB / LIQUID SURFACE V28 — independent, clipped, restrained. */
+
+/* FRAME LAB / LIQUID CONTOUR V31 — complete per-control redraw. */
 .liquid-cta{
   isolation:isolate!important;
   -webkit-tap-highlight-color:transparent;
+  background-color:transparent!important;
 }
 .liquid-cta>.liquid-canvas-layer{
   position:absolute!important;
@@ -2860,16 +2862,16 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
   height:100%!important;
   max-width:none!important;
   max-height:none!important;
-  z-index:0!important;
+  z-index:1!important;
   border-radius:inherit!important;
-  overflow:hidden!important;
   pointer-events:none!important;
+  overflow:hidden!important;
 }
 .liquid-cta>:not(.liquid-canvas-layer){z-index:2}
 .liquid-cta>.liquid-label-fragment{
   position:relative!important;
   display:inline-block!important;
-  z-index:2!important;
+  z-index:3!important;
   margin:0!important;
   padding:0!important;
   color:inherit!important;
@@ -2878,13 +2880,18 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
   line-height:inherit!important;
   white-space:inherit;
 }
+.liquid-cta.project-card,
+.liquid-cta.project-index-row,
+.liquid-cta.process-step,
+.liquid-cta.lab-button{--liquid-fill:transparent!important}
 .liquid-cta:focus-visible{
-  outline:1px solid rgba(199,255,66,.72)!important;
+  outline:1px solid rgba(199,255,66,.78)!important;
   outline-offset:4px;
 }
-.liquid-cta:active{filter:brightness(.965)}
 .liquid-cta:disabled{cursor:not-allowed;opacity:.58}
+@media(max-width:700px){
+  .liquid-cta>.liquid-canvas-layer{border-radius:inherit!important}
+}
 @media(prefers-reduced-motion:reduce){
   .liquid-cta>.liquid-canvas-layer{display:none!important}
-  .liquid-cta:active{filter:none}
 }
