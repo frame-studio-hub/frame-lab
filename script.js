@@ -1102,7 +1102,7 @@
  * Every control owns its own pointer, contour, inertia and animation state.
  * No neighbouring-button blending and no fixed-size partial blob.
  */
-const SELECTOR = 'button,[role="button"],.header-contact,.start-button,#instagram-brief,.round-link,.service-brief-link';
+const SELECTOR = 'button,.header-contact,.start-button,#instagram-brief,.round-link,.service-brief-link';
 const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const BASE = '#292729';
 const states = new WeakMap();
@@ -1149,14 +1149,11 @@ function isTransparent(color) {
   return values.length >= 4 && Number(values[3]) <= .01;
 }
 
-function fillOf(el) {
-  const style = getComputedStyle(el);
-  const custom = style.getPropertyValue('--liquid-fill').trim();
+function fillOf(el,state) {
+  const custom = state.originalLiquidFill;
   if (custom) return custom;
-  if (style.backgroundImage && style.backgroundImage !== 'none') return 'transparent';
-  if (!isTransparent(style.backgroundColor)) return style.backgroundColor;
-  if (el.matches('.project-card,.project-index-row,.process-step,.lab-button')) return 'transparent';
-  return BASE;
+  return state.originalBackgroundColor && !isTransparent(state.originalBackgroundColor)
+    ? state.originalBackgroundColor : BASE;
 }
 
 function isGreenSurface(el) {
@@ -1359,11 +1356,19 @@ function draw(state) {
 
   const contour = contourFor(state);
   const path = contour.path;
-  const fill = fillOf(state.el);
-  if (fill !== 'transparent') {
-    ctx.fillStyle = fill;
-    ctx.fill(path);
-  }
+  const fill = fillOf(state.el,state);
+  ctx.fillStyle = fill;
+  ctx.fill(path);
+
+  // Draw the actual button boundary from the same deformed path as its fill.
+  // The old CSS rectangle is made transparent, so the whole control—not an
+  // inner glow inside a static button—now follows the liquid contour.
+  ctx.save();
+  ctx.strokeStyle = state.originalBorderColor || 'rgba(255,255,255,.16)';
+  ctx.lineWidth = state.originalBorderWidth;
+  ctx.lineJoin = 'round';
+  ctx.stroke(path);
+  ctx.restore();
 
   const green = isGreenSurface(state.el);
   ctx.save();
@@ -1499,6 +1504,10 @@ function init(el) {
 
   const state = {
     el,canvas,ctx,width:0,height:0,dpr:1,
+    originalBackgroundColor:getComputedStyle(el).backgroundColor,
+    originalBorderColor:getComputedStyle(el).borderTopColor,
+    originalBorderWidth:Math.max(1,parseFloat(getComputedStyle(el).borderTopWidth)||1),
+    originalLiquidFill:getComputedStyle(el).getPropertyValue('--liquid-fill').trim(),
     x:0,y:0,targetX:0,targetY:0,tailX:0,tailY:0,
     vx:0,vy:0,activity:0,phase:0,
     hover:false,focused:false,pressed:false,needsDraw:true
