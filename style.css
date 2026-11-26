@@ -3382,3 +3382,57 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .flux-meta,.flux-side{font-size:7px;letter-spacing:.15em;color:#b3c0ae}
 @media(max-width:700px){.flux-composition{left:4%;right:0;top:13%;bottom:11%}.flux-type{font-size:clamp(66px,17vw,112px);bottom:15%}.flux-bottomline{bottom:5%}}
 @media(prefers-reduced-motion:reduce){.art-vanta .vanta-sculpture,.art-flux .flux-sculpture{animation:none}}
+
+
+/* PROJECT DECK / 2026 — cover artwork aligned with the six live project cards */
+@media(min-width:1101px){
+  .project-orbit-node{width:clamp(290px,22vw,430px);height:clamp(360px,26vw,500px);border-radius:17px;padding:0}
+  .orbit-node-surface{padding:clamp(16px,1.35vw,25px);gap:0}
+  .orbit-node-code{font-size:clamp(7px,.48vw,9px);letter-spacing:.16em}
+  .orbit-art{margin:13px 0 12px;border-radius:11px}
+  .orbit-node-surface strong{font-size:clamp(25px,1.9vw,36px);letter-spacing:-.075em}
+  .orbit-node-surface>small{font-size:8px;margin-top:10px;letter-spacing:.15em}
+}
+.project-orbit-node{transform-origin:50% 50%;will-change:transform,opacity,filter}
+.orbit-node-surface{background:linear-gradient(155deg,rgba(255,255,255,.035),transparent 42%),radial-gradient(circle at 50% 38%,rgba(180,223,176,.055),transparent 65%)}
+.orbit-art{isolation:isolate;transition:filter .7s ease,background .7s ease}
+.project-orbit-node.is-current .orbit-art{filter:saturate(1.08) brightness(1.06)}
+/* AETHER — dark polished identity sphere with a restrained orbit system */
+.orbit-art-aether{background:radial-gradient(ellipse at 50% 55%,rgba(173,199,163,.22),transparent 52%),linear-gradient(145deg,#202a21,#070b08)!important}
+.orbit-art-aether:before{content:"";position:absolute;width:clamp(82px,7vw,128px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 28% 21%,#f5f8eb 0,#c1cfb8 5%,#566b56 16%,#d8e1ce 24%,#26372c 43%,#080e0a 62%,#9eae91 72%,#101a13 86%);box-shadow:inset -16px -19px 28px #020604,0 18px 36px rgba(0,0,0,.48),0 0 35px rgba(195,222,177,.12);z-index:2}
+.orbit-art-aether:after{content:"";position:absolute;width:70%;height:34%;border:1px solid rgba(218,232,209,.72);border-radius:50%;transform:rotate(-28deg);box-shadow:0 0 0 1px rgba(199,255,66,.08);z-index:3}
+.orbit-art-aether i{position:absolute;width:78%;height:48%;border:2px solid rgba(188,207,181,.65);border-radius:50%;transform:rotate(54deg);z-index:1}
+.orbit-art-aether b{position:absolute;width:88%;height:18%;border-top:1px solid rgba(199,255,66,.5);border-radius:50%;transform:rotate(-15deg);z-index:3}
+/* NØRD — light editorial cover, not a generic dark thumbnail */
+.orbit-art-nord{background:linear-gradient(138deg,#eef0e5 0%,#dce2d4 56%,#b5c1b0 100%)!important;color:#1a241b}
+.orbit-art-nord:before{content:"";position:absolute;inset:8%;border:1px solid rgba(30,44,31,.2);background:linear-gradient(90deg,transparent 49.8%,rgba(29,43,31,.08) 50%,transparent 50.2%)}
+.orbit-art-nord b{position:relative;z-index:2;font:800 clamp(27px,2.2vw,42px)/1 var(--sans);letter-spacing:-.105em;color:#263126}
+.orbit-art-nord i{z-index:3;width:25%;height:auto;aspect-ratio:1;right:7%;bottom:-8%;background:radial-gradient(circle at 30% 24%,#f7f4df,#b8c1a8 38%,#66725f 70%,#273328);box-shadow:0 12px 24px rgba(25,37,25,.24)}
+/* VANTA — current black-glass / machined-steel sculpture */
+.orbit-art-vanta{background:radial-gradient(ellipse at 50% 48%,rgba(112,137,115,.32),transparent 48%),linear-gradient(145deg,#202a22,#080d09)!important}
+.orbit-art-vanta:before{content:"";position:absolute;width:37%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 30% 23%,#9eab9b,#26352a 19%,#060a07 58%,#829181 76%,#0b100c 88%);box-shadow:inset -12px -14px 20px #020503,0 12px 26px rgba(0,0,0,.5);z-index:2}
+.orbit-art-vanta i{z-index:1;width:75%;height:34%;border-color:rgba(216,228,212,.78);box-shadow:0 0 10px rgba(199,255,66,.06)}
+.orbit-art-vanta i:nth-child(2){width:58%;height:76%;border-color:rgba(199,255,66,.6)}
+.orbit-art-vanta i:nth-child(3){width:88%;height:26%;border-color:rgba(205,218,201,.38);transform:rotate(14deg)}
+.orbit-art-vanta b{position:absolute;z-index:3;width:8px;height:8px;border-radius:50%;background:#c7ff42;box-shadow:0 0 16px rgba(199,255,66,.65)}
+/* FLUX — a single continuous chrome ribbon, with controlled silhouette */
+.orbit-art-flux{background:radial-gradient(ellipse at 55% 52%,rgba(157,181,136,.28),transparent 55%),linear-gradient(135deg,#243024,#0c120d)!important}
+.orbit-art-flux:before{content:"";position:absolute;width:82%;height:38%;border:1px solid rgba(229,238,218,.22);border-radius:50%;transform:rotate(-19deg)}
+.orbit-art-flux i{position:absolute;z-index:2;width:78%;height:28%;border-radius:50%;transform:rotate(-31deg);background:none;border:clamp(14px,1.3vw,23px) solid transparent;border-left-color:#dfe7d7;border-top-color:#82927b;border-right-color:#e9eee2;border-bottom-color:#354535;filter:drop-shadow(0 12px 12px rgba(0,0,0,.45))}
+.orbit-art-flux b{position:absolute;z-index:3;width:60%;height:12%;border-radius:50%;transform:rotate(21deg);background:linear-gradient(90deg,#263326,#f4f2e8 23%,#85947d 43%,#f4f3e9 61%,#344333 82%);filter:blur(.2px);box-shadow:0 10px 18px rgba(0,0,0,.35)}
+/* OBJECT 05 — layered tactile metal membranes */
+.orbit-art-object{background:linear-gradient(145deg,#e7eadf,#b5c1b0 62%,#788777)!important}
+.orbit-art-object:before{content:"05";position:absolute;left:7%;top:5%;font:800 clamp(45px,5vw,82px)/.8 var(--sans);letter-spacing:-.12em;color:rgba(26,42,28,.85)}
+.orbit-art-object i{width:28%;height:76%;border-radius:42% 58% 40% 60%;background:linear-gradient(105deg,#f6f8eb,#839681 25%,#edf0e3 46%,#50664f 70%,#f2f4e8);box-shadow:inset 8px 0 14px rgba(255,255,255,.65),8px 16px 22px rgba(24,39,25,.2);z-index:2}
+.orbit-art-object i:nth-child(1){transform:rotate(24deg) translateX(-20%)}
+.orbit-art-object i:nth-child(2){transform:rotate(-22deg) translateX(20%) scale(.86)}
+.orbit-art-object b{position:absolute;inset:10%;border:1px solid rgba(32,51,34,.32);transform:rotate(-17deg)}
+/* SØL — quiet horizon, soft mineral light */
+.orbit-art-sol{background:linear-gradient(155deg,#e8e6d8,#b5c0ad 55%,#536652)!important}
+.orbit-art-sol:before{content:"";position:absolute;left:0;right:0;bottom:23%;height:1px;background:rgba(29,47,31,.48);transform:rotate(-7deg);z-index:2}
+.orbit-art-sol i{position:relative;z-index:1;width:35%;height:auto;aspect-ratio:1;background:radial-gradient(circle at 29% 22%,#fffdf0,#e5e8d4 16%,#b4c1a9 42%,#6c8069 69%,#2d3c2e);box-shadow:0 18px 32px rgba(26,44,28,.28),0 0 42px rgba(255,255,232,.22)}
+.orbit-art-sol b{position:absolute;width:67%;height:26%;border:1px solid rgba(246,249,226,.8);border-radius:50%;transform:rotate(-25deg) scaleY(.42)}
+@media(max-width:1100px){
+  .project-orbit-node{transition:transform 1.05s cubic-bezier(.22,.75,.24,1),opacity .65s ease,filter .65s ease}
+}
+@media(prefers-reduced-motion:reduce){.orbit-art,.orbit-art:before,.orbit-art:after,.orbit-art i,.orbit-art b{transition:none!important}}
