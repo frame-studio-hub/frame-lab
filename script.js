@@ -962,7 +962,7 @@
   // Apply the reference liquid morph to every compact interactive button and CTA.
   // Structural controls (hamburger, modal close, orbit cards and index rows) keep their native geometry.
   // Every native button and button-like CTA uses one liquid surface system.
-  document.querySelectorAll('button, .header-contact, .start-button, #instagram-brief, .round-link').forEach(control => control.classList.add('liquid-cta'));
+  // Liquid CTA class is applied by the contour engine after it snapshots native styles.
 
   // Activate the existing glass/chrome/lime material controls in Creative Lab.
   const materialButtons = Array.from(document.querySelectorAll('[data-material-mode]'));
@@ -1152,6 +1152,9 @@ function isTransparent(color) {
 function fillOf(el,state) {
   const custom = state.originalLiquidFill;
   if (custom) return custom;
+  // Keep authored gradients and image fills intact beneath the transparent
+  // canvas; solid controls are repainted from their pre-engine color.
+  if (state.originalBackgroundImage && state.originalBackgroundImage !== 'none') return 'transparent';
   return state.originalBackgroundColor && !isTransparent(state.originalBackgroundColor)
     ? state.originalBackgroundColor : BASE;
 }
@@ -1261,8 +1264,8 @@ function contourFor(state) {
   // straight, detached stroke on wide buttons.
   const count = clamp(Math.round((width+height)*.92),112,256);
   const base = roundedRectContour(width,height,radius,count);
-  const reach = clamp(minSide*1.18,34,86);
-  const amplitude = Math.min(10.5,minSide*.15);
+  const reach = clamp(minSide*1.34,40,104);
+  const amplitude = Math.min(12,minSide*.17);
   const speed = Math.min(1,Math.hypot(state.vx,state.vy)/15);
   const phase = state.phase;
   const result = [];
@@ -1330,7 +1333,7 @@ function drawLocalContourRim(ctx,points,state,green) {
   ctx.lineJoin='round';
   ctx.lineWidth=green?1.35+speed*.45:1.15+speed*.35;
   ctx.shadowBlur=green?9:7;
-  ctx.shadowColor=green?'rgba(246,255,220,.42)':'rgba(244,226,232,.34)';
+  ctx.shadowColor=green?'rgba(199,164,255,.48)':'rgba(205,177,255,.42)';
   ctx.strokeStyle=green
     ? 'rgba(248,255,229,'+alpha+')'
     : 'rgba(250,239,242,'+alpha+')';
@@ -1339,7 +1342,7 @@ function drawLocalContourRim(ctx,points,state,green) {
   // A tiny specular point gives the contour a glass-like finish without a stripe.
   const mid=arc[Math.floor(arc.length*.5)];
   const dot=ctx.createRadialGradient(mid.x,mid.y,0,mid.x,mid.y,green?5.5:4.5);
-  dot.addColorStop(0,green?'rgba(255,255,237,'+(alpha*.72)+')':'rgba(255,248,248,'+(alpha*.62)+')');
+  dot.addColorStop(0,green?'rgba(244,232,255,'+(alpha*.72)+')':'rgba(248,239,255,'+(alpha*.68)+')');
   dot.addColorStop(1,'rgba(255,255,255,0)');
   ctx.fillStyle=dot;
   ctx.beginPath();
@@ -1380,18 +1383,18 @@ function draw(state) {
     const reach=clamp(Math.min(width,height)*1.12,44,116);
     const field=ctx.createRadialGradient(x-11-state.vx*1.3,y-9-state.vy*1.3,1,x,y,reach);
     if (green) {
-      field.addColorStop(0,'rgba(12,35,20,.86)');
-      field.addColorStop(.16,'rgba(21,52,30,.74)');
-      field.addColorStop(.38,'rgba(34,75,43,.49)');
-      field.addColorStop(.63,'rgba(75,105,54,.24)');
-      field.addColorStop(.84,'rgba(238,244,210,.10)');
-      field.addColorStop(1,'rgba(238,244,210,0)');
+      field.addColorStop(0,'rgba(91,69,132,.58)');
+      field.addColorStop(.18,'rgba(125,98,169,.48)');
+      field.addColorStop(.4,'rgba(157,132,194,.32)');
+      field.addColorStop(.68,'rgba(193,174,220,.17)');
+      field.addColorStop(.88,'rgba(222,210,239,.07)');
+      field.addColorStop(1,'rgba(222,210,239,0)');
     } else {
-      field.addColorStop(0,'rgba(238,210,213,.62)');
-      field.addColorStop(.18,'rgba(204,190,203,.48)');
-      field.addColorStop(.42,'rgba(151,159,177,.28)');
-      field.addColorStop(.7,'rgba(106,122,143,.12)');
-      field.addColorStop(1,'rgba(41,39,41,0)');
+      field.addColorStop(0,'rgba(111,86,151,.56)');
+      field.addColorStop(.18,'rgba(145,119,181,.46)');
+      field.addColorStop(.42,'rgba(177,155,205,.3)');
+      field.addColorStop(.7,'rgba(207,191,225,.15)');
+      field.addColorStop(1,'rgba(207,191,225,0)');
     }
     ctx.globalAlpha=activity*(green?.88:.58);
     ctx.fillStyle=field;
@@ -1400,36 +1403,21 @@ function draw(state) {
     const trailRadius=reach*.58;
     const trail=ctx.createRadialGradient(state.tailX,state.tailY,0,state.tailX,state.tailY,trailRadius);
     if (green) {
-      trail.addColorStop(0,'rgba(250,255,226,.34)');
-      trail.addColorStop(.3,'rgba(216,234,181,.22)');
-      trail.addColorStop(.68,'rgba(93,125,68,.11)');
-      trail.addColorStop(1,'rgba(93,125,68,0)');
+      trail.addColorStop(0,'rgba(237,222,255,.28)');
+      trail.addColorStop(.32,'rgba(204,181,235,.2)');
+      trail.addColorStop(.72,'rgba(153,126,190,.09)');
+      trail.addColorStop(1,'rgba(153,126,190,0)');
     } else {
-      trail.addColorStop(0,'rgba(239,224,225,.15)');
-      trail.addColorStop(.48,'rgba(177,181,195,.08)');
-      trail.addColorStop(1,'rgba(177,181,195,0)');
+      trail.addColorStop(0,'rgba(239,224,255,.3)');
+      trail.addColorStop(.34,'rgba(207,188,232,.2)');
+      trail.addColorStop(.72,'rgba(153,133,184,.09)');
+      trail.addColorStop(1,'rgba(153,133,184,0)');
     }
     ctx.globalAlpha=activity*(green?.78:.52);
     ctx.fillStyle=trail;
     ctx.fillRect(0,0,width,height);
 
-    // A narrow, polished reflection accelerates slightly with pointer speed.
-    const angle=Math.atan2(state.vy,state.vx);
-    const streak=clamp(Math.min(width,height)*(.18+Math.min(.06,Math.hypot(state.vx,state.vy)*.004)),5,20);
-    ctx.save();
-    ctx.translate(x-state.vx*1.5,y-state.vy*1.5);
-    ctx.rotate(angle);
-    ctx.beginPath();
-    ctx.ellipse(0,0,streak*1.9,Math.max(1.5,streak*.19),0,0,Math.PI*2);
-    const shine=ctx.createLinearGradient(-streak*2,0,streak*2,0);
-    shine.addColorStop(0,'rgba(255,255,255,0)');
-    shine.addColorStop(.36,green?'rgba(255,255,231,.12)':'rgba(255,245,241,.055)');
-    shine.addColorStop(.5,green?'rgba(255,255,245,.48)':'rgba(255,245,241,.2)');
-    shine.addColorStop(.64,green?'rgba(255,255,231,.12)':'rgba(255,245,241,.055)');
-    shine.addColorStop(1,'rgba(255,255,255,0)');
-    ctx.fillStyle=shine;
-    ctx.fill();
-    ctx.restore();
+
   }
 
   ctx.restore();
@@ -1458,13 +1446,13 @@ function render(time) {
     const engaged = state.hover || state.focused || state.pressed;
     const target = engaged ? 1 : 0;
     const oldX = state.x, oldY = state.y;
-    state.x = lerp(state.x,state.targetX,(engaged?.24:.14)*dt);
-    state.y = lerp(state.y,state.targetY,(engaged?.24:.14)*dt);
-    state.tailX = lerp(state.tailX,state.x,.075*dt);
-    state.tailY = lerp(state.tailY,state.y,.075*dt);
+    state.x = lerp(state.x,state.targetX,(engaged?.32:.17)*dt);
+    state.y = lerp(state.y,state.targetY,(engaged?.32:.17)*dt);
+    state.tailX = lerp(state.tailX,state.x,.105*dt);
+    state.tailY = lerp(state.tailY,state.y,.105*dt);
     state.vx = lerp(state.vx,(state.x-oldX)/Math.max(.45,dt),.25);
     state.vy = lerp(state.vy,(state.y-oldY)/Math.max(.45,dt),.25);
-    state.activity = lerp(state.activity,target,(engaged?.24:.12)*dt);
+    state.activity = lerp(state.activity,target,(engaged?.29:.14)*dt);
     state.phase += (engaged?.055:.024)*dt;
 
     if (engaged || state.activity > .002 || state.needsDraw) {
@@ -1480,6 +1468,14 @@ function render(time) {
 
 function init(el) {
   if (!(el instanceof Element) || states.has(el)) return;
+
+  // Snapshot native appearance before .liquid-cta CSS changes its paint.
+  const nativeStyle = getComputedStyle(el);
+  const nativeBackgroundColor = nativeStyle.backgroundColor;
+  const nativeBackgroundImage = nativeStyle.backgroundImage;
+  const nativeBorderColor = nativeStyle.borderTopColor;
+  const nativeBorderWidth = Math.max(1,parseFloat(nativeStyle.borderTopWidth)||1);
+  const nativeLiquidFill = nativeStyle.getPropertyValue('--liquid-fill').trim();
 
   // Orbit clones can copy the old canvas. Remove only that copied layer.
   el.querySelectorAll(':scope > canvas.liquid-canvas-layer').forEach(node=>node.remove());
@@ -1504,10 +1500,11 @@ function init(el) {
 
   const state = {
     el,canvas,ctx,width:0,height:0,dpr:1,
-    originalBackgroundColor:getComputedStyle(el).backgroundColor,
-    originalBorderColor:getComputedStyle(el).borderTopColor,
-    originalBorderWidth:Math.max(1,parseFloat(getComputedStyle(el).borderTopWidth)||1),
-    originalLiquidFill:getComputedStyle(el).getPropertyValue('--liquid-fill').trim(),
+    originalBackgroundColor:nativeBackgroundColor,
+    originalBackgroundImage:nativeBackgroundImage,
+    originalBorderColor:nativeBorderColor,
+    originalBorderWidth:nativeBorderWidth,
+    originalLiquidFill:nativeLiquidFill,
     x:0,y:0,targetX:0,targetY:0,tailX:0,tailY:0,
     vx:0,vy:0,activity:0,phase:0,
     hover:false,focused:false,pressed:false,needsDraw:true
