@@ -4118,3 +4118,94 @@ button,a{-webkit-tap-highlight-color:transparent}
 @media(prefers-reduced-motion:reduce){
   .project-card,.project-art,.service-item,.process-step,.project-info{transition:none!important}
 }
+
+
+/* CONTACT SECTION — restore contrast after dark palette override */
+.contact{
+  isolation:isolate;
+  position:relative;
+  color:#f0f0e9!important;
+  background:
+    radial-gradient(ellipse at 78% 38%,rgba(125,157,100,.14),transparent 38%),
+    radial-gradient(ellipse at 18% 82%,rgba(94,119,75,.07),transparent 42%),
+    linear-gradient(180deg,#0d110d 0%,#090c09 100%)!important;
+}
+.contact:before{
+  background:
+    radial-gradient(ellipse at 78% 28%,rgba(193,221,174,.12),transparent 30%),
+    linear-gradient(125deg,rgba(223,237,211,.035),transparent 42%,rgba(0,0,0,.2))!important;
+}
+.contact:after{
+  opacity:.1!important;
+  background-image:
+    linear-gradient(rgba(224,239,215,.12) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(224,239,215,.12) 1px,transparent 1px)!important;
+  background-size:72px 72px!important;
+}
+.contact-top{
+  color:#aab39f!important;
+  border-top-color:rgba(224,237,215,.18)!important;
+  position:relative;z-index:3;
+}
+.contact-title{
+  position:relative;z-index:3;
+  color:#f0f0e9!important;
+  text-shadow:0 12px 48px rgba(0,0,0,.32)!important;
+}
+.contact-title em{
+  color:transparent!important;
+  -webkit-text-stroke:1.2px rgba(201,255,74,.86)!important;
+  text-shadow:none!important;
+}
+.contact-art{
+  z-index:0;opacity:.62!important;
+  mix-blend-mode:screen!important;
+  filter:drop-shadow(0 28px 60px rgba(0,0,0,.32));
+}
+.contact-ring{border-color:rgba(201,255,74,.22)!important}
+.contact-ring.ring-b{border-color:rgba(230,239,220,.16)!important}
+.contact-glass{
+  background:radial-gradient(circle at 28% 25%,#dce8d0 0,#89977b 7%,#343d2e 23%,#10150e 53%,#879b70 68%,#151c12 80%)!important;
+  border:1px solid rgba(226,239,216,.22)!important;
+  box-shadow:inset -20px -30px 40px #050705,0 0 80px rgba(199,255,66,.12)!important;
+}
+.contact-light{opacity:.32!important}
+.contact-bottom{
+  position:relative;z-index:3;
+}
+.contact-bottom>p{color:#aeb7a4!important}
+.contact-social{color:#8e9987!important}
+.contact-social a{
+  color:#eef1e8!important;
+  border-bottom:1px solid rgba(224,237,215,.28)!important;
+}
+.contact-social a:hover{color:#c9ff4a!important}
+.contact .start-button{
+  background:#c9ff4a!important;
+  color:#10140c!important;
+  border:1px solid #c9ff4a!important;
+  box-shadow:0 10px 34px rgba(199,255,66,.12)!important;
+}
+.contact .start-button span,.contact .start-button b{color:#10140c!important}
+.contact .start-button:hover{
+  background:#dcff83!important;
+  border-color:#dcff83!important;
+  color:#10140c!important;
+  box-shadow:0 16px 42px rgba(199,255,66,.2)!important;
+}
+.contact .site-footer{
+  position:relative;z-index:3;
+  border-top-color:rgba(224,237,215,.17)!important;
+  color:#899386!important;
+}
+.contact .footer-brand,.contact .site-footer>a:last-child{
+  color:#f0f0e9!important;
+}
+.contact .footer-brand span{color:#c9ff4a!important}
+.contact .site-footer>a:hover{color:#c9ff4a!important}
+@media(max-width:650px){
+  .contact{min-height:730px}
+  .contact-title{color:#f0f0e9!important}
+  .contact-art{opacity:.42!important;right:-28%;top:22%}
+  .contact-bottom>p{color:#aeb7a4!important}
+}
