@@ -3937,3 +3937,184 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
   .hero-v44 .hero-stage:after{width:115%;height:58%;right:-25%;top:39%;transform:rotate(-23deg) scaleY(.7)}
   .hero-v44 .hero-copy:before{display:none}
 }
+
+/* FRAME LAB — design system pass v46 */
+:root{
+  --line-soft:rgba(231,239,222,.105);
+  --panel:rgba(21,26,19,.58);
+  --panel-strong:rgba(24,30,21,.82);
+  --lime-soft:rgba(199,255,66,.11);
+}
+html{scroll-padding-top:100px}
+body{
+  background:
+    radial-gradient(ellipse at 8% 28%,rgba(86,111,67,.055),transparent 34%),
+    radial-gradient(ellipse at 92% 63%,rgba(93,120,71,.045),transparent 36%),
+    #090b09;
+}
+main>section:not(.hero){position:relative;scroll-margin-top:80px}
+.section-kicker{
+  display:flex;align-items:center;justify-content:space-between;gap:24px;
+  padding-bottom:15px;border-bottom:1px solid var(--line-soft);
+  color:#aab19f;font-size:9px;letter-spacing:.15em;
+}
+.section-kicker span:first-child{color:var(--lime)}
+.section-kicker span:last-child{color:#737c6e;text-align:right}
+.display-heading{font-family:"Manrope","Space Grotesk",sans-serif;font-weight:750}
+.display-heading em{-webkit-text-stroke:1px rgba(226,235,218,.58)}
+.section-intro{max-width:330px;color:#a0a697;font-size:13px;line-height:1.9}
+.about{background:linear-gradient(180deg,rgba(15,19,14,.12),rgba(16,21,15,.42) 55%,rgba(9,11,9,0))}
+.about-grid{padding-top:clamp(65px,8vw,108px);padding-bottom:clamp(65px,8vw,100px)}
+.about-symbol{background:radial-gradient(circle at 45% 40%,rgba(199,255,66,.07),transparent 68%);box-shadow:0 0 55px rgba(199,255,66,.025)}
+.about-strip{border-color:var(--line-soft);color:#a5ad9b}
+.work{
+  background:
+    radial-gradient(ellipse at 50% 35%,rgba(75,95,61,.11),transparent 55%),
+    linear-gradient(180deg,rgba(16,20,15,.76),rgba(11,14,10,.9));
+  border-top:1px solid rgba(230,240,220,.045);
+  border-bottom:1px solid rgba(230,240,220,.045);
+}
+.work .section-heading-row{padding-top:clamp(65px,7.5vw,100px)}
+.project-card{position:relative}
+.project-art{
+  border:1px solid rgba(228,239,217,.12);
+  box-shadow:0 18px 55px rgba(0,0,0,.16);
+  transition:border-color .45s,box-shadow .55s,transform .55s cubic-bezier(.16,1,.3,1);
+}
+.project-art:before{
+  content:"";position:absolute;z-index:6;inset:0;pointer-events:none;
+  background:linear-gradient(135deg,rgba(238,247,230,.075),transparent 25%,transparent 72%,rgba(0,0,0,.2));
+  opacity:.55;transition:opacity .5s;
+}
+.project-card:hover .project-art,.project-card:focus-visible .project-art{
+  border-color:rgba(199,255,66,.42);
+  box-shadow:0 28px 75px rgba(0,0,0,.3),0 0 38px rgba(199,255,66,.055);
+}
+.project-card:hover .project-art:before,.project-card:focus-visible .project-art:before{opacity:1}
+.project-card:focus-visible{outline:2px solid var(--lime);outline-offset:7px}
+.project-info{padding:18px 2px 0;border-bottom:1px solid transparent;transition:border-color .35s,padding .35s}
+.project-card:hover .project-info{border-color:rgba(199,255,66,.2);padding-left:7px;padding-right:7px}
+.project-type{letter-spacing:.15em}
+.project-info h3{font-size:clamp(18px,2vw,24px);font-weight:600;letter-spacing:-.055em}
+.project-arrow{width:38px;height:38px;border-color:rgba(226,237,216,.2)}
+.project-view-controls,.project-orbit-heading,.project-orbit-foot{border-color:var(--line-soft)}
+.object-gallery{
+  background:
+    radial-gradient(ellipse at 50% 50%,rgba(71,91,59,.095),transparent 54%),
+    linear-gradient(180deg,#0b0e0b,#0d110d 50%,#0a0d0a);
+  border-bottom:1px solid rgba(230,240,220,.055);
+}
+.services{background:linear-gradient(180deg,rgba(10,13,10,.2),rgba(17,21,15,.52) 48%,rgba(10,13,10,.18))}
+.services-head{padding-top:clamp(65px,7.5vw,100px)}
+.service-list{border-top:1px solid var(--line-soft)}
+.service-item{
+  min-height:142px;
+  border-bottom:1px solid var(--line-soft);
+  transition:padding .45s cubic-bezier(.16,1,.3,1),background .45s,border-color .45s;
+}
+.service-item:hover,.service-item:focus-within{
+  padding-left:clamp(12px,2vw,24px);
+  background:linear-gradient(90deg,rgba(199,255,66,.055),rgba(199,255,66,.012) 48%,transparent 82%);
+  border-bottom-color:rgba(199,255,66,.24);
+}
+.service-main h3{font-weight:600}
+.service-result{color:#c5cbbb}
+.service-detail{filter:drop-shadow(0 10px 24px rgba(0,0,0,.22))}
+.process{
+  background:
+    radial-gradient(ellipse at 84% 46%,rgba(99,125,74,.1),transparent 42%),
+    linear-gradient(180deg,rgba(19,24,17,.82),rgba(12,15,11,.94));
+  border-top:1px solid var(--line-soft);border-bottom:1px solid var(--line-soft);
+}
+.process-heading{padding-top:clamp(65px,7.5vw,100px)}
+.process-promise{
+  border:1px solid rgba(222,237,210,.13);
+  background:linear-gradient(140deg,rgba(227,242,215,.045),rgba(227,242,215,.008));
+  padding:24px 27px;
+}
+.process-tabs,.process-detail{border-color:var(--line-soft)}
+.process-step{transition:background .35s,padding .35s,border-color .35s}
+.process-step:hover{background:linear-gradient(90deg,rgba(199,255,66,.045),transparent);padding-left:10px}
+.lab{
+  background:radial-gradient(ellipse at 82% 52%,rgba(85,111,66,.08),transparent 44%);
+}
+.lab-visual{
+  border-color:rgba(224,238,213,.2);
+  box-shadow:0 25px 75px rgba(0,0,0,.24),inset 0 0 60px rgba(199,255,66,.025);
+}
+.start-project{
+  background:linear-gradient(180deg,rgba(15,19,13,.16),rgba(18,23,16,.68));
+  border-top:1px solid var(--line-soft);
+}
+.planner-shell{
+  border-color:rgba(223,237,212,.2);
+  background:
+    radial-gradient(ellipse at 100% 0%,rgba(199,255,66,.055),transparent 42%),
+    linear-gradient(145deg,rgba(27,32,23,.9),rgba(10,12,9,.96));
+  box-shadow:0 30px 100px rgba(0,0,0,.28);
+}
+.choice-card{border-radius:3px}
+.choice-card:hover{box-shadow:0 12px 32px rgba(0,0,0,.2)}
+.reviews{
+  background:linear-gradient(180deg,rgba(10,13,10,.16),rgba(16,20,14,.5));
+  border-top:1px solid var(--line-soft);
+}
+.review-form-shell{
+  border-radius:4px;
+  background:linear-gradient(145deg,rgba(25,30,22,.78),rgba(10,12,9,.88));
+  border-color:rgba(226,239,216,.17);
+}
+.faq{
+  background:linear-gradient(180deg,rgba(18,23,16,.72),rgba(11,14,10,.86));
+}
+.faq-list details{transition:border-color .3s}
+.faq-list details[open]{border-bottom-color:rgba(199,255,66,.28)}
+.faq-list details p{font-size:12px;max-width:600px}
+.contact{
+  background:
+    radial-gradient(ellipse at 78% 38%,rgba(137,165,105,.1),transparent 39%),
+    linear-gradient(180deg,#0b0e0a,#080a08);
+  border-top:1px solid var(--line-soft);
+}
+.contact-title{font-family:"Manrope","Space Grotesk",sans-serif}
+.site-footer{border-top-color:rgba(224,237,213,.18)}
+:where(a,button,input,textarea,select,summary,[tabindex]):focus-visible{
+  outline:2px solid rgba(199,255,66,.8);outline-offset:4px;
+}
+button,a{-webkit-tap-highlight-color:transparent}
+@media(hover:hover) and (pointer:fine){
+  .project-card:hover{transform:translateY(-5px)}
+  .service-item:hover .service-plus{color:var(--lime)}
+}
+@media(max-width:900px){
+  .section-kicker{font-size:8px}
+  .service-item{min-height:158px}
+}
+@media(max-width:650px){
+  html{scroll-padding-top:76px}
+  .section-kicker{padding-bottom:12px;font-size:7px;letter-spacing:.1em}
+  .display-heading{font-size:clamp(45px,12vw,74px);line-height:.91}
+  .section-intro{font-size:11px;line-height:1.8}
+  .about-grid{padding-top:48px;padding-bottom:44px}
+  .work .section-heading-row,.services-head,.process-heading,.start-heading,.reviews-heading{padding-top:45px;padding-bottom:32px}
+  .project-art,.project-wide .project-art{border-radius:3px}
+  .project-card:hover{transform:none}
+  .project-card:hover .project-info{padding-left:2px;padding-right:2px}
+  .service-item,.service-item:hover,.service-item:focus-within{
+    min-height:0;padding:20px 15px;background:rgba(229,239,218,.018);
+    border:1px solid rgba(224,237,213,.12);border-radius:3px;
+  }
+  .service-item+.service-item{margin-top:8px}
+  .service-num{padding-top:3px}
+  .process-promise{padding:18px;margin-top:12px}
+  .lab-visual{height:min(108vw,430px)}
+  .planner-shell{padding:19px 15px;border-radius:3px}
+  .choice-card{min-height:122px;padding:14px}
+  .review-form-shell{padding:20px 15px;border-radius:3px}
+  .faq-list summary{padding:21px 2px 21px 0}
+  .contact-title{font-size:clamp(48px,12.5vw,82px);line-height:.9}
+  .site-footer{gap:16px}
+}
+@media(prefers-reduced-motion:reduce){
+  .project-card,.project-art,.service-item,.process-step,.project-info{transition:none!important}
+}
